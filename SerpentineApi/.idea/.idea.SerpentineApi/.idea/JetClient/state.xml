@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JetClientState">
+    <option name="draftsState">
+      <draftsState>
+        <option name="requests">
+          <list>
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  &quot;userName&quot;: &quot;breiddy&quot;,&#10;  &quot;password&quot;: &quot;12345678&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="id" value="c3dec465-b5a9-48dd-916d-9381d2561cd1" />
+              <option name="method" value="POST" />
+              <option name="name" value="Draft" />
+              <option name="url" value="http://localhost:5084/api/user/authenticate" />
+            </requestState>
+          </list>
+        </option>
+      </draftsState>
+    </option>
+    <option name="id" value="8d36f3c9-a7eb-435c-8d3c-3eb82aefe9d6" />
+    <option name="version" value="6" />
+  </component>
+</project>

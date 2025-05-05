@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="History">
+    <option name="requestHistoryStates">
+      <list>
+        <requestHistoryState>
+          <option name="dateTime" value="1746396288602" />
+          <option name="id" value="566d37f4-e7e0-406c-9327-1af171365f6c" />
+          <option name="request">
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  &quot;userName&quot;: &quot;brei&quot;,&#10;  &quot;password&quot;: &quot;hola&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="id" value="c3dec465-b5a9-48dd-916d-9381d2561cd1" />
+              <option name="method" value="POST" />
+              <option name="name" value="Draft" />
+              <option name="url" value="http://localhost:5084/user/authenticate" />
+            </requestState>
+          </option>
+          <option name="response">
+            <responseState>
+              <option name="code" value="404" />
+              <option name="connectionEstablishingTime" value="243" />
+              <option name="contentType" value="application/octet-stream" />
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Length" />
+                    <option name="value" value="0" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Date" />
+                    <option name="value" value="Sun, 04 May 2025 22:04:47 GMT" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Server" />
+                    <option name="value" value="Kestrel" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="566d37f4-e7e0-406c-9327-1af171365f6c" />
+              <option name="message" value="Not Found" />
+              <option name="time" value="254" />
+            </responseState>
+          </option>
+          <option name="workspaceId" value="drafts" />
+        </requestHistoryState>
+        <requestHistoryState>
+          <option name="dateTime" value="1746396423129" />
+          <option name="id" value="19fec270-b830-4775-88b4-69660fc4e7d1" />
+          <option name="request">
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  &quot;userName&quot;: &quot;brei&quot;,&#10;  &quot;password&quot;: &quot;hola&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="id" value="c3dec465-b5a9-48dd-916d-9381d2561cd1" />
+              <option name="method" value="POST" />
+              <option name="name" value="Draft" />
+              <option name="url" value="http://localhost:5084/api/user/authenticate" />
+            </requestState>
+          </option>
+          <option name="response">
+            <responseState>
+              <option name="code" value="200" />
+              <option name="contentType" value="application/octet-stream" />
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Length" />
+                    <option name="value" value="0" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Date" />
+                    <option name="value" value="Sun, 04 May 2025 22:07:02 GMT" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Server" />
+                    <option name="value" value="Kestrel" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="19fec270-b830-4775-88b4-69660fc4e7d1" />
+              <option name="message" value="OK" />
+              <option name="time" value="16" />
+            </responseState>
+          </option>
+          <option name="workspaceId" value="drafts" />
+        </requestHistoryState>
+        <requestHistoryState>
+          <option name="dateTime" value="1746396769967" />
+          <option name="id" value="3d3185fc-af00-4f84-b4fa-20ca3c470b5b" />
+          <option name="request">
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  &quot;userName&quot;: &quot;brei&quot;,&#10;  &quot;password&quot;: &quot;hola&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="id" value="c3dec465-b5a9-48dd-916d-9381d2561cd1" />
+              <option name="method" value="POST" />
+              <option name="name" value="Draft" />
+              <option name="url" value="http://localhost:5084/api/user/authenticate" />
+            </requestState>
+          </option>
+          <option name="response">
+            <responseState>
+              <option name="code" value="200" />
+              <option name="connectionEstablishingTime" value="16" />
+              <option name="contentType" value="application/octet-stream" />
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Length" />
+                    <option name="value" value="0" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Date" />
+                    <option name="value" value="Sun, 04 May 2025 22:12:49 GMT" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Server" />
+                    <option name="value" value="Kestrel" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="3d3185fc-af00-4f84-b4fa-20ca3c470b5b" />
+              <option name="message" value="OK" />
+              <option name="time" value="40809" />
+            </responseState>
+          </option>
+          <option name="workspaceId" value="drafts" />
+        </requestHistoryState>
+        <requestHistoryState>
+          <option name="dateTime" value="1746397919731" />
+          <option name="id" value="3ff899f1-020c-49fe-bdef-419bbf9a7540" />
+          <option name="request">
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  &quot;userName&quot;: &quot;breiddy&quot;,&#10;  &quot;password&quot;: &quot;12345678&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="id" value="c3dec465-b5a9-48dd-916d-9381d2561cd1" />
+              <option name="method" value="POST" />
+              <option name="name" value="Draft" />
+              <option name="url" value="http://localhost:5084/api/user/authenticate" />
+            </requestState>
+          </option>
+          <option name="response">
+            <responseState>
+              <option name="bodyBytesBase64" value="eyJtZXNzYWdlIjoiSW52YWxpZCBSZXF1ZXN0Iiwic3RhdHVzQ29kZSI6NDIyLCJlcnJvcnMiOltdfQ==" />
+              <option name="bodyString" value="{&#10;  &quot;message&quot;: &quot;Invalid Request&quot;,&#10;  &quot;statusCode&quot;: 422,&#10;  &quot;errors&quot;: []&#10;}" />
+              <option name="code" value="400" />
+              <option name="connectionEstablishingTime" value="7" />
+              <option name="contentType" value="application/json; charset=utf-8" />
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Type" />
+                    <option name="value" value="application/json; charset=utf-8" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Date" />
+                    <option name="value" value="Sun, 04 May 2025 22:31:59 GMT" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Server" />
+                    <option name="value" value="Kestrel" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Transfer-Encoding" />
+                    <option name="value" value="chunked" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="3ff899f1-020c-49fe-bdef-419bbf9a7540" />
+              <option name="message" value="Bad Request" />
+              <option name="prettyResponseType" value="JSON" />
+              <option name="rawBodyString" value="{&quot;message&quot;:&quot;Invalid Request&quot;,&quot;statusCode&quot;:422,&quot;errors&quot;:[]}" />
+              <option name="size" value="58" />
+              <option name="time" value="676" />
+            </responseState>
+          </option>
+          <option name="workspaceId" value="drafts" />
+        </requestHistoryState>
+      </list>
+    </option>
+  </component>
+</project>
