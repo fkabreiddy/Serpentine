@@ -3,13 +3,20 @@ import {Button} from "@heroui/button";
 import {Input} from "@heroui/input";
 import LoginUserRequest from "@/models/requests/user/login-user-request";
 import { useLoginUser } from "../../hooks/user-hooks";
-export default function LoginForm() {
+import { Spinner } from "@heroui/spinner";
+
+interface LoginFormProps{
+
+    onViewChange : () => void
+}
+
+const LoginForm : React.FC<LoginFormProps> = ({onViewChange}) => {
     const [loginUserRequest, setLoginUserRequest] = React.useState<LoginUserRequest>({
         userName: "",
         password: ""
     });
 
-    const { login, data, loading, isSuccess, message, errors } = useLoginUser();
+    const { login, loading, } = useLoginUser();
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,12 +33,16 @@ export default function LoginForm() {
        
     };
 
-    const passwordIcon : React.ReactNode = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" className={"size-4"}>
-    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+    const handleViewChange = () => {
+        onViewChange();
+    }
+
+    const passwordIcon : React.ReactNode = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.7" stroke="currentColor" className={"size-4"}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
   </svg>
 
-    const userIcon : React.ReactNode =<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className={"size-5"}>
-    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25" />
+    const userIcon : React.ReactNode =<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={"size-5"}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25" />
     </svg>
 
    
@@ -39,7 +50,7 @@ export default function LoginForm() {
 
     return(
         <>
-            <p className={"text-xl my-2 font-semibold"}>Welcome to Serpentine</p>
+            <p className={"text-2xl my-2 font-semibold"}>Welcome to Serpentine</p>
             <form onSubmit={handleSubmit} className="w-[40%] max-sm:w-full flex flex-col  gap-3  mt-4">
            
                 <div className="flex flex-col gap-1">
@@ -77,9 +88,20 @@ export default function LoginForm() {
                         />
                 </div>
 
-                <Button isDisabled={loading || loginUserRequest.password === "" || loginUserRequest.userName === ""} color="primary" type="submit" className="w-full transition-all hover:scale-[105%] mt-4 text-sm font-semibold" variant="solid" size="sm">
-                    Login   
-                </Button>
+                {loading ? 
+                
+                    <Spinner color="default" size="sm"  classNames={{label: "text-foreground mt-4"}}  variant="spinner" />
+
+                :
+                
+                    <Button isDisabled={loading || loginUserRequest.password === "" || loginUserRequest.userName === ""} color="primary" type="submit" className="w-full transition-all hover:scale-[105%] mt-4 text-sm font-semibold" variant="solid" size="sm">
+                    
+                     Login   
+
+                    </Button>
+                }
+               
+               <p onClick={handleViewChange} className="text-sm font-normal text-center underline text-blue-600 cursor-pointer">Create an account</p>
 
                 
             </form>
@@ -88,3 +110,5 @@ export default function LoginForm() {
         </>
     )
 }
+
+export default LoginForm;

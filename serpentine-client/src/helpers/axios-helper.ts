@@ -2,6 +2,7 @@ import api from "@/config/axios-config";
 import ApiResult from "@/models/api-result";
 import { useEffect, useState } from "react";
 import {addToast} from "@heroui/toast";
+import { AxiosError, isAxiosError } from "axios";
 
 const showToast = (title: string, description: string) => {
 
@@ -14,42 +15,55 @@ const showToast = (title: string, description: string) => {
 
 
 
-export function usePost<T>() {
-    const [data, setData] = useState<T | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState<string | null>(null);
-    const [errors, setErrors] = useState<string[]>([]);
-    const [isSuccess, setIsSuccess] = useState(false);
+export function usePost<T>()  {
   
-    const post = async (url: string, body: any, token: string = "") => {
-      setLoading(true);
-      setErrors([]);
-      setMessage(null);
-      setIsSuccess(false);
-  
+    
+   
+    const post = async (url: string, body: any, token: string = "") : Promise<ApiResult<T>> => {
+      
+
       try {
         const response = await api.post<ApiResult<T>>(url, body, {
           headers: {
-            "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
+          
   
-        if (response.data.statusCode !== 200) {
-          setMessage(response.data.message);
-          setErrors(response.data.errors);
-          showToast("Error", response.status + " " + response.data.message);
-        } else {
-          setData(response.data.data);
-          setIsSuccess(true);
+        if(response.data.statusCode === 401) {
+          showToast("Error", "You are not authorized to perform this action.");
         }
-      } catch (err) {
-        showToast("Error", "Error de conexión con el servidor.");
 
-      } finally {
-        setLoading(false);
-      }
+       return response.data;
+       
+      } 
+      catch (error ) 
+      { 
+
+        
+
+        if (isAxiosError(error)) {
+          const result = error.response?.data as ApiResult<T>;
+
+          return result;
+         
+        }
+        else
+        {
+          return {
+            statusCode: 500,
+            message: "Error de conexión con el servidor.",
+            errors: [],
+            data: null,
+          }
+        }
+       
+       
+
+      } 
     };
+
+    return { post};
   
-    return { post, data, loading, isSuccess, message, errors };
+  
   }
