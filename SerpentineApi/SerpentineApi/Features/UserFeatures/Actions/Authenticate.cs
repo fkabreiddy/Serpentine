@@ -80,10 +80,10 @@ internal class AuthenticateUserEndpoint : IEndpoint
 
                         if (token is null)
                         {
-                            return Results.BadRequest(new BadRequestApiResult("Error creating token"));
+                            return Results.BadRequest(new BadRequestApiResult(){Message = "Error creating token"});
                         }
                         
-                        return Results.Ok(new SuccessApiResult<Jwt>(token));
+                        return Results.Ok(new SuccessApiResult<Jwt>(){Data = token});
                     });
                 }
         )
@@ -94,7 +94,7 @@ internal class AuthenticateUserEndpoint : IEndpoint
         .Produces<NotFoundApiResult>(404)
         .Produces<BadRequestApiResult>(400)
         .Produces<ServerErrorApiResult>(500)
-        .Produces<ValidationApiResult>(422)
+        .Produces<ValidationApiResult>(400)
         .WithName(nameof(AuthenticateUserEndpoint));
     }
 
@@ -103,7 +103,7 @@ internal class AuthenticateUserEndpoint : IEndpoint
 
 }
 
-internal class AuthenticateUserCommandHandler()
+internal class AuthenticateUserRequestHandler()
     : IEndpointHandler<AuthenticateUserRequest, OneOf<UserResponse, IApiResult>>
 {
     public async Task<OneOf<UserResponse, IApiResult>> HandleAsync(
@@ -117,6 +117,6 @@ internal class AuthenticateUserCommandHandler()
             return userResponse;
         }
 
-        return new NotFoundApiResult("Invalid credentials");
+        return new NotFoundApiResult(){Message = "Invalid credentials"};
     }
 }

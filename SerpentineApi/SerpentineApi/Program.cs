@@ -60,7 +60,10 @@ app.UseExceptionHandler(appError =>
         {
             logger.LogError($"Server error: {contextFeature.Error.Message}");
            
-            await context.Response.WriteAsJsonAsync(new ServerErrorApiResult(errors: [contextFeature.Error.Message]));
+            await context.Response.WriteAsJsonAsync(new ServerErrorApiResult()
+            {
+                Errors = [contextFeature.Error.Message]
+            });
         }
     });
 });

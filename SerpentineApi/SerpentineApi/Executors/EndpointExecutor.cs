@@ -34,19 +34,26 @@ public class EndpointExecutor<T>
         catch (FluentValidation.ValidationException ex)
         {
             caughtException = ex;
-           
-            return Results.BadRequest(new ValidationApiResult(
-                "Invalid Request", 
-                ex.Errors.Select(e => e.ErrorMessage).ToList()));
+
+            return Results.BadRequest(new ValidationApiResult()
+            {
+                Message = "Invalid Request",
+                Errors = ex.Errors.Select(e => e.ErrorMessage).ToList()
+            });
+
+
         }
         catch (Exception e)
         {
             caughtException = e;
 
             return ResultsBuilder.Match<T>(
-               new ServerErrorApiResult(errors: new (){e.InnerException?.Message ?? e.Message})
+                new ServerErrorApiResult()
+                {
+                    Errors = new() { e.InnerException?.Message ?? e.Message }
+                }
             );
-            
+
         }
         finally
         {
