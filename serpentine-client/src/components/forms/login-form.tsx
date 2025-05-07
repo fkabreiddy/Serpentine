@@ -46,6 +46,8 @@ const LoginForm : React.FC<LoginFormProps> = ({onViewChange}) => {
     </svg>
 
    
+
+   
     
 
     return(
