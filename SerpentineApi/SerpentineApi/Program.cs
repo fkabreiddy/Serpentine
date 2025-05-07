@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
 using SerpentineApi;
-using SerpentineApi.Utilities;
 using Scalar.AspNetCore;
 using SerpentineApi.Dependencies;
 
@@ -13,7 +12,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "default", policy =>
     {
-        policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5000").AllowAnyMethod().AllowAnyHeader();
     });
 });
 

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SerpentineApi.DataAccess.Models;
+﻿namespace SerpentineApi.DataAccess.Models;
 
 public abstract class BaseEntity
 {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using SerpentineApi.DataAccess.Context;
 
 namespace SerpentineApi.Dependencies;
 

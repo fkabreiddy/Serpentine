@@ -3,12 +3,10 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using SerpentineApi.Responses;
-using SerpentineApi.Utilities;
 
 namespace SerpentineApi.Identity;
 
-public class JwtBuilder(IOptions<JwtSettings> jwtSettings, ILogger<JwtBuilder> logger)
+public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
 {
     
     private JwtSettings _jwtSettings = jwtSettings.Value;
@@ -32,7 +30,7 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings, ILogger<JwtBuilder> l
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                     new Claim(
                         JwtRegisteredClaimNames.Picture,
-                        user.ProfilePictureUrl ?? string.Empty
+                        user.ProfilePictureUrl
                     ),
                     new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                 ]

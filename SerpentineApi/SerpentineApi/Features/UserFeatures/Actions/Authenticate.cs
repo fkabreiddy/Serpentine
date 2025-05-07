@@ -1,25 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using FluentValidation;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
-using SerpentineApi.Executors;
 using SerpentineApi.Helpers;
 using SerpentineApi.Identity;
-using SerpentineApi.Responses;
-using SerpentineApi.Utilities;
 
 namespace SerpentineApi.Features.UserFeatures.Actions;
 
 public class AuthenticateUserRequest : IRequest<OneOf<UserResponse, IApiResult>>
 {
-    
-    [Required, FromBody, JsonPropertyName("userName"), MaxLength(30), MinLength(3), RegularExpression("^[a-zA-Z0-9._]+$")]
-    public string Username { get; set; }
-    
+
+    [Required, FromBody, JsonPropertyName("userName"), MaxLength(30), MinLength(3),
+     RegularExpression("^[a-zA-Z0-9._]+$")]
+    public string Username { get; set; } = null!;
+
     [Required, FromBody, MaxLength(30), JsonPropertyName("password"), MinLength(8)]
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 }
 
 public class GetChannelActiveUsersQueryValidator : AbstractValidator<AuthenticateUserRequest>
@@ -83,12 +78,13 @@ internal class AuthenticateUserEndpoint : IEndpoint
                             return Results.BadRequest(new BadRequestApiResult(){Message = "Error creating token"});
                         }
                         
-                        return Results.Ok(new SuccessApiResult<Jwt>(){Data = token});
+                        return Results.Ok(new SuccessApiResult<Jwt>(token));
                     });
                 }
         )
         .DisableAntiforgery()
         .AllowAnonymous()
+        .RequireCors()
         .Accepts<AuthenticateUserRequest>(false, "application/json")
         .Produces<SuccessApiResult<Jwt>>(200)
         .Produces<NotFoundApiResult>(404)
@@ -103,7 +99,10 @@ internal class AuthenticateUserEndpoint : IEndpoint
 
 }
 
-internal class AuthenticateUserRequestHandler()
+internal class AuthenticateUserRequestHandler(
+    DbContextAccessor<User> dbContextAccessor
+
+    )
     : IEndpointHandler<AuthenticateUserRequest, OneOf<UserResponse, IApiResult>>
 {
     public async Task<OneOf<UserResponse, IApiResult>> HandleAsync(
@@ -111,12 +110,18 @@ internal class AuthenticateUserRequestHandler()
         CancellationToken cancellationToken = default
     )
     {
-        if (request.Password == "12345678" && request.Username == "breiddy")
-        {
-            var userResponse = new UserResponse { Id = 1, Username = "fka.breiddy" };
-            return userResponse;
-        }
 
-        return new NotFoundApiResult(){Message = "Invalid credentials"};
+        var hashedPassword = request.Password.Hash();
+        var user = await dbContextAccessor.GetAnyAsync(
+            u => u.Username == request.Username.ToLower().Trim() && u.Password == hashedPassword,
+            cancellationToken: cancellationToken);
+        
+        
+        if(user is null)
+            return new NotFoundApiResult(){Message = "Invalid credentials"};
+
+        return new SuccessApiResult<UserResponse>(user.ToResponse());
     }
+
+  
 }

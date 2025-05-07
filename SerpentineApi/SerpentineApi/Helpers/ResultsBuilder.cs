@@ -1,6 +1,4 @@
-﻿using SerpentineApi.Utilities;
-
-namespace SerpentineApi.Helpers;
+﻿namespace SerpentineApi.Helpers;
 
 public class ResultsBuilder
 {

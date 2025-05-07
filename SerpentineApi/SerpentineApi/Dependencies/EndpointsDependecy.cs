@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SerpentineApi.Executors;
 using SerpentineApi.Features;
 
 namespace SerpentineApi.Dependencies;

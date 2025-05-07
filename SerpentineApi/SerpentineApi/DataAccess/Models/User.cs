@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using SerpentineApi.Features.UserFeatures.Actions;
+﻿using SerpentineApi.Features.UserFeatures.Actions;
 
 namespace SerpentineApi.DataAccess.Models;
 
@@ -19,13 +18,15 @@ public class User : BaseEntity
     
     [Required, Range(16, 100)]
     public int Age { get; set; }
+    
+    
 
     public UserResponse ToResponse() => new()
     {
         FullName = FullName,
         Username = Username,
-        ProfilePictureUrl = ProfilePictureUrl ?? string.Empty,
-        Age = Age
+        ProfilePictureUrl = ProfilePictureUrl ?? "",
+        Age = Age,
     };
 
     public static User Create(CreateUserRequest request)
@@ -35,7 +36,6 @@ public class User : BaseEntity
             FullName = request.FullName.Trim(),
             Username = request.Username.Trim(),
             Password = request.Password.Trim(),
-            ProfilePictureUrl = request.ProfilePictureUrl ,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now
         };
