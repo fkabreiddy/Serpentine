@@ -8,7 +8,7 @@ public class User : BaseEntity
     [Required, MaxLength(30), MinLength(3), RegularExpression(@"^[a-zA-Z0-9._]+$")]
     public string Username { get; set; } = null!;
     
-    [Required, MaxLength(30), MinLength(8)]
+    [Required, MinLength(1)]
     public string Password { get; set; } = null!;
     
     public string? ProfilePictureUrl { get; set; }
@@ -23,6 +23,7 @@ public class User : BaseEntity
 
     public UserResponse ToResponse() => new()
     {
+        Id = Id,
         FullName = FullName,
         Username = Username,
         ProfilePictureUrl = ProfilePictureUrl ?? "",
@@ -35,7 +36,7 @@ public class User : BaseEntity
             Age = request.Age,
             FullName = request.FullName.Trim(),
             Username = request.Username.Trim(),
-            Password = request.Password.Trim(),
+            Password = request.Password.Hash(),
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now
         };

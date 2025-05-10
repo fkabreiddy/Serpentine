@@ -23,6 +23,7 @@ export default function IndexPage() {
         </div>
         <div className="w-full flex overflow-auto scrollbar-hide  items-center   justify-center flex-col h-fit  max-h-full max-sm:max-h-fit px-6 py-6">
           <ThemeSwitch/>
+          <div className="grain w-4 h-4 absolute inset-0"></div>
           {view === "login" ? <LoginForm onViewChange={handleViewChange}/> : <><CreateUserForm  onViewChanged={handleViewChange}/></> }
         </div>
      </div>

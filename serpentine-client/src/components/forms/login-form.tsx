@@ -4,6 +4,7 @@ import {Input} from "@heroui/input";
 import LoginUserRequest from "@/models/requests/user/login-user-request";
 import { useLoginUser } from "../../hooks/user-hooks";
 import { Spinner } from "@heroui/spinner";
+import * as motion from "motion/react-client"
 
 interface LoginFormProps{
 
@@ -51,8 +52,15 @@ const LoginForm : React.FC<LoginFormProps> = ({onViewChange}) => {
     
 
     return(
-        <>
-            <p className={"text-2xl my-2 font-semibold"}>Welcome to Serpentine</p>
+        <motion.div
+        initial={{ opacity: 0, }}
+        animate={{ opacity: 1, }}
+        transition={{ duration: 0.5 }}
+        className="w-full flex flex-col relative items-center justify-center "
+        >
+           
+                 <p className={"text-2xl my-2 font-semibold"}>Welcome to Serpentine</p>
+           
             <form onSubmit={handleSubmit} className="w-[40%] max-sm:w-full flex flex-col  gap-3  mt-4">
            
                 <div className="flex flex-col gap-1">
@@ -72,23 +80,28 @@ const LoginForm : React.FC<LoginFormProps> = ({onViewChange}) => {
                         />
                 </div>
 
+               
                 <div className="flex flex-col gap-1">
-                    <label className="text-sm font-semibold ml-1 text-start">Password</label>
-                    <Input
-                        type="password"
-                        onChange={handleChange}
-                        placeholder="Enter your password"
-                        name="password"
-                        endContent={passwordIcon}
-                        minLength={8}
-                        maxLength={30}
-                        radius="md"
-                        required={true}
+                                <label className="text-sm font-semibold ml-1 text-start">Password</label>
+                                <Input
+                                    type="password"
+                                    onChange={handleChange}
+                                    placeholder="Enter your password"
+                                    name="password"
+                                    endContent={passwordIcon}
+                                    minLength={8}
+                                    maxLength={30}
+                                    radius="md"
+                                    required={true}
 
-                    
-                        description="Password must be at least 8 characters."
-                        />
-                </div>
+                                
+                                    description="Password must be at least 8 characters."
+                                    />
+                            </div>
+
+             
+
+               
 
                 {loading ? 
                 
@@ -109,7 +122,7 @@ const LoginForm : React.FC<LoginFormProps> = ({onViewChange}) => {
             </form>
 
 
-        </>
+        </motion.div>
     )
 }
 

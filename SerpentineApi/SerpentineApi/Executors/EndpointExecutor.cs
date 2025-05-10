@@ -31,7 +31,7 @@ public class EndpointExecutor<T>
         {
             caughtException = ex;
 
-            return Results.BadRequest(new ValidationApiResult()
+            return Results.UnprocessableEntity(new ValidationApiResult()
             {
                 Message = "Invalid Request",
                 Errors = ex.Errors.Select(e => e.ErrorMessage).ToList()

@@ -25,12 +25,26 @@ public class CreateUserRequest : IRequest<OneOf<UserResponse, IApiResult>>
     [Required, JsonPropertyName("fullName"), MaxLength(30), MinLength(10), RegularExpression(@"^[\p{L}\p{M}0-9\s]+$"), FromForm]
     public string FullName { get; set; } = null!;
     
-    [Required, JsonPropertyName("age"), Range(16, 100), FromForm]
-    public int Age { get; set; }
+   [BindNever, JsonIgnore]
+    public int Age
+    {
+        get
+        {
+            var today = DateTime.Today;
+            var age = today.Year - DateOfBirth.Year;
+            if (DateOfBirth.Date > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
+        }
+    }
     
     [JsonPropertyName("imageFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
     public IFormFile? ImageFile { get; set; }
 
+    [Required, JsonPropertyName("dateOfBirth"), FromForm]
+    public DateTime DateOfBirth { get; set; } = DateTime.Now;
    
 
 }
@@ -118,7 +132,7 @@ public class CreateUserEndpoint : IEndpoint
             .Produces<ConflictApiResult>(409, "application/json")
             .Produces<BadRequestApiResult>(400, "application/json")
             .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(400, "application/json")
+            .Produces<ValidationApiResult>(422, "application/json")
             .WithName(nameof(CreateUserEndpoint));
     }
 }
@@ -156,7 +170,7 @@ internal class CreateUserRequestHandler(
                 {
 
                     result.Entity.ProfilePictureUrl = imageUploaded.Data;
-                    await context.SaveChangesAsync(cancellationToken);
+                    await context.SaveChangesAsync();
                 }
             }
             

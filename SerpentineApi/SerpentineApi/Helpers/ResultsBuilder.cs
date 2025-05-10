@@ -23,7 +23,7 @@ public class ResultsBuilder
 
           
             case ValidationApiResult:
-                return Results.BadRequest(apiResult);
+                return Results.UnprocessableEntity(apiResult);
 
             default:
                 return Results.BadRequest(apiResult);

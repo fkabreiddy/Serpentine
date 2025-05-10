@@ -17,9 +17,9 @@ public class AuthenticateUserRequest : IRequest<OneOf<UserResponse, IApiResult>>
     public string Password { get; set; } = null!;
 }
 
-public class GetChannelActiveUsersQueryValidator : AbstractValidator<AuthenticateUserRequest>
+public class AuthenticateUserRequestValidator : AbstractValidator<AuthenticateUserRequest>
 {
-    public GetChannelActiveUsersQueryValidator()
+    public AuthenticateUserRequestValidator()
     {
     
         RuleFor(x => x.Username)
@@ -90,7 +90,7 @@ internal class AuthenticateUserEndpoint : IEndpoint
         .Produces<NotFoundApiResult>(404)
         .Produces<BadRequestApiResult>(400)
         .Produces<ServerErrorApiResult>(500)
-        .Produces<ValidationApiResult>(400)
+        .Produces<ValidationApiResult>(422)
         .WithName(nameof(AuthenticateUserEndpoint));
     }
 
@@ -113,7 +113,7 @@ internal class AuthenticateUserRequestHandler(
 
         var hashedPassword = request.Password.Hash();
         var user = await dbContextAccessor.GetAnyAsync(
-            u => u.Username == request.Username.ToLower().Trim() && u.Password == hashedPassword,
+            u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim() && u.Password == hashedPassword,
             cancellationToken: cancellationToken);
         
         
