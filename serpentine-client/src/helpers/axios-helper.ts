@@ -1,138 +1,127 @@
 import api from "@/config/axios-config";
 import ApiResult from "@/models/api-result";
-import { useEffect, useState } from "react";
-import {addToast} from "@heroui/toast";
+import { showToast } from "./sonner-helper";
 import { AxiosError, isAxiosError } from "axios";
+import { getToken, decode } from "./jwt-helper";
+import { useAuthStore } from "@/contexts/authentication-context";
+import { useNavigate } from "react-router-dom";
+import HttpVerbsEnum from '../models/http-verbs-enum';
 
-const showToast = (title: string, description: string) => {
+interface RequestConfig {
+  endpoint: string;
+  requireToken?: boolean;
+  contentType?: string;
+}
 
-    addToast({
-      title: title,
-      description: description,
-      hideIcon: true,
+
+const DEFAULT_CONTENT_TYPE = "application/json";
+
+
+const createApiResult = <T>(
+  isSuccess: boolean,
+  statusCode: number,
+  message: string,
+  errors: string[] = [],
+  data: T | null = null
+): ApiResult<T> => ({
+  isSuccess,
+  statusCode,
+  message,
+  errors,
+  data,
+});
+
+const handleTokenCheck = (): string | null => {
+
+  const navigate = useNavigate();
+  const decoded = decode();
+  if (!decoded) {
+    useAuthStore.getState().logout();
+    navigate("/");
+    showToast({
+      title: "Session Expired",
+      description: "Your session has expired, login again",
     });
+    return null;
+  }
+  return getToken();
+};
+
+const handleApiError = <T>(error: unknown): ApiResult<T> => {
+  if (!isAxiosError(error)) {
+    showToast({ title: "Oops", description: "Unknown error has occurred" });
+    return createApiResult(false, 0, "");
+  }
+
+  const { response } = error as AxiosError<ApiResult<T>>;
+  if (!response?.data) {
+    return createApiResult(false, 0, "");
+  }
+
+  const result = response.data;
+  if (result.statusCode === 500) {
+    showToast({ title: "Oops", description: result.message });
+    return createApiResult(false, 0, "");
+  }
+
+  return result;
+};
+
+export function useFetch<T>() {
+  const getAuthHeaders = (token: string | null, contentType: string) => ({
+    "Content-Type": contentType,
+    Authorization: token ? `Bearer ${token}` : "",
+  });
+
+  const handleRequest = async (
+    { endpoint, requireToken = true, contentType = DEFAULT_CONTENT_TYPE }: RequestConfig,
+    method: HttpVerbsEnum,
+    data?: any
+  ): Promise<ApiResult<T>> => {
+    try {
+     
+      if (requireToken) {
+        const token = handleTokenCheck();
+        if (!token) {
+          return createApiResult(false, 401, "Session Expired", ["Session Expired"]);
+        }
+      }
+
+      const config = {
+        headers: getAuthHeaders(requireToken ? getToken() : null, contentType),
+      };
+
+      let response;
+      switch (method) {
+        case HttpVerbsEnum.Post:
+          response = await api.post<ApiResult<T>>(endpoint, data, config);
+          break;
+        case HttpVerbsEnum.Get:
+            const queryString = new URLSearchParams(data).toString() 
+            response = await api.get<ApiResult<T>>(`${endpoint}${queryString}`, config);
+          break;
+        case HttpVerbsEnum.Put:
+          response = await api.put<ApiResult<T>>(endpoint, data, config);
+          break;
+        case HttpVerbsEnum.Delete:
+          response = await api.delete<ApiResult<T>>(endpoint, config);
+          break;
+        default:
+          throw new Error(`Unsupported HTTP method: ${method}`);
+      }
+
+      if (response.data.statusCode === 401) {
+        return createApiResult(false, 401, "Session Expired", ["Session Expired"]);
+      }
+
+      return response.data;
+    } catch (error) {
+      return handleApiError<T>(error);
+    }
+  };
+
+  return {
+    post: (config: RequestConfig, body: unknown) => handleRequest(config, HttpVerbsEnum.Post, body),
+    get: (config: RequestConfig, data: any) => handleRequest(config, HttpVerbsEnum.Get, data),
+  };
 }
-
-
-
-export function useFetch<T>()  {
-  
-    
-   
-    const post = async (endpoint: string, body: any, token: string = "", contentType: string = "application/json") : Promise<ApiResult<T>> => {
-      
-
-      try {
-        const response = await api.post<ApiResult<T>>(endpoint, body, {
-          headers: {
-           
-            "Content-Type": contentType,
-        
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-  
-        if(response.data.statusCode === 401) {
-          showToast("Error", "You are not authorized to perform this action.");
-        }
-
-       return response.data;
-       
-      } 
-      catch (error ) 
-      { 
-
-        
-        if (isAxiosError(error)) {
-
-          if(error.response?.data === null || error.response?.data === undefined)
-          {
-            return {
-              statusCode: 500,
-              message: "An unknown error has ocurred",
-              errors: [],
-              data: null,
-            }
-
-          }
-          const result = error.response?.data as ApiResult<T>;
-
-          return result;
-         
-        }
-        else
-        {
-          return {
-            statusCode: 500,
-            message: "Error connecting to the server",
-            errors: [],
-            data: null,
-          }
-        }
-       
-       
-
-      } 
-    };
-
-    const get = async (endpoint: string, parameterObject: any, token: string = "", contentType: string = "application/json") : Promise<ApiResult<T>> => {
-      
-      const query = new URLSearchParams(parameterObject).toString();
-
-      try {
-        const response = await api.get<ApiResult<T>>(endpoint + query, {
-          headers: {
-           
-            "Content-Type": contentType,
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-  
-        if(response.data.statusCode === 401) {
-          showToast("Error", "You are not authorized to perform this action.");
-        }
-
-       return response.data;
-       
-      } 
-      catch (error ) 
-      { 
-
-        
-        if (isAxiosError(error)) {
-
-          if(error.response?.data === null || error.response?.data === undefined)
-          {
-            return {
-              statusCode: 500,
-              message: "An unknown error has ocurred",
-              errors: [],
-              data: null,
-            }
-
-          }
-          const result = error.response?.data as ApiResult<T>;
-
-          return result;
-         
-        }
-        else
-        {
-          return {
-            statusCode: 500,
-            message: "Error connecting to the server",
-            errors: [],
-            data: null,
-          }
-        }
-       
-       
-
-      } 
-    };
-
-    return { post, get};
-  
-  
-}
-

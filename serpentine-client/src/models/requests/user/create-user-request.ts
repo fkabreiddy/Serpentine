@@ -4,8 +4,9 @@ export interface CreateUserRequest {
     password: string;           // Min: 8, at least one uppercase, one number and one symbol
     confirmPassword: string;    // Same as password
     fullName: string;           // Min: 10, Max: 30, letters, numbers and spaces
-    dateOfBirth: string;                // Between 16 and 100
-    imageFile?: File | null;    // Extensions: jpg, png, webp, img, jpeg. Optional
+    imageFile?: File | null;    // Extensions: jpg, png, webp, img, jpeg. Optional   
+    profilePictureUrl?: string | null;    // Same as password
+
 }
 
  

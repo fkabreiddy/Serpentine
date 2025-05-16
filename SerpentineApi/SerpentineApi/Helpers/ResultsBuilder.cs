@@ -30,5 +30,29 @@ public class ResultsBuilder
         }
     }
     
+     public static IResult Match(Failure apiResult)
+        {
+            switch (apiResult)
+            {
+                case NotFoundApiResult:
+                    return Results.NotFound(apiResult);
+    
+                case ServerErrorApiResult:
+                    return Results.InternalServerError(apiResult);
+    
+                case BadRequestApiResult:
+                    return Results.BadRequest(apiResult);
+    
+                case UnauthorizedApiResult:
+                    return Results.Unauthorized();
+                
+                case ValidationApiResult:
+                    return Results.UnprocessableEntity(apiResult);
+    
+                default:
+                    return Results.BadRequest(apiResult);
+            }
+        }
+    
 
 }

@@ -7,7 +7,7 @@ namespace SerpentineApi.Features.UserFeatures.Queries;
 
 
 
-public class GetUserByNameRequest : IRequest<OneOf<UserResponse, IApiResult>>
+public class GetUserByNameRequest : IRequest<OneOf<UserResponse, Failure>>
 {
 
     [Required, 
@@ -94,9 +94,9 @@ internal class GetUserByUsernameRequestHandler(
     DbContextAccessor<User> dbContextAccessor
 
     )
-    : IEndpointHandler<GetUserByNameRequest, OneOf<UserResponse, IApiResult>>
+    : IEndpointHandler<GetUserByNameRequest, OneOf<UserResponse, Failure>>
 {
-    public async Task<OneOf<UserResponse, IApiResult>> HandleAsync(
+    public async Task<OneOf<UserResponse, Failure>> HandleAsync(
         GetUserByNameRequest request,
         CancellationToken cancellationToken = default
     )
@@ -106,11 +106,11 @@ internal class GetUserByUsernameRequestHandler(
         var user = await dbContextAccessor.GetAnyAsync(
             u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim(),
             cancellationToken: cancellationToken);
-        
-        if(user is null)
-            return new NotFoundApiResult(){Message = "User not found"};
 
-        return new SuccessApiResult<UserResponse>(user.ToResponse());
+        if (user is null)
+            return new NotFoundApiResult("User not found");
+
+        return user.ToResponse();
     }
 
   

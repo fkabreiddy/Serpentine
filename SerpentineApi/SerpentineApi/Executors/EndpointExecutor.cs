@@ -31,11 +31,8 @@ public class EndpointExecutor<T>
         {
             caughtException = ex;
 
-            return Results.UnprocessableEntity(new ValidationApiResult()
-            {
-                Message = "Invalid Request",
-                Errors = ex.Errors.Select(e => e.ErrorMessage).ToList()
-            });
+            return Results.UnprocessableEntity(new ValidationApiResult("Invalid Request",
+                ex.Errors.Select(e => e.ErrorMessage).ToList()));
 
 
         }
@@ -43,11 +40,8 @@ public class EndpointExecutor<T>
         {
             caughtException = e;
 
-            return ResultsBuilder.Match<T>(
-                new ServerErrorApiResult()
-                {
-                    Errors = new() { e.InnerException?.Message ?? e.Message }
-                }
+            return ResultsBuilder.Match(
+                new ServerErrorApiResult(e.InnerException?.Message ?? e.Message)
             );
 
         }

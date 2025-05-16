@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -9,7 +10,7 @@ using SerpentineApi.Services.CloudinaryStorage;
 namespace SerpentineApi.Features.UserFeatures.Actions;
 
 
-public class CreateUserRequest : IRequest<OneOf<UserResponse, IApiResult>>
+public class CreateUserRequest : IRequest<OneOf<UserResponse, Failure>>
 {
     
     [Required, MaxLength(30), JsonPropertyName("userName"), MinLength(3), RegularExpression(@"^[a-zA-Z0-9._]+$"), FromForm]
@@ -24,28 +25,15 @@ public class CreateUserRequest : IRequest<OneOf<UserResponse, IApiResult>>
     
     [Required, JsonPropertyName("fullName"), MaxLength(30), MinLength(10), RegularExpression(@"^[\p{L}\p{M}0-9\s]+$"), FromForm]
     public string FullName { get; set; } = null!;
+
+    [JsonPropertyName("profilePictureUrl"), Url, FromForm]
+    public string? ProfilePictureUrl { get; set; } 
     
-   [BindNever, JsonIgnore]
-    public int Age
-    {
-        get
-        {
-            var today = DateTime.Today;
-            var age = today.Year - DateOfBirth.Year;
-            if (DateOfBirth.Date > today.AddYears(-age))
-            {
-                age--;
-            }
-            return age;
-        }
-    }
     
     [JsonPropertyName("imageFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
     public IFormFile? ImageFile { get; set; }
 
-    [Required, JsonPropertyName("dateOfBirth"), FromForm]
-    public DateTime DateOfBirth { get; set; } = DateTime.Now;
-   
+ 
 
 }
 
@@ -70,18 +58,19 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
         RuleFor(x => x.ConfirmPassword)
             .NotEmpty().WithMessage("Confirm Password is required.")
             .Equal(x => x.Password).WithMessage("Passwords do not match.");
-            
 
-        
-        
+
+        RuleFor(x => x.ProfilePictureUrl)
+            .Must(pfp => pfp == null || Uri.IsWellFormedUriString(pfp, UriKind.Absolute))
+            .WithMessage("Profile picture must be null or an URL");
+           
         RuleFor(x => x.FullName)
             .NotEmpty().WithMessage("Full name is required.")
             .MinimumLength(10).WithMessage("Full name must be at least 10 characters.")
             .MaximumLength(30).WithMessage("Full name must not exceed 30 characters.")
             .Matches(@"^[\p{L}\p{M}0-9\s]+$").WithMessage("Only letters, numbers, and spaces are allowed.");
 
-        RuleFor(x => x.Age)
-            .InclusiveBetween(16, 100).WithMessage("Age must be between 16 and 100.");
+         
 
         RuleFor(x => x.ImageFile)
             .Must(file => file == null || file.Length <= 5 * 1024 * 1024) // 5 MB
@@ -108,10 +97,10 @@ public class CreateUserEndpoint : IEndpoint
                 {
                     return await executor.ExecuteAsync<UserResponse>(async () =>
                     {
-                        
+
 
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
-                        
+
                         if (result.IsT1)
                         {
                             var error = result.AsT1;
@@ -127,6 +116,7 @@ public class CreateUserEndpoint : IEndpoint
             .DisableAntiforgery()
             .AllowAnonymous()
             .RequireCors()
+            .WithDescription($"Creates an user. Not requires authorization. Accepts an {nameof(CreateUserRequest)}. Returns a ApiResult with an {nameof(UserResponse)}")
             .Accepts<AuthenticateUserRequest>(false, "multipart/form-data")
             .Produces<SuccessApiResult<UserResponse>>(200, "application/json")
             .Produces<ConflictApiResult>(409, "application/json")
@@ -141,9 +131,9 @@ internal class CreateUserRequestHandler(
     SerpentineDbContext  context,
     CloudinaryService cloudinaryService
     )
-    : IEndpointHandler<CreateUserRequest, OneOf<UserResponse, IApiResult>>
+    : IEndpointHandler<CreateUserRequest, OneOf<UserResponse, Failure>>
 {
-    public async Task<OneOf<UserResponse, IApiResult>> HandleAsync(
+    public async Task<OneOf<UserResponse, Failure>> HandleAsync(
         CreateUserRequest request,
         CancellationToken cancellationToken = default
         )
@@ -154,7 +144,7 @@ internal class CreateUserRequestHandler(
             cancellationToken: cancellationToken
         ))
         {
-            return new ConflictApiResult(){Message = "An user with the same username already exist"};
+            return new ConflictApiResult("An user with the same username already exist");
         }
         
 
@@ -163,26 +153,30 @@ internal class CreateUserRequestHandler(
         
         if (result.Entity.Id > 0)
         {
-            if (request.ImageFile is not null)
+            if (request.ImageFile is not null && request.ProfilePictureUrl is null)
             {
                 var imageUploaded = await cloudinaryService.UploadImage(request.ImageFile, CloudinaryFolders.ProfilePictures.ToString(), result.Entity.Id.ToString());
                 if (imageUploaded.TaskSucceded())
                 {
 
                     result.Entity.ProfilePictureUrl = imageUploaded.Data;
-                    await context.SaveChangesAsync();
+
                 }
             }
+            else
+            {
+                result.Entity.ProfilePictureUrl = request.ProfilePictureUrl;
+
+            }
+
+            await context.SaveChangesAsync();
             
             context.ChangeTracker.Clear();
             
         }
         else
         {
-            return new BadRequestApiResult()
-            {
-                Message = "Could not create user"
-            };
+            return new BadRequestApiResult("Could not create user");
         }
 
 
@@ -190,10 +184,7 @@ internal class CreateUserRequestHandler(
 
         if (user is null)
         {
-            return new BadRequestApiResult()
-            {
-                Message = "Could not create user"
-            };
+            return new BadRequestApiResult("Could not create user");
         }
         
         return user.ToResponse();

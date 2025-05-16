@@ -6,7 +6,7 @@ using SerpentineApi.Identity;
 
 namespace SerpentineApi.Features.UserFeatures.Actions;
 
-public class AuthenticateUserRequest : IRequest<OneOf<UserResponse, IApiResult>>
+public class AuthenticateUserRequest : IRequest<OneOf<UserResponse, Failure>>
 {
 
     [Required, FromBody, JsonPropertyName("userName"), MaxLength(30), MinLength(3),
@@ -66,7 +66,7 @@ internal class AuthenticateUserEndpoint : IEndpoint
                         {
                             var error = result.AsT1;
 
-                            return ResultsBuilder.Match<UserResponse>(error);
+                            return ResultsBuilder.Match<Jwt>(error);
                         }
 
                         var user = result.AsT0;
@@ -103,9 +103,9 @@ internal class AuthenticateUserRequestHandler(
     DbContextAccessor<User> dbContextAccessor
 
     )
-    : IEndpointHandler<AuthenticateUserRequest, OneOf<UserResponse, IApiResult>>
+    : IEndpointHandler<AuthenticateUserRequest, OneOf<UserResponse, Failure>>
 {
-    public async Task<OneOf<UserResponse, IApiResult>> HandleAsync(
+    public async Task<OneOf<UserResponse, Failure>> HandleAsync(
         AuthenticateUserRequest request,
         CancellationToken cancellationToken = default
     )
@@ -115,12 +115,12 @@ internal class AuthenticateUserRequestHandler(
         var user = await dbContextAccessor.GetAnyAsync(
             u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim() && u.Password == hashedPassword,
             cancellationToken: cancellationToken);
-        
-        
-        if(user is null)
-            return new NotFoundApiResult(){Message = "Invalid credentials"};
 
-        return new SuccessApiResult<UserResponse>(user.ToResponse());
+
+        if (user is null)
+            return new NotFoundApiResult("Invalid credentials");
+
+        return user.ToResponse();
     }
 
   

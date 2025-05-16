@@ -1,4 +1,4 @@
-import React, {useEffect, useState}from "react";
+import React, {useEffect, useState, useRef}from "react";
 import { Button } from "@heroui/button";
 import { CreateUserRequest } from "@/models/requests/user/create-user-request";
 import { Spinner } from "@heroui/spinner";
@@ -23,13 +23,13 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
         fullName: "",
         password: "",
         confirmPassword: "",
-        dateOfBirth: "",
+        dateOfBirth: new Date(),
         imageFile: null,
     });
 
     const { createUser, loading, data} = useCreateUser();
-
-   
+    
+    
     const [isMounted, setIsMounted] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -65,6 +65,8 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
         formData.append('password', createUserRequest.password);
         formData.append('confirmPassword', createUserRequest.confirmPassword);
         formData.append('dateOfBirth', createUserRequest.dateOfBirth.toString());
+        formData.append('profilePictureUrl', createUserRequest.profilePictureUrl ?? "");
+
         if (createUserRequest.imageFile) {
             formData.append('imageFile', createUserRequest.imageFile);
         }
@@ -92,11 +94,12 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
                         className="w-full flex flex-col  h-screen max-sm:h-fit justify-center relative items-center  "
                         >
 
-                        <form onSubmit={handleSubmit} className="w-[70%] max-sm:w-full flex  flex-col  gap-4  mt-4">
-                            <p onClick={toggleViewChange} className="text-sm mb-3 font-semibold text-start underline text-blue-600 cursor-pointer">Login with an existing account</p>
+                        <form onSubmit={handleSubmit} className="w-[70%] max-sm:w-[90%] flex  flex-col  gap-4  mt-4">
+
 
                             <AnimatePresence  initial={false}>
                                 {currentStep === 0 && (
+                                    
                                     <motion.div
                                         key="full-name"
                                         initial={{ opacity: 0, x: -10 }}
@@ -104,6 +107,8 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
                                         exit={{ opacity: 0, x:10}}
                                         className="flex flex-col gap-1 relative"
                                     >
+                                        <p onClick={toggleViewChange} className="text-sm   font-semibold text-start underline text-blue-600 cursor-pointer">Cancel</p>
+
                                         <CreateUserNameForm user={createUserRequest} onAgeChanged={(val) => setCreateUserRequest((prev) => ({ ...prev, dateOfBirth: val }))} onUserNameChanged={(userName) => setCreateUserRequest((prev) => ({ ...prev, userName }))} onNameChanged={(name) => setCreateUserRequest((prev) => ({ ...prev, fullName: name }))} onNext={() => setCurrentStep(1)} currentStep={currentStep}/>
 
                                     </motion.div>
@@ -141,17 +146,19 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
                                         exit={{ opacity: 0, x:10}}
                                         className="flex flex-col gap-1 relative"
                                     >
-                                        <CreateProfilePictureForm user={createUserRequest} onFileChange={(val) => setCreateUserRequest((prev) => ({ ...prev, imageFile: val }))} onPrev={()=> setCurrentStep(1)}  currentStep={currentStep}/>
+                                        <CreateProfilePictureForm user={createUserRequest} onProfilePictureUrl={(val) => setCreateUserRequest((prev) => ({ ...prev, profilePictureUrl: val }))} onFileChange={(val) => setCreateUserRequest((prev) => ({ ...prev, imageFile: val }))} onPrev={()=> setCurrentStep(1)}  currentStep={currentStep}/>
                                         {  loading ? 
                                                 
                                             <Spinner color="default" size="sm"  classNames={{label: "text-foreground mt-4"}}  variant="spinner" />
                         
                                             :
                                         
-                                            <Button isDisabled={loading} color="primary" type="submit" className="w-full transition-all hover:scale-[105%] mt-4 text-sm font-semibold" variant="solid" size="sm">
-                                            
-                                                Create Account   
+                                            <Button disabled={loading} type="submit" className={`w-full backdrop-blur-xl bg-default-100/80 mt-4  backdrop-brightness-100 ${loading ? " opacity-50" : ""}  max-h-9  border border-default-100/20 transition-all   text-sm font-semibold`}  >
+                                                <div className="grain w-4 h-4 absolute inset-0 opacity-50"></div>
                         
+                                                Create Account   
+                                                
+                                                
                                             </Button>
                                         }
                                     </motion.div>
@@ -167,6 +174,8 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
                         
                                         
                         </form>
+
+
 
                     </motion.div>
             }

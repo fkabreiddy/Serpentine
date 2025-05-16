@@ -4,6 +4,7 @@ public interface IApiResult
 {
    public string Message { get; set; }
    public int StatusCode { get; }
+   public bool IsSuccess {get;  }
    
    public List<string> Errors { get; set; }
 }
@@ -17,64 +18,87 @@ public class SuccessApiResult<T> : IApiResult
         Data = data;
     }
 
-    public T Data { get; set; } 
+    public T Data { get; set; }
+    public bool IsSuccess { get; private set; } = true;
     public string Message { get; set; } = "Success";
-    public int StatusCode { get; } = 200;
+    public int StatusCode { get; private set; } = 200;
     public List<string> Errors { get; set; } = new();
 
    
 }
 
-public class NotFoundApiResult : IApiResult
+public abstract class Failure : IApiResult
 {
-    public string Message { get; set; } = "Not Found";
-    public int StatusCode { get;  } =  404;
-    public List<string> Errors { get; set; } = new() { "Not found" };
-
+    public string Message { get; set; } = "";
+    public int StatusCode { get; private set; } =  0;
     
+    public bool IsSuccess { get; private set; } = false;
+
+    public List<string> Errors { get; set; } = [];
+
+    public void Build(string message, int statusCode, List<string>? messages = null)
+    {
+        Message = message;
+        StatusCode = statusCode;
+        Errors = messages ?? [message];
+        IsSuccess = false;
+    }
+
 }
 
-public class ValidationApiResult : IApiResult
+public class NotFoundApiResult : Failure
 {
-    public string Message { get; set; } = "Invalid Request";
-    public int StatusCode { get; } = 422;
-    public List<string> Errors { get; set; } = new (){"Invalid Request"};
+    public NotFoundApiResult(string message = "Not Found", List<string>? messages = null)
+    {
+        Build(message, 404, new(){message});
+    }
+}
+
+public class ValidationApiResult : Failure
+{
+    public ValidationApiResult(string message = "Invalid Request", List<string>? messages = null)
+    {
+        Build(message, 422, messages ?? new(){message});
+    }
 
   
 }
 
-public class UnauthorizedApiResult : IApiResult
+public class UnauthorizedApiResult : Failure
 {
-    public string Message { get; set; } = "Access Denied";
-    public int StatusCode { get;  } = 401;
-    public List<string> Errors { get; set; } = new() { "Access Denied" };
+    public UnauthorizedApiResult(string message = "Unauthorized", List<string>? messages = null)
+    {
+        Build(message, 401, new(){message});
+    }
 
-
+  
 }
 
-public class BadRequestApiResult : IApiResult
+public class BadRequestApiResult : Failure
 {
-    public string Message { get; set; } = "Bad Request";
-    public int StatusCode { get; } = 400;
-    public List<string> Errors { get; set; } = new() { "Bad Request" };
+    public BadRequestApiResult(string message = "Bad Request", List<string>? messages = null)
+    {
+        Build(message, 404, new(){message});
+    }
 
-
+  
 }
 
-public class ConflictApiResult : IApiResult
+public class ConflictApiResult  : Failure
 {
-    public string Message { get; set; } =  "Conflict";
-    public int StatusCode { get;  } = 409;
-    public List<string> Errors { get; set; } = new(){"Conflict"};
+    public ConflictApiResult(string message = "Bad Request", List<string>? messages = null)
+    {
+        Build(message, 404, new(){message});
+    }
 
-   
+  
 }
 
-public class ServerErrorApiResult : IApiResult
+public class ServerErrorApiResult : Failure
 {
-    public string Message { get; set; } = "Something went wrong with Serpentine";
-    public  int StatusCode { get; }= 500;
-    public List<string> Errors { get; set; } = new() { "Something went wrong with Serpentine" };
-
+    public ServerErrorApiResult(string message = "Server error", List<string>? messages = null)
+    {
+        Build(message, 500, new(){message});
+    }
   
 }

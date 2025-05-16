@@ -33,7 +33,6 @@ public class User : BaseEntity
     public static User Create(CreateUserRequest request)
         => new()
         {
-            Age = request.Age,
             FullName = request.FullName.Trim(),
             Username = request.Username.Trim(),
             Password = request.Password.Hash(),
