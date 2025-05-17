@@ -23,7 +23,6 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
         fullName: "",
         password: "",
         confirmPassword: "",
-        dateOfBirth: new Date(),
         imageFile: null,
     });
 
@@ -64,7 +63,6 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
         formData.append('fullName', createUserRequest.fullName);
         formData.append('password', createUserRequest.password);
         formData.append('confirmPassword', createUserRequest.confirmPassword);
-        formData.append('dateOfBirth', createUserRequest.dateOfBirth.toString());
         formData.append('profilePictureUrl', createUserRequest.profilePictureUrl ?? "");
 
         if (createUserRequest.imageFile) {
@@ -109,7 +107,7 @@ const CreateUserForm : React.FC<CreateUserFormProps> = ({onViewChanged}) => {
                                     >
                                         <p onClick={toggleViewChange} className="text-sm   font-semibold text-start underline text-blue-600 cursor-pointer">Cancel</p>
 
-                                        <CreateUserNameForm user={createUserRequest} onAgeChanged={(val) => setCreateUserRequest((prev) => ({ ...prev, dateOfBirth: val }))} onUserNameChanged={(userName) => setCreateUserRequest((prev) => ({ ...prev, userName }))} onNameChanged={(name) => setCreateUserRequest((prev) => ({ ...prev, fullName: name }))} onNext={() => setCurrentStep(1)} currentStep={currentStep}/>
+                                        <CreateUserNameForm user={createUserRequest}  onUserNameChanged={(userName) => setCreateUserRequest((prev) => ({ ...prev, userName }))} onNameChanged={(name) => setCreateUserRequest((prev) => ({ ...prev, fullName: name }))} onNext={() => setCurrentStep(1)} currentStep={currentStep}/>
 
                                     </motion.div>
                                 )}

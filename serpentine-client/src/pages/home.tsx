@@ -18,10 +18,10 @@ export default function HomePage () {
         setLoading(false);
     },[])
 
-    if(isMounted || loading)
+    if(!isMounted || loading)
     {
         return (
-            <div className="w-screen h-screen flex items-center justify-center flex-col gap-2">
+            <div className="w-screen absolute inset-0 h-screen flex items-center justify-center flex-col gap-2">
                 <p className="font-semibold text-xs">Welcome. Keep waiting, we are doing something 4 u</p>
                 <Spinner variant="spinner" size="sm"/>
             </div>
@@ -31,7 +31,6 @@ export default function HomePage () {
     {
         return (<>
 
-            <p>Protegido</p>
 
         </>);
     }

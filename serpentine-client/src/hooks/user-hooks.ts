@@ -131,3 +131,20 @@ export function useGetByUsername() {
 
     return { getByUsername, loading, data };
 }
+
+export function useCloseSession() {
+    const [loading, setLoading] = useState<boolean>(false);
+    const {logout} = useAuthStore();
+    const navigator = useNavigate();
+    
+    const closeSession = () =>{
+        setLoading(true);
+        logout();
+        setLoading(false);
+        navigator("/");
+        
+    }
+
+
+    return { closeSession, loading };
+}
