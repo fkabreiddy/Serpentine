@@ -4,14 +4,14 @@ import { JwtPayload } from '@/models/responses/jwt-response';
 import { UserResponse } from '@/models/responses/user-response';
 import { picture } from 'motion/react-client';
 import { showToast } from '@/helpers/sonner-helper';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 interface AuthState {
   username: string | null;
   userId: number | null;
   userPofilePicture:string | null
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (token: string, navigate:NavigateFunction) => void;
   logout: () => void;
   setUser: ()=>void;
 }
@@ -21,9 +21,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   userId: null,
   userPofilePicture: null,
   isAuthenticated: decode() !== null,
-  login: (token: string) => {
+  login: (token: string, navigate:NavigateFunction) => {
     setToken(token);
-    const navigate = useNavigate();
     const payload : JwtPayload | null = decode();
     let username: string | null = null;
     let userId: number | null = null;

@@ -47,7 +47,7 @@ export function useLoginUser() {
         if (data.data && data.statusCode === 200) {
 
             let token = data.data.token;
-            useAuthStore.getState().login(token);
+            useAuthStore.getState().login(token, navigate);
             addToast({ title: "Login Success", description: "You have successfully logged in" });
             setState(prev => ({ ...prev, loading: false }));
             navigate("/home")
