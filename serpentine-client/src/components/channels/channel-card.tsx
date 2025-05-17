@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import GroupCardMini from "../groups/group-card-mini";
 import { picture } from "motion/react-client";
 import ChannelCardMenu from "./channel-card-menu";
+import GroupCard from "../groups/group-card";
+import { motion } from "motion/react";
 
 interface ChannelCardProps{
     index : number,
@@ -11,6 +13,7 @@ interface ChannelCardProps{
 const ChannelCard:React.FC<ChannelCardProps> = ({index, name}) =>{
 
     const [selected, setSelected] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const pictures : string[] = [
           "https://img.freepik.com/premium-vector/vector-abstract-grainy-texture-gradient-background_296715-733.jpg", 
@@ -30,31 +33,58 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, name}) =>{
         )}
 
         <ChannelCardMenu  isOpen={selected} >
-              <div  onContextMenu={(e) =>  {e.preventDefault(); setSelected(true);}}  className={`flex w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : "hover:scale-[103%] z-[-1]"}   flex-col gap-4 border-b   hover:bg-default-50/50 transition-all cursor-pointer border-b-default-100 py-4 px-4`}>
-                <div className="flex items-start w-full max-w-full gap-3 justify-between">
-                    <div className="flex flex-col">
-                        <p className="text-[13px] font-semibold opacity-80 line-clamp-1 text-ellipsis  max-w-full break-words  ">#{name}</p>
+            <li   onContextMenu={(e) =>  {e.preventDefault(); setIsExpanded(false); setSelected(true);}}  className={`flex w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : " z-[-1]"}   flex-col gap-2 border-b   hover:bg-default-50/20 transition-all cursor-pointer border-b-default-100 py-2 `}>
+                <div className="flex items-start w-full max-w-full gap-3 justify-between py-2 px-4">
+                    <div className="flex text-ellipsis overflow-hidden  flex-col" onClick={() => {setIsExpanded(!isExpanded);}}>
+                        <p className="text-[13px] font-semibold opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full"># {name}</p>
                         <span className="text-[11px]  opacity-30">Id.01321312</span>
-
                     </div>
                     <div className="flex items-center gap-3">
                         <Mute/>
 
                     </div>
                 </div>
+                {isExpanded ?
+                    <div className="flex items-end flex-col  ml-5 ">
+                            
+                         {[...Array(4)].map((_, i) => (
 
-                <div className="flex items-center gap-3">
+                            <React.Fragment key={`gc-${i}`}>
+                                <motion.div
+                                    key="logout-icon"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 1}}
+                                    transition={{delay: i * 0.1}}
+                                    className="flex flex-col items-end w-full relative "
+                                >
+                                      <GroupCard key={`group-${i}`} cover={pictures[i]}  />
+                                    {i !== 3 && <hr className="w-[90%] border rounded-full  border-default-50/50"/>}
+
+                                </motion.div>
+                                 
+                            </React.Fragment>
+                         
+                            
+                        ))}
+                            
+
+                    </div> 
+                : 
+                 <div className="flex items-center gap-3 py-2 px-4">
                     
                     {[...Array(4)].map((_, i) => (
-                    <React.Fragment key={`mini-${i}`}>
-                        {i === 1 && <div key={`dot-left-${i}`} className="rounded-full bg-default-300 w-1 h-1"></div>}
-                        <GroupCardMini key={`group-${i}`} cover={pictures[i]} index={i} />
-                        {i === 3 && <div key={`dot-right-${i}`} className="rounded-full bg-default-300 w-1 h-1"></div>}
-                    </React.Fragment>
+                        <React.Fragment key={`mini-${i}`}>
+                           
+                            {i === 1 && <div key={`dot-left-${i}`} className="rounded-full bg-default-300 w-1 h-1"></div>}
+                            <GroupCardMini key={`group-${i}`} cover={pictures[i]} index={i} />
+                            {i === 3 && <div key={`dot-right-${i}`} className="rounded-full bg-default-300 w-1 h-1"></div>}
+                        </React.Fragment>
                     ))}
                     <p className="text-xs font-semibold opacity-45">+3</p>
-                </div>
-            </div>
+                </div>}
+               
+            </li>
             
         </ChannelCardMenu>
 

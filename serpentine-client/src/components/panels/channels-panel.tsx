@@ -18,7 +18,7 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
     const channels = ["svelte", "blazor", "pokemon", "final-fantasy", "fka-twigs", "youtube"]
     return(
 
-        <div className="w-[23%] max-md:w-full flex flex-col border-r border-r-default-100 overflow-auto h-screen scroll-smooth scrollbar-hide">
+        <div className="w-[23%] bg-white dark:bg-black  max-md:w-full flex flex-col border-r border-y border-default-100 overflow-auto h-screen scroll-smooth scrollbar-hide">
             <div className="border-b border-b-default-100 h-[50px] justify-center backdrop-blur-lg pr-4  p-2  z-[1] sticky top-0 items-center ">
                 
                 <SearchChannelBar onSearch={setFilter} />
@@ -27,14 +27,17 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
                  <label className="text-xs  opacity-50">My Channels</label>
                  <Button variant="" className="hover:underline text-blue-500 text-xs p-0" color="primary">Join a channel</Button>
             </div>
-            <ScrollShadow hideScrollBar className=" h-full overflow-auto scroll-smooth">
-                <AnimatedList delay={0} className="gap-0" >
-                   {channels
-                    .filter(ch => ch.toLowerCase().includes(filter.toLowerCase()))
-                    .map((ch, i) => (
-                        <ChannelCard  key={`${i}-${ch}`}  index={i} name={ch} />
-                    ))}
-                </AnimatedList>
+            <ScrollShadow hideScrollBar >
+               <ul className=" h-full overflow-auto scrollbar-hide  scroll-smooth">
+                    <AnimatedList delay={0} className="gap-0" >
+                    {channels
+                        .filter(ch => ch.toLowerCase().includes(filter.toLowerCase()))
+                        .map((ch, i) => (
+                            <ChannelCard  key={`${i}-${ch}`}  index={i} name={ch} />
+                        ))}
+                    </AnimatedList>
+               </ul>
+                
               
              
             </ScrollShadow>

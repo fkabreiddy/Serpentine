@@ -28,7 +28,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = () =>{
 
     return(
 
-        <div className="max-md:h-fit max-md:w-full max-md:flex-row bg-default-50/30 w-[5%]  relative min-w-fit border-r border-default-100 flex flex-col items-center px-3 py-4 justify-between gap-3 h-screen opacity-50 hover:opacity-100 transition-all">
+        <nav className="max-md:h-fit max-md:w-full max-md:flex-row bg-default-50/30 w-[5%]  relative min-w-fit border border-default-100 flex flex-col items-center px-3 py-4 justify-between gap-3 h-screen opacity-50 hover:opacity-100 transition-all">
             <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
            
             {!isAuthenticated ? 
@@ -57,7 +57,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = () =>{
               
             </div>
           
-        </div>
+        </nav>
     )
 }
 
