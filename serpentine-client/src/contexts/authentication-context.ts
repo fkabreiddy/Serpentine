@@ -13,7 +13,7 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (token: string, navigate:NavigateFunction) => void;
   logout: () => void;
-  setUser: ()=>void;
+  setUser: (behaviour : () => void)=>void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       isAuthenticated: payload !== null,
     });
   },
-  setUser: () =>{
+  setUser: (behaviour : () => void) =>{
     const payload : JwtPayload | null = decode();
     let username: string | null = null;
     let userId: number | null = null;
@@ -64,11 +64,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         pfp = payload.picture;
     }
 
-    console.log(payload);
 
     if(!payload)
     {
         removeToken();
+        behaviour();
+        showToast({title: "Oops!", description:"Your session has expired"})
+        return;
+        
     }
    
 

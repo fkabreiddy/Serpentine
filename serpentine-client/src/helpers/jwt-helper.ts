@@ -50,7 +50,6 @@ export function decode(): JwtPayload | null {
 
     return isTokenExpired(decoded.exp) ? null : decoded;
   } catch (error) {
-    console.error('Error decoding JWT:', error);
     return null;
   }
 }

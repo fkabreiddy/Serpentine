@@ -22,7 +22,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = () =>{
 
     useEffect(()=>{
 
-        setUser();
+        setUser(closeSession);
 
     },[])
 

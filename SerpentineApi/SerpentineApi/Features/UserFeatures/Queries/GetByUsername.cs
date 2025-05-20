@@ -11,10 +11,10 @@ public class GetUserByNameRequest : IRequest<OneOf<UserResponse, Failure>>
 {
 
     [Required, 
-        FromQuery(Name = "username"),
-        JsonPropertyName("username"),
-     MaxLength(30), MinLength(3),
-     RegularExpression("^[a-zA-Z0-9._]+$")]
+    FromQuery(Name = "username"),
+    JsonPropertyName("username"),
+    MaxLength(30), MinLength(3),
+    RegularExpression("^[a-zA-Z0-9._]+$")]
     public string Username { get; set; } = null!;
 
   

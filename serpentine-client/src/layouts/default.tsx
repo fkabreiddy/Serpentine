@@ -15,19 +15,13 @@ export default function DefaultLayout({
   return (
     <div className="relative max-md:flex-col flex w-screen  h-screen">
 
+      <ProfilePanel/>
+      <ChannelsPanel/>
       {isMobile ? 
         <>
          
 
-          {!currentChatId || currentChatId <= 0 ?  
-            
-             <>
-               <ProfilePanel/>
-                <ChannelsPanel/>
-             </>
-
-             :
-            
+          {currentChatId && currentChatId >= 1 &&
             <div className="w-full ">
               {children}
 
@@ -38,8 +32,7 @@ export default function DefaultLayout({
         </>
         :
         <>
-           <ProfilePanel/>
-            <ChannelsPanel/>
+          
             <div className="w-[80%] ">
               {children}
 

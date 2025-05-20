@@ -33,7 +33,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, name}) =>{
         )}
 
         <ChannelCardMenu  isOpen={selected} >
-            <li   onContextMenu={(e) =>  {e.preventDefault(); setIsExpanded(false); setSelected(true);}}  className={`flex w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : " z-[-1]"}   flex-col gap-2 border-b   hover:bg-default-50/20 transition-all cursor-pointer border-b-default-100 py-2 `}>
+            <li   onContextMenu={(e) =>  {e.preventDefault(); setIsExpanded(false); setSelected(true);}}  className={`flex w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : " z-[-1] hover:bg-default-50/20"}   flex-col gap-2 border-b    transition-all cursor-pointer border-b-default-100 py-2 `}>
                 <div className="flex items-start w-full max-w-full gap-3 justify-between py-2 px-4">
                     <div className="flex text-ellipsis overflow-hidden  flex-col" onClick={() => {setIsExpanded(!isExpanded);}}>
                         <p className="text-[13px] font-semibold opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full"># {name}</p>
