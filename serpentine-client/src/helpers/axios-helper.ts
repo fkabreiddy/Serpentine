@@ -31,13 +31,12 @@ const createApiResult = <T>(
   data,
 });
 
+
 const handleTokenCheck = (): string | null => {
 
-  const navigate = useNavigate();
   const decoded = decode();
   if (!decoded) {
     useAuthStore.getState().logout();
-    navigate("/");
     showToast({
       title: "Session Expired",
       description: "Your session has expired, login again",
@@ -49,6 +48,7 @@ const handleTokenCheck = (): string | null => {
 
 const handleApiError = <T>(error: unknown): ApiResult<T> => {
   if (!isAxiosError(error)) {
+    
     showToast({ title: "Oops", description: "Unknown error has occurred" });
     return createApiResult(false, 0, "");
   }
@@ -99,6 +99,7 @@ export function useFetch<T>() {
         case HttpVerbsEnum.Get:
             const queryString = new URLSearchParams(data).toString() 
             response = await api.get<ApiResult<T>>(`${endpoint}${queryString}`, config);
+          
           break;
         case HttpVerbsEnum.Put:
           response = await api.put<ApiResult<T>>(endpoint, data, config);

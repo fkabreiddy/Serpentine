@@ -40,6 +40,7 @@ const PhotoEditor : React.FC<PhotoEditorProps> = ({open, onClose, file, onSaveIm
 
       <ReactPhotoEditor
 
+      
         open={showModal}
         onClose={onClose}
         file={parentFile}

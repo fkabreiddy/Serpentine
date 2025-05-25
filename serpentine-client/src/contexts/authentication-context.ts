@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { decode, setToken, removeToken } from '@/helpers/jwt-helper';
 import { JwtPayload } from '@/models/responses/jwt-response';
-import { UserResponse } from '@/models/responses/user-response';
-import { picture } from 'motion/react-client';
+
 import { showToast } from '@/helpers/sonner-helper';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 

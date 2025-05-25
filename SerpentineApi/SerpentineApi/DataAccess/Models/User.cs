@@ -19,6 +19,8 @@ public class User : BaseEntity
     [Required, Range(16, 100)]
     public int Age { get; set; }
     
+    public List<ChannelMember> MyChannels { get; set; } = new List<ChannelMember>();
+    
     
 
     public UserResponse ToResponse() => new()

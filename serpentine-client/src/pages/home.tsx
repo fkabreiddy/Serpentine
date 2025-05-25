@@ -45,7 +45,7 @@ export default function HomePage () {
                     <>
                         <AnimatedGridPattern
                             numSquares={30}
-                            maxOpacity={0.1}
+                            maxOpacity={0.05}
                             duration={3}
                             repeatDelay={1}
                             className={cn(
@@ -56,6 +56,10 @@ export default function HomePage () {
 
                         <div className="flex items-center flex-col gap-2">
 
+                            <span>
+                                         ٩(*❛⊰❛)～❤
+
+                            </span>
                             <span className="text-md font-semibold">Welcome to serpentine</span>
                             <span className="text-xs font-normal">How are you doing today?</span>
                         </div>

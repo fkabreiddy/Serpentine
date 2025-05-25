@@ -11,12 +11,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 
 interface ChannelCardMenuProps{
 
-    onClose : () => void
-    isOpen : boolean
+    onClose : () => void,
+    isOpen : boolean,
+    imOwner: boolean,
     children: ReactNode 
 }
 
-const ChannelCardMenu:React.FC<ChannelCardMenuProps> = ({onClose, isOpen = false, children}) =>{
+const ChannelCardMenu:React.FC<ChannelCardMenuProps> = ({onClose, imOwner = false, isOpen = false, children}) =>{
 
     return (
     <Popover onClose={onClose} backdrop="transparent" isOpen={isOpen} placement="bottom"  showArrow={true}>
@@ -88,20 +89,32 @@ const ChannelCardMenu:React.FC<ChannelCardMenuProps> = ({onClose, isOpen = false
           
            
         </ListboxItem>
-
-        <ListboxItem key="delete" color="danger"  className="rounded-md">
+        {imOwner ? <ListboxItem key="delete" color="danger"  className="rounded-md">
             <div className="flex w-full items-center gap-4 justify-between">
                 <div >
                    <p className="text-[13px] font-normal">Delete Channel</p>  
 
                 </div>
-                <AddIcon/>
+
+
+            </div>
+          
+           
+        </ListboxItem> :
+         <ListboxItem key="delete" color="danger"  className="rounded-md">
+            <div className="flex w-full items-center gap-4 justify-between">
+                <div >
+                   <p className="text-[13px] font-normal">Leave Channel</p>  
+
+                </div>
 
 
             </div>
           
            
         </ListboxItem>
+        }
+        
       
       </Listbox>
       </PopoverContent>

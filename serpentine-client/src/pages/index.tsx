@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { decode, getToken } from "@/helpers/jwt-helper";
 import { useAuthStore } from "@/contexts/authentication-context";
+import CreateAccountForm from "@/components/forms/create-account-form";
 
 export default function IndexPage() {
 
@@ -41,13 +42,16 @@ export default function IndexPage() {
 
   return (
     <LoginLayout>
-     <div className="w-full  h-screen max-sm:h-fit flex max-sm:flex-col items-center justify-center ">
-        <div className="w-[60%] max-sm:h-[50vh] max-md:w-full   relative h-full">
+     <div className="w-full relative h-screen max-sm:h-fit flex max-sm:flex-col items-center justify-center ">
+        <div className="w-full z-[0] static  h-full">
           <SerpentineBanner/>
         </div>
-        <div className="w-[40%]  max-md:w-full  flex overflow-auto scrollbar-hide  items-center   justify-center flex-col h-fit  max-h-full max-sm:max-h-fit px-2 py-6">
-          <div className="grain w-4 h-4 absolute inset-0"></div>
-          {view === "login" ? <LoginForm onViewChange={handleViewChange}/> : <><CreateUserForm  onViewChanged={handleViewChange}/></> }
+        <div className="w-screen h-screen backdrop-blur-xl absolute z-[1]">
+            <div className="grain w-4 h-4 absolute inset-0"></div>
+
+        </div>
+      <div className="w-[30%] z-[2] max-md:w-[80%] absolute flex overflow-y-scroll scrollbar-hide items-center justify-center flex-col max-h-screen px-2 py-4">
+          {view === "login" ? <LoginForm onViewChange={handleViewChange}/> : <><CreateAccountForm  onClose={handleViewChange}/></> }
         </div>
      </div>
     </LoginLayout>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useFetch } from "@/helpers/axios-helper";
 import LoginUserRequest from '@/models/requests/user/login-user-request';
 import { addToast } from '@heroui/toast';
@@ -8,11 +8,8 @@ import { UserResponse } from '@/models/responses/user-response';
 import { GetByUsernameRequest } from '@/models/requests/user/get-by-username';
 import { useAuthStore } from '@/contexts/authentication-context';
 import { useNavigate } from 'react-router-dom';
+import { HookState } from '@/models/api-result';
 
-interface UseApiState<T> {
-    loading: boolean;
-    data: ApiResult<T>;
-}
 
 const initialApiState = <T>(): ApiResult<T> => ({
     statusCode: 0,
@@ -23,18 +20,17 @@ const initialApiState = <T>(): ApiResult<T> => ({
 });
 
 const handleApiErrors = (data: ApiResult<any>) => {
-    if (data.statusCode === 400 || data.statusCode === 422) {
-        data.errors?.forEach(error => {
-            addToast({
-                title: "Validation Error",
-                description: error,
-            });
+    data.errors?.forEach(error => {
+        addToast({
+            title: "Validation Error",
+            description: error,
         });
-    }
+    });
+    
 };
 
 export function useLoginUser() {
-    const [{ loading, data }, setState] = useState<UseApiState<JWTResponse>>({
+    const [{ loading, data }, setState] = useState<HookState<JWTResponse>>({
         loading: false,
         data: initialApiState()
     });
@@ -72,64 +68,74 @@ export function useLoginUser() {
 }
 
 export function useCreateUser() {
-    const [{ loading, data }, setState] = useState<UseApiState<UserResponse>>({
-        loading: false,
-        data: initialApiState()
-    });
+  
+    const [isCreatingUser, setIsCreatingUser] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<UserResponse>>(initialApiState);
     const { post } = useFetch<UserResponse>();
 
     useEffect(() => {
-        if (!data.statusCode || data.statusCode === 401) return;
+        if (!result.statusCode || result.statusCode === 401) return;
 
-        if (data.data && data.statusCode === 200) {
+        if (result.data && result.isSuccess) {
             addToast({ title: "Creation Successful", description: "Your account was created successfully" });
-        } else if (data.statusCode === 409) {
-            addToast({ title: "Creation Failed", description: data.message });
-        } else {
-            handleApiErrors(data);
         }
+        else{
+            handleApiErrors(result);
+        }
+        setIsCreatingUser(false);
 
-        setState(prev => ({ ...prev, loading: false }));
-    }, [data]);
+    }, [result]);
 
     const createUser = async (user: FormData) => {
-        setState({ loading: true, data: initialApiState() });
+        setResult(initialApiState());
+        setIsCreatingUser(true);
         const response = await post({endpoint:"user/create", requireToken: false, contentType:"multipart/form-data"}, user);
-        setState({ loading: false, data: response });
+        setResult(response);
     };
 
-    return { createUser, loading, data };
+    return { createUser,result, isCreatingUser };
 }
 
 export function useGetByUsername() {
-    const [{ loading, data }, setState] = useState<UseApiState<UserResponse>>({
-        loading: false,
-        data: initialApiState()
-    });
+   
+    const [isAvailable, setIsAvailable] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<UserResponse>>(initialApiState);
+    const [isGettingByUsername, setIsGettingByUsername] = useState<boolean>(false);
     const { get } = useFetch<UserResponse>();
 
     useEffect(() => {
-        if (!data.statusCode || data.statusCode === 401) return;
 
-        if (data.data && data.statusCode === 200) {
+        if (!result.statusCode || result.statusCode === 401) return;
+
+        if (result.data && result.isSuccess) {
             addToast({ title: "Oops!", description: "This username is already taken" });
-        } else if (data.statusCode !== 404) {
-            handleApiErrors(data);
-            if (data.statusCode !== 400 && data.statusCode !== 422) {
-                addToast({ title: "An error has occurred", description: data.message });
-            }
+            
+        } else if (result.statusCode === 404) {
+            setIsAvailable(true);
+        }
+        else
+        {
+            handleApiErrors(result);
+
         }
 
-        setState(prev => ({ ...prev, loading: false }));
-    }, [data]);
+        setIsGettingByUsername(false);
+
+    }, [result]);
 
     const getByUsername = async (data: GetByUsernameRequest) => {
-        setState({ loading: true, data: initialApiState() });
+
+        setResult(initialApiState());
+        setIsGettingByUsername(true);
+        setIsAvailable(false);
         const response = await get({endpoint: "user/by-username?", requireToken: false,}, data );
-        setState({ loading: false, data: response });
+        setResult(response);
+
+       
+      
     };
 
-    return { getByUsername, loading, data };
+    return { getByUsername, result,  isAvailable,  setIsAvailable, isGettingByUsername };
 }
 
 export function useCloseSession() {

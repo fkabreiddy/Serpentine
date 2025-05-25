@@ -22,6 +22,86 @@ namespace SerpentineApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Channel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AdultContent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("MembersCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Channels");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChannelId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSilenced")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastAccess")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ChannelId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ChannelMembers");
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -62,6 +142,35 @@ namespace SerpentineApi.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelMember", b =>
+                {
+                    b.HasOne("SerpentineApi.DataAccess.Models.Channel", "Channel")
+                        .WithMany("Members")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SerpentineApi.DataAccess.Models.User", "User")
+                        .WithMany("MyChannels")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Channel", b =>
+                {
+                    b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
+                {
+                    b.Navigation("MyChannels");
                 });
 #pragma warning restore 612, 618
         }

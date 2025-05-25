@@ -4,13 +4,15 @@ import { picture } from "motion/react-client";
 import ChannelCardMenu from "./channel-card-menu";
 import GroupCard from "../groups/group-card";
 import { motion } from "motion/react";
+import { ChannelResponse } from "@/models/responses/channel-response";
+import { Badge } from "../ui/badge";
 
 interface ChannelCardProps{
     index : number,
-    name : string
+    channel: ChannelResponse
 }
 
-const ChannelCard:React.FC<ChannelCardProps> = ({index, name}) =>{
+const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
 
     const [selected, setSelected] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -36,11 +38,17 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, name}) =>{
             <li   onContextMenu={(e) =>  {e.preventDefault(); setIsExpanded(false); setSelected(true);}}  className={`flex w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : " z-[-1] hover:bg-default-50/20"}   flex-col gap-2 border-b    transition-all cursor-pointer border-b-default-100 py-2 `}>
                 <div className="flex items-start w-full max-w-full gap-3 justify-between py-2 px-4">
                     <div className="flex text-ellipsis overflow-hidden  flex-col" onClick={() => {setIsExpanded(!isExpanded);}}>
-                        <p className="text-[13px] font-semibold opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full"># {name}</p>
-                        <span className="text-[11px]  opacity-30">Id.01321312</span>
+                        <p className="text-[13px] font-semibold opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">#{channel.name}</p>
+                        <span className="text-[11px]  opacity-30">Id.{channel.id}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Mute/>
+                        {
+                            channel.myMember.isOwner && <p className="text-[11px] font-semibold text-default-300">Owned</p>
+                        }
+                        {
+                            channel.myMember.isSilenced && <Mute/>
+
+                        }
 
                     </div>
                 </div>

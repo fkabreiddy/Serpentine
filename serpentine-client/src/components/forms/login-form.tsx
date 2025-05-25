@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
 import { Spinner } from "@heroui/spinner";
 import * as motion from "motion/react-client";
 import { ThemeSwitch } from "../theme-switch";
 import LoginUserRequest from "@/models/requests/user/login-user-request";
 import { useLoginUser } from "../../hooks/user-hooks";
+import { Input } from "@heroui/input";
 
 interface LoginFormProps {
     onViewChange: () => void;
@@ -40,27 +40,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onViewChange }) => {
             <ThemeSwitch />
             <p className="text-2xl my-2 font-semibold">Welcome to Serpentine</p>
 
-            <form onSubmit={handleSubmit} className="w-[60%] max-sm:w-[80%] max-xs:w-[90%] flex flex-col gap-3 mt-4">
-                <FormField
+            <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3 mt-4">
+                <Input
                     label="Username"
                     type="text"
                     name="userName"
                     placeholder="Enter your user name"
-                    icon={<UserIcon />}
+                    endContent={<UserIcon />}
                     minLength={3}
                     maxLength={30}
+                    labelPlacement="outside"
+                    autoComplete="username"
                     description="Not need to put @"
                     onChange={handleChange}
                 />
 
-                <FormField
+                <Input
                     label="Password"
                     type="password"
                     name="password"
                     placeholder="Enter your password"
                     minLength={8}
                     maxLength={30}
-                    icon={<PasswordIcon/>}
+                    labelPlacement="outside"
+                    autoComplete="current-password"
+                    endContent={<PasswordIcon/>}
                     description="Password must be at least 8 characters."
                     onChange={handleChange}
                 />
@@ -89,22 +93,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onViewChange }) => {
     );
 };
 
-const FormField: React.FC<{
-    label: string;
-    type: string;
-    name: string;
-    placeholder: string;
-    icon: React.ReactNode;
-    minLength: number;
-    maxLength: number;
-    description: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ label, ...props }) => (
-    <div className="flex flex-col gap-1">
-        <label className="text-sm font-semibold ml-1 text-start">{label}</label>
-        <Input {...props} endContent={props.icon} radius="md" required />
-    </div>
-);
+
 
 const Divider = () => (
     <div className="w-[60%] max-sm:w-[80%] max-xs:w-[90%] items-center mt-7 flex gap-3">

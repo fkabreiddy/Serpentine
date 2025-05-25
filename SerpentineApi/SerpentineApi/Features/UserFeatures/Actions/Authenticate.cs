@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 using SerpentineApi.Identity;
 
@@ -86,11 +87,13 @@ internal class AuthenticateUserEndpoint : IEndpoint
         .AllowAnonymous()
         .RequireCors()
         .Accepts<AuthenticateUserRequest>(false, "application/json")
-        .Produces<SuccessApiResult<Jwt>>(200)
-        .Produces<NotFoundApiResult>(404)
-        .Produces<BadRequestApiResult>(400)
-        .Produces<ServerErrorApiResult>(500)
-        .Produces<ValidationApiResult>(422)
+        .Produces<SuccessApiResult<Jwt>>(200, "application/json")
+        .Produces<NotFoundApiResult>(404, "application/json")
+        .Produces<BadRequestApiResult>(400, "application/json")
+        .Produces<ServerErrorApiResult>(500, "application/json")
+        .Produces<ValidationApiResult>(422, "application/json")
+        .Stable()
+        .WithDescription($"Authenticates an user based on the credentials. Requires a {nameof(AuthenticateUserRequest)}. Returns {nameof(Jwt)}")
         .WithName(nameof(AuthenticateUserEndpoint));
     }
 

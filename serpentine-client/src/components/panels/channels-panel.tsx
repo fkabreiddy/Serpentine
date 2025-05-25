@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import SearchChannelBar from "../search-channel-bar";
 import ChannelCard from "../channels/channel-card";
 import {ScrollShadow} from "@heroui/scroll-shadow";
@@ -6,6 +6,8 @@ import { AnimatedList } from "@/components/magicui/animated-list";
 import { useIsMobile } from '../../hooks/use-mobile';
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/contexts/authentication-context";
+import { useGetChannelsByUserId } from "@/hooks/channel-hooks";
 
 import {
   Drawer,
@@ -19,6 +21,10 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ChannelResponse } from "@/models/responses/channel-response";
+import { user } from '@heroui/theme';
+import { Spinner } from "@heroui/spinner";
+import { start } from "repl";
 
 interface ChannelsPanelProps{
 
@@ -83,9 +89,38 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
 const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
 
     const [filter, setFilter] = useState<string>("");
+    const [isMounted, setIsMounted] = useState<boolean>(false);
     const [joinChannelIsOpen, setJoinChannelIsOpen] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
-    const channels = ["svelte", "blazor", "pokemon", "final-fantasy", "fka-twigs", "youtube"]
+    const {userId} = useAuthStore();
+
+    const {getChannelsByUserId, channels, hasMore, setHasMore, setChannels } = useGetChannelsByUserId();
+
+  useEffect(() => {
+   setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      
+      startTransition(() => {
+        fetchChannels();
+      });
+    }
+  }, [userId]);
+
+  const fetchChannels = async () => {
+  
+      await getChannelsByUserId({ userId: userId ?? 0, take: 5, skip: channels.length });
+     
+  };
+   
+
+    if (!isMounted) {
+        return <></>;
+    }
+
     return(
 
         <div className="w-[23%] bg-white dark:bg-black  max-md:w-full flex flex-col border-r border-y border-default-100 overflow-auto h-screen scroll-smooth scrollbar-hide">
@@ -95,23 +130,36 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
             </div>
             <div className="border-b flex border-default-100 h-[30px] justify-between bg-default-50/50 backdrop-blur-lg   p-3  z-[1] sticky top-[50px] items-center">
                 <label className="text-xs  opacity-50">My Channels</label>
-                 <JoinChannelDrawer />
+                 <JoinChannelDrawer open={joinChannelIsOpen} openChanged={setJoinChannelIsOpen} />
 
                 
             </div>
-            <ScrollShadow hideScrollBar >
-               <ul className=" h-full overflow-auto scrollbar-hide  scroll-smooth">
-                    <AnimatedList delay={0} className="gap-0" >
-                    {channels
-                        .filter(ch => ch.toLowerCase().includes(filter.toLowerCase()))
-                        .map((ch, i) => (
-                            <ChannelCard  key={`${i}-${ch}`}  index={i} name={ch} />
-                        ))}
-                    </AnimatedList>
-               </ul>
-                
+            <ScrollShadow hideScrollBar className=" flex flex-col">
               
-             
+              
+              {channels.length === 0 && isPending === false ? (
+                <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
+                  <p className="text-xl font-semibold text-default-300">(ᵔᴥᵔ)</p>
+                  <p className="text-xs font-semibold text-default-300">It seems like you dont have any channel yet</p>
+                </div>
+              ) : (
+                <ul className="h-full overflow-auto scrollbar-hide scroll-smooth">
+                  <AnimatedList delay={0} className="gap-0">
+                    {channels
+                      .filter(ch => ch.name.toLowerCase().includes(filter.toLowerCase()))
+                      .map((ch, i) => (
+                        <ChannelCard key={`${i}-${ch.name}`} index={i} channel={ch} />
+                    ))}
+                  </AnimatedList>
+                  {isPending &&
+                   <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
+                      <Spinner size="sm" variant="spinner" color="default"/>
+                    </div>
+                  }
+
+                 
+                </ul>
+              )}
             </ScrollShadow>
 
             

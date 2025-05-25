@@ -8,4 +8,10 @@ class ApiResult<T> {
   ) {}
 }
 
+export interface HookState<T> {
+    loading: boolean;
+    data: ApiResult<T>;
+}
+
+
 export default ApiResult;

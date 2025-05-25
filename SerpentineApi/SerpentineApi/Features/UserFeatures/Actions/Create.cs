@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 using SerpentineApi.Services.CloudinaryStorage;
 
@@ -13,7 +14,7 @@ namespace SerpentineApi.Features.UserFeatures.Actions;
 public class CreateUserRequest : IRequest<OneOf<UserResponse, Failure>>
 {
     
-    [Required, MaxLength(30), JsonPropertyName("userName"), MinLength(3), RegularExpression(@"^[a-zA-Z0-9._]+$"), FromForm]
+    [Required, MaxLength(30), JsonPropertyName("username"), MinLength(3), RegularExpression(@"^[a-zA-Z0-9._]+$"), FromForm]
     public string Username { get; set; } = null!;
     
     [Required, MaxLength(30), RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$"), JsonPropertyName("password"), MinLength(8), FromForm]
@@ -123,7 +124,9 @@ public class CreateUserEndpoint : IEndpoint
             .Produces<BadRequestApiResult>(400, "application/json")
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")
-            .WithName(nameof(CreateUserEndpoint));
+            .WithName(nameof(CreateUserEndpoint))
+            .Stable()
+            ;
     }
 }
 

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 
 namespace SerpentineApi.Features.UserFeatures.Queries;
@@ -82,6 +83,7 @@ internal class GetUserByUsernameEndpoint : IEndpoint
         .Produces<BadRequestApiResult>(400)
         .Produces<ServerErrorApiResult>(500)
         .Produces<ValidationApiResult>(422)
+        .Stable()
         .WithName(nameof(GetUserByUsernameEndpoint));
     }
 

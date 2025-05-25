@@ -1,4 +1,7 @@
 export class UserResponse {
+    id: number = 0;
+    createdAt: Date = new Date();
+    updatedAt: Date = new Date();
     fullName: string = '';
     username: string = '';
     profilePictureUrl: string = '';

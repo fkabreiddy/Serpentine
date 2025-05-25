@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.OpenApi.Models;
 using SerpentineApi;
 using Scalar.AspNetCore;
 using SerpentineApi.Dependencies;
+using SerpentineApi.Helpers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +20,7 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApiServices();
 
 
 var app = builder.Build();
@@ -34,8 +36,11 @@ if (app.Environment.IsDevelopment())
             .WithTitle("Serpentine API")
             .WithSidebar(true);
         // Bearer
-        options
-            .WithPreferredScheme("Bearer"); // Security scheme name from the OpenAPI document
+        options.Authentication = 
+            new ScalarAuthenticationOptions
+            {
+                PreferredSecuritySchemes = [ApiConstants.AuthenticationScheme]
+            }; // Security scheme name from the OpenAPI document
 
 
     });

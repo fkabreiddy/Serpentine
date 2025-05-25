@@ -55,25 +55,25 @@
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "OneOf": {
               "target": "Package",
@@ -85,7 +85,7 @@
             },
             "Scalar.AspNetCore": {
               "target": "Package",
-              "version": "[2.2.5, )"
+              "version": "[2.4.2, )"
             }
           },
           "imports": [
