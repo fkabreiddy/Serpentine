@@ -118,8 +118,7 @@ internal class AuthenticateUserRequestHandler(
         var user = await dbContextAccessor.GetAnyAsync(
             u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim() && u.Password == hashedPassword,
             cancellationToken: cancellationToken);
-
-
+        
         if (user is null)
             return new NotFoundApiResult("Invalid credentials");
 

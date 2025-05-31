@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@heroui/accordion": "^2.2.16",
     "@heroui/alert": "^2.2.19",
     "@heroui/autocomplete": "^2.3.20",
@@ -60,6 +61,7 @@
     "@heroui/use-theme": "2.1.8",
     "@heroui/user": "^2.2.15",
     "@hookform/resolvers": "^5.0.1",
+    "@internationalized/date": "^3.8.0",
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-aspect-ratio": "^1.1.6",
@@ -89,6 +91,7 @@
     "@react-aria/visually-hidden": "3.8.22",
     "@react-types/shared": "3.29.0",
     "axios": "^1.9.0",
+    "boring-avatars": "^1.11.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

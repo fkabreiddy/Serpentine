@@ -26,15 +26,28 @@ public class CreateUserRequest : IRequest<OneOf<UserResponse, Failure>>
     
     [Required, JsonPropertyName("fullName"), MaxLength(30), MinLength(10), RegularExpression(@"^[\p{L}\p{M}0-9\s]+$"), FromForm]
     public string FullName { get; set; } = null!;
-
-    [JsonPropertyName("profilePictureUrl"), Url, FromForm]
-    public string? ProfilePictureUrl { get; set; } 
-    
     
     [JsonPropertyName("imageFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
     public IFormFile? ImageFile { get; set; }
 
- 
+    [BindNever, JsonIgnore] public int Age => GetAge(this.DayOfBirth);
+        
+    [JsonPropertyName("dayOfBirth"), FromForm, Required]
+    public DateTime DayOfBirth { get; set; }
+
+    private int GetAge(DateTime dateOfBirth)
+    {
+        DateTime hoy = DateTime.Now;
+        int edad = hoy.Year - dateOfBirth.Year;
+
+        // Si aún no ha cumplido años este año, se resta uno
+        if (dateOfBirth.Date > hoy.AddYears(-edad)) 
+        {
+            edad--;
+        }
+
+        return edad;
+    }
 
 }
 
@@ -59,11 +72,10 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
         RuleFor(x => x.ConfirmPassword)
             .NotEmpty().WithMessage("Confirm Password is required.")
             .Equal(x => x.Password).WithMessage("Passwords do not match.");
-
-
-        RuleFor(x => x.ProfilePictureUrl)
-            .Must(pfp => pfp == null || Uri.IsWellFormedUriString(pfp, UriKind.Absolute))
-            .WithMessage("Profile picture must be null or an URL");
+        
+        RuleFor(x => x.Age)
+            .InclusiveBetween(16, 100)
+            .WithMessage("Age must be between 16 and 100.");
            
         RuleFor(x => x.FullName)
             .NotEmpty().WithMessage("Full name is required.")
@@ -156,7 +168,7 @@ internal class CreateUserRequestHandler(
         
         if (result.Entity.Id > 0)
         {
-            if (request.ImageFile is not null && request.ProfilePictureUrl is null)
+            if (request.ImageFile is not null)
             {
                 var imageUploaded = await cloudinaryService.UploadImage(request.ImageFile, CloudinaryFolders.ProfilePictures.ToString(), result.Entity.Id.ToString());
                 if (imageUploaded.TaskSucceded())
@@ -166,13 +178,9 @@ internal class CreateUserRequestHandler(
 
                 }
             }
-            else
-            {
-                result.Entity.ProfilePictureUrl = request.ProfilePictureUrl;
+           
 
-            }
-
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
             
             context.ChangeTracker.Clear();
             
@@ -183,7 +191,7 @@ internal class CreateUserRequestHandler(
         }
 
 
-        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == result.Entity.Id);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == result.Entity.Id, cancellationToken);
 
         if (user is null)
         {

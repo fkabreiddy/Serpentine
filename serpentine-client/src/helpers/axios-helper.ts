@@ -112,7 +112,7 @@ export function useFetch<T>() {
       }
 
       if (response.data.statusCode === 401) {
-        return createApiResult(false, 401, "Session Expired", ["Session Expired"]);
+        return createApiResult(false, 401, "Oops", ["Your session has expired, please login again"]);
       }
 
       return response.data;

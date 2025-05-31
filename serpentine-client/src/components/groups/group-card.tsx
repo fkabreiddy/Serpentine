@@ -7,21 +7,26 @@ interface GroupCardProps{
 
 const GroupCard : React.FC<GroupCardProps> = ({cover = null}) =>{
     return(
-        <div className="flex flex-col items-end w-full">
+        <li className="flex transition-all hover:bg-default-50/20 border-t border-neutral-900/20 flex-col items-end w-full">
 
-            <li className=" p-3 w-full gap-3 flex items-center  ">
-                <div className="rounded-full shrink-0 bg-default-50 w-6 h-6 flex items-center hover:bg-blue-600 z-[0]  hover:text-white cursor-pointer transition-all justify-center">
-                                {cover === "" || cover === null ? <HashIcon/> : <Image   className="h-6 w-6 rounded-full z-[0]" src={cover}/>}
-                </div>
-                <div className="flex text-ellipsis overflow-hidden   w-full flex-col gap-0">
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold opacity-80 hover:text-blue-600 hover:underline">Group name</span>
+            <div className="w-full flex items-center justify-between gap-1">
+                 <div className=" p-3 w-full gap-3 flex items-center   ">
+                    <div className="rounded-full shrink-0 bg-default-50 w-6 h-6 flex items-center hover:bg-blue-500 z-[0]  hover:text-white cursor-pointer transition-all justify-center">
+                                    {cover === "" || cover === null ? <HashIcon/> : <Image   className="h-6 w-6 rounded-full z-[0]" src={cover}/>}
                     </div>
-                    <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">fka.breiddy: hola</span>
+                    <div className="flex text-ellipsis overflow-hidden   w-full flex-col gap-0">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold opacity-80 hover:text-blue-500 hover:underline">Group name</span>
+                        </div>
+                        <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">fka.breiddy: hola</span>
+                    </div>
                 </div>
-            </li>
 
-        </div>
+                <div className="w-1 h-1 bg-blue-800 rounded-full mr-4 "/>
+            </div>
+           
+
+        </li>
        
     )
 }

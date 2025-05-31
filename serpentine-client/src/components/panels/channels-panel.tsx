@@ -3,11 +3,14 @@ import SearchChannelBar from "../search-channel-bar";
 import ChannelCard from "../channels/channel-card";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import { AnimatedList } from "@/components/magicui/animated-list";
+import { ArchiveIcon } from "lucide-react";
 import { useIsMobile } from '../../hooks/use-mobile';
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/contexts/authentication-context";
+import { PackageOpenIcon } from "lucide-react";
 import { useGetChannelsByUserId } from "@/hooks/channel-hooks";
+import { SearchIcon } from "lucide-react";
 
 import {
   Drawer,
@@ -21,10 +24,13 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ChannelResponse } from "@/models/responses/channel-response";
-import { user } from '@heroui/theme';
+import { RocketLaunchIcon } from "@heroicons/react/24/solid";
 import { Spinner } from "@heroui/spinner";
-import { start } from "repl";
+import Divider from "../divider";
+import { Tooltip } from "@heroui/tooltip";
+import IconButton from '../icon-button';
+import {Plus} from "lucide-react"
+
 
 interface ChannelsPanelProps{
 
@@ -46,8 +52,11 @@ const [open, setOpen] = useState(false);
   return (
     <Drawer open={open}  onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-                <Button variant="light" color="primary" size="sm"  className="font-xs p-0 text-blue-500">Join a channel</Button>
-      </DrawerTrigger>
+          <IconButton tootltipText="Create a channel" >
+                <Plus className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
+
+          </IconButton>      
+        </DrawerTrigger>
       <DrawerContent className={cn(
         `${isMobile ? "" : "absolute w-[25%] justify-self-end h-screen bottom-0 z-50   flex  flex-col   "} border backdrop-blur-xl bg-default-50 border-default-100`
  
@@ -91,28 +100,36 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
     const [filter, setFilter] = useState<string>("");
     const [isMounted, setIsMounted] = useState<boolean>(false);
     const [joinChannelIsOpen, setJoinChannelIsOpen] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
-    const {userId} = useAuthStore();
+    const {user} = useAuthStore();
 
-    const {getChannelsByUserId, channels, hasMore, setHasMore, setChannels } = useGetChannelsByUserId();
+    const {getChannelsByUserId, channels, hasMore, loadingChannels, isBusy } = useGetChannelsByUserId();
+
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
+
+   
+
+  const hasFetched = React.useRef(false);
 
   useEffect(() => {
-   setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (userId) {
-      
-      startTransition(() => {
-        fetchChannels();
-      });
+    if (user && !loadingChannels && !isBusy && !hasFetched.current) {
+      hasFetched.current = true;
+      fetchChannels();
     }
-  }, [userId]);
+  }, [user]);
+
+  const searchAgain = async () =>{
+    
+   
+  }
+
 
   const fetchChannels = async () => {
   
-      await getChannelsByUserId({ userId: userId ?? 0, take: 5, skip: channels.length });
+    await getChannelsByUserId({ userId: parseInt(user?.sub ?? "0"), take: 5, skip: channels.length });
      
   };
    
@@ -123,43 +140,77 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
 
     return(
 
-        <div className="w-[23%] bg-white dark:bg-black  max-md:w-full flex flex-col border-r border-y border-default-100 overflow-auto h-screen scroll-smooth scrollbar-hide">
-            <div className="border-b border-b-default-100 h-[50px] justify-center backdrop-blur-lg pr-4  p-2  z-[1] sticky top-0 items-center ">
-                
-                <SearchChannelBar onSearch={setFilter} />
-            </div>
-            <div className="border-b flex border-default-100 h-[30px] justify-between bg-default-50/50 backdrop-blur-lg   p-3  z-[1] sticky top-[50px] items-center">
-                <label className="text-xs  opacity-50">My Channels</label>
-                 <JoinChannelDrawer open={joinChannelIsOpen} openChanged={setJoinChannelIsOpen} />
+        <div className="w-[28%] rounded-r-xl border-r border-y max-md:border-y-0 max-md:rounded-b-none bg-neutral-100 dark:bg-neutral-900/20 max-md:w-full flex flex-col  border-defult-100 dark:border-default-50   overflow-auto h-screen scroll-smooth scrollbar-hide">
 
-                
-            </div>
-            <ScrollShadow hideScrollBar className=" flex flex-col">
-              
-              
-              {channels.length === 0 && isPending === false ? (
-                <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
-                  <p className="text-xl font-semibold text-default-300">(ᵔᴥᵔ)</p>
-                  <p className="text-xs font-semibold text-default-300">It seems like you dont have any channel yet</p>
-                </div>
-              ) : (
-                <ul className="h-full overflow-auto scrollbar-hide scroll-smooth">
-                  <AnimatedList delay={0} className="gap-0">
-                    {channels
-                      .filter(ch => ch.name.toLowerCase().includes(filter.toLowerCase()))
-                      .map((ch, i) => (
-                        <ChannelCard key={`${i}-${ch.name}`} index={i} channel={ch} />
-                    ))}
-                  </AnimatedList>
-                  {isPending &&
-                   <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
-                      <Spinner size="sm" variant="spinner" color="default"/>
+            <div className="  border-defult-100 dark:border-default-50 flex  justify-between gap-2 backdrop-blur-lg   px-4 py-3  z-[1] sticky top-0 items-center ">
+               {showSearchBar ?                 
+                  
+                  <SearchChannelBar onCancel={() => { setShowSearchBar(false)}} onSearch={setFilter} /> :
+                  <>
+                    <label className="font-normal text-xs opacity-30 flex-nowrap text-nowrap">Your channels</label>
+                    <div className="flex items-center gap-3">
+
+                      <IconButton onClick={()=> setShowSearchBar(true)} tootltipText="Search channels" >
+                        <SearchIcon  className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
+
+                      </IconButton>
+                      <IconButton tootltipText="Archived channels" >
+                        <ArchiveIcon className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
+
+                      </IconButton>
+                      <JoinChannelDrawer open={joinChannelIsOpen} openChanged={setJoinChannelIsOpen} />
+
+                     
                     </div>
-                  }
-
+                  
+                  </>
                  
-                </ul>
-              )}
+                 
+               }
+               
+            </div>
+            
+            <ScrollShadow hideScrollBar className=" flex flex-col px-3 ">
+              
+              {
+                  (channels.length === 0 && loadingChannels === true) ? 
+                    
+                    <div className="h-screen w-full flex items-center justify-center">
+                          <Spinner color="default" variant="spinner" size="sm"/> 
+
+                    </div>
+                  : 
+
+                  <>
+                     {(channels.length === 0 && hasMore === false && loadingChannels === false) ? (
+                      <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
+                        <PackageOpenIcon className="size-[30px] animate-bounce  opacity-30"/>
+                        <p className="text-xs font-normal text-default-300">No channel yet</p>
+                        <p className="text-xs font-normal text-default-300">If you think this is an error <a className="text-yellow-500 ml-1 ${} underline cursor-pointer" onClick={async ()=>{await searchAgain()}}>try again</a></p>
+
+                      </div>
+                    ) : (
+                      <div className="h-full overflow-auto scrollbar-hide scroll-smooth">
+                          {channels
+                            .filter(ch => ch.name.toLowerCase().includes(filter.toLowerCase()))
+                            .map((ch, i) => (
+                              <ChannelCard key={`${i}-${ch.name}`} index={i} channel={ch} />
+                          ))}
+                        {loadingChannels &&
+                        <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
+                            <Spinner size="sm" variant="spinner" color="default"/>
+                          </div>
+                        }
+
+                      
+                      </div>
+                    )}
+                  </>
+              
+                 
+              }
+              
+              
             </ScrollShadow>
 
             

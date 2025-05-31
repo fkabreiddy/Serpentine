@@ -1,7 +1,7 @@
 import { useEffect, useState, useTransition } from 'react';
 import { useFetch } from "@/helpers/axios-helper";
 import LoginUserRequest from '@/models/requests/user/login-user-request';
-import { addToast } from '@heroui/toast';
+import { showToast } from '@/helpers/sonner-helper';
 import ApiResult from '@/models/api-result';
 import { JWTResponse } from '@/models/responses/jwt-response';
 import { UserResponse } from '@/models/responses/user-response';
@@ -21,50 +21,51 @@ const initialApiState = <T>(): ApiResult<T> => ({
 
 const handleApiErrors = (data: ApiResult<any>) => {
     data.errors?.forEach(error => {
-        addToast({
-            title: "Validation Error",
+        showToast({
+            title: "Error",
             description: error,
+            
         });
     });
     
 };
 
 export function useLoginUser() {
-    const [{ loading, data }, setState] = useState<HookState<JWTResponse>>({
-        loading: false,
-        data: initialApiState()
-    });
+    const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<JWTResponse>>(initialApiState());
     const navigate = useNavigate();
     const { post } = useFetch<JWTResponse>();
+    const {login} = useAuthStore();
 
     useEffect(() => {
-        if (!data.statusCode || data.statusCode === 401) return;
 
-        if (data.data && data.statusCode === 200) {
+        if (result.data && result.statusCode === 200) {
 
-            let token = data.data.token;
-            useAuthStore.getState().login(token, navigate);
-            addToast({ title: "Login Success", description: "You have successfully logged in" });
-            setState(prev => ({ ...prev, loading: false }));
+            let token = result.data.token;
+            login(token, ()=>{}, ()=>{navigate("/home")});
+            showToast({ title: "Login Success", description: "You have successfully logged in" });
+            setIsLoggingIn(false);
             navigate("/home")
 
 
-        } else if (data.statusCode === 404) {
-            addToast({ title: "Login Failed", description: "Invalid username or password" });
+        } else if (result.statusCode === 404) {
+            showToast({ title: "Login Failed", description: "Invalid username or password" });
         } else {
-            handleApiErrors(data);
+            handleApiErrors(result);
         }
 
-        setState(prev => ({ ...prev, loading: false }));
-    }, [data]);
+        setIsLoggingIn(false);
 
-    const login = async (user: LoginUserRequest) => {
-        setState({ loading: true, data: initialApiState() });
+    }, [result]);
+
+    const loginUser = async (user: LoginUserRequest) => {
+        setResult(initialApiState());
+        setIsLoggingIn(true);
         const response = await post({endpoint: "user/authenticate", requireToken: false}, user);
-        setState({ loading: false, data: response });
+        setResult(response);
     };
 
-    return { login, loading, data };
+    return { loginUser, isLoggingIn, result };
 }
 
 export function useCreateUser() {
@@ -74,10 +75,8 @@ export function useCreateUser() {
     const { post } = useFetch<UserResponse>();
 
     useEffect(() => {
-        if (!result.statusCode || result.statusCode === 401) return;
-
         if (result.data && result.isSuccess) {
-            addToast({ title: "Creation Successful", description: "Your account was created successfully" });
+            showToast({ title: "Creation Successful", description: "Your account was created successfully" });
         }
         else{
             handleApiErrors(result);
@@ -108,7 +107,7 @@ export function useGetByUsername() {
         if (!result.statusCode || result.statusCode === 401) return;
 
         if (result.data && result.isSuccess) {
-            addToast({ title: "Oops!", description: "This username is already taken" });
+            showToast({ title: "Oops!", description: "This username is already taken" });
             
         } else if (result.statusCode === 404) {
             setIsAvailable(true);

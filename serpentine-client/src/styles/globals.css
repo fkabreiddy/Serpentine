@@ -8,10 +8,23 @@
 *{
 
     
+    
     font-family: "Inter" !important;
 }
+
+
+    
+
 body, html {
    
+  
+
+    [data-slot="input-wrapper"] {
+        box-shadow: none !important;
+        
+        @apply border  border-default-foreground/5 !bg-default-50 !bg-opacity-50 !backdrop-blur-3xl ;
+        
+    }
 
     font-family: 'Inter',  !important;
     input, textarea {
@@ -92,16 +105,26 @@ input{
 
 }
 
+.animate-border-radius{
+    -webkit-transition:  border-radius 0.2s ease-in-out;
+    transition:  border-radius 0.2s ease-in-out;
+}
+
 
 
 .doodle-pattern {
-   position: relative;
+   position: absolute;
+    width: 100%;
+    height: 100%;
     background:  transparent  url('../../public/doodle3.svg')  repeat 0 0;
     bottom: 0;
     top:0;
+    left: 0;
+    right: 0;
+    opacity:0.2;
     z-index: -10;
-    opacity: 0.1;
     visibility: visible;
+ 
 
 
 
@@ -114,6 +137,20 @@ input{
     background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
    z-index: -10;
     opacity: 0.4;
+    visibility: visible;
+    
+
+   
+}
+
+.grain-lighter {
+
+    position: absolute;
+    width:100%;
+    height:100%;
+    background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
+   z-index: -10;
+    opacity: 0.2;
     visibility: visible;
     
 

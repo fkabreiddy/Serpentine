@@ -1,13 +1,38 @@
 import { motion } from "motion/react";
 import {useForm} from "react-hook-form"
 import { z } from "zod";
-import React, { useEffect, useRef, useTransition } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
+import Avatar from "boring-avatars"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetByUsername, useCreateUser } from "@/hooks/user-hooks";
 import { Button } from '@heroui/button';
 import { Input } from "@heroui/input";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Image } from "@heroui/image";
+import { UploadCloud, UploadIcon } from "lucide-react";
+import {ArrowUpIcon, MagnifyingGlassIcon} from '@heroicons/react/24/solid'
+import Divider from "../divider";
+import { DateInput } from "@heroui/date-input";
+import { CreateUserRequest } from "@/models/requests/user/create-user-request";
+import { CalendarIcon } from "lucide-react";
+import { parseDate, today, getLocalTimeZone, CalendarDate, parseAbsolute, } from "@internationalized/date";
+import { data } from "motion/react-client";
+import { CakeIcon } from "lucide-react";
+
+const minAge = () => {
+    const currentDate = today(getLocalTimeZone());
+    return currentDate.subtract({ years: 16 });
+};
+
+const maxAge = () => {
+    const currentDate = today(getLocalTimeZone());
+    return currentDate.subtract({ years: 100 });
+    // Convert calendar date to JavaScript Date for maxAge validation
+   
+};
+
+ 
+type FileType = File;
 
 // Remove the node:url import as we'll use the browser's URL API
 
@@ -18,28 +43,34 @@ interface CreateAccountFormProps {
 const createAccountSchema = z.object({
     fullName: z.string()
         .min(3, "Your name must be at least 3 characters")
-        .max(30, "Your name must be less than 30 characters"),
+        .max(30, "Your name must be less than 30 characters")
+        .regex(/^[a-zA-Z\s]+$/, "Full name can only contain letters and spaces")
+        .default(""),
   
     username: z.string()
         .min(3, "Username must be at least 3 characters")
         .max(30, "Username must be less than 30 characters")
-        .regex(/^[a-zA-Z0-9._]{3,30}$/, "Username can only contain letters, numbers, dots and underscores"),
+        .regex(/^[a-zA-Z0-9._]{3,30}$/, "Username can only contain letters, numbers, dots and underscores")
+        .default(""),
 
     password: z.string()
-           .min(8, "Password must be at least 8 characters")
-           .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-           .regex(/\d/, "Password must contain at least one number")
-           .regex(/[\W_]/, "Password must contain at least one special character"),
+        .min(8, "Password must be at least 8 characters")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/\d/, "Password must contain at least one number")
+        .regex(/[\W_]/, "Password must contain at least one special character")
+        .default(""),
            
-  confirmPassword: z.string(),
+    confirmPassword: z.string().default(""),
 
-    profilePictureUrl: z.string().nullable(),
-    imageFile: z.instanceof(File).nullable(),
+    imageFile: z.instanceof(File).nullable().default(null),
+    dayOfBirth: z.instanceof(CalendarDate).default(today(getLocalTimeZone()))
 
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirmPassword"],
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
 });
+
+
 
 
 
@@ -56,16 +87,63 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
             resolver: zodResolver(createAccountSchema),
             mode: "onChange",
             defaultValues: {
-                profilePictureUrl: "https://img.freepik.com/premium-vector/vector-abstract-grainy-texture-gradient-background_296715-733.jpg",
                 imageFile:null
             }
+            
 
         });
-    const file = watch("imageFile");
 
+
+
+
+        
     const {getByUsername,isAvailable, setIsAvailable, isGettingByUsername } = useGetByUsername();
     const profilePictureInput = useRef<HTMLInputElement>(null);
     const {createUser, result, isCreatingUser} = useCreateUser();
+    const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+    const [request, setRequest] = useState<CreateUserRequest>({
+        username: watch("username"),
+        fullName: watch("fullName"),
+        password: watch("password"),
+        dayOfBirth: today(getLocalTimeZone()).toString(),
+        confirmPassword: watch("confirmPassword"),
+        imageFile: watch("imageFile") as FileType | null,
+    });
+
+    const ageIsValid = () =>{
+
+        return watch("dayOfBirth") <= minAge() &&  watch("dayOfBirth") >= maxAge()
+    }
+
+
+    useEffect(() => {
+        setRequest({
+            username: watch("username"),
+            fullName: watch("fullName"),
+            password: watch("password"),
+            confirmPassword: watch("confirmPassword"),
+            dayOfBirth: today(getLocalTimeZone()).toString(),
+            imageFile: watch("imageFile") as FileType | null,
+        });
+
+        const date = watch("dayOfBirth");
+
+        if(date) {
+            setRequest((prev) => ({
+            ...prev,
+                dayOfBirth: date.toString()
+            }));
+        }
+        else
+        {
+             setRequest((prev) => ({
+            ...prev,
+                dayOfBirth:  today(getLocalTimeZone()).toString()
+            }));
+        }
+
+    }, [watch("username"), watch("fullName"), watch("password"), watch("dayOfBirth"), watch("confirmPassword"), watch("imageFile")]);
+
 
     const handleEditPictureClicked = () => {
         profilePictureInput.current?.click();
@@ -75,17 +153,16 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     const buildForm = () : FormData =>{
 
         const formData = new FormData();
-        formData.append('username', watch("username"));
-        formData.append('fullName', watch("fullName"));
-        formData.append('password', watch("password"));
-        formData.append('confirmPassword', watch("confirmPassword"));
+        formData.append('username', request.username);
+        formData.append('fullName', request.fullName);
+        formData.append('password', request.password);
+        formData.append('confirmPassword', request.confirmPassword);
+        formData.append("dayOfBirth", request.dayOfBirth);
      
-        formData.append('profilePictureUrl', watch("profilePictureUrl") ?? "");
 
-        if (watch("imageFile")) {
+        if (request.imageFile) {
 
-            const imageFile = watch("imageFile");
-            formData.append('imageFile', imageFile ? imageFile : "");
+            formData.append('imageFile', request.imageFile);
         }
 
         return formData;
@@ -94,17 +171,18 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     useEffect(()=>{
         if(result && result.isSuccess === true && result.statusCode === 200)
         {
-            onClose();
+            onClose()
         }
     },[result]);
 
-    const submit = async () => {
+    const submit = async (data: z.infer<typeof createAccountSchema>) => {
         const formData = buildForm();
+        console.log("Submitting form data:", formData);
         await createUser(formData);
        
     };
     
-
+    
     useEffect(() => {
 
         setIsAvailable(false);
@@ -113,7 +191,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     const clearPicture = () =>{
 
         setValue("imageFile", null);
-        setValue("profilePictureUrl", "https://img.freepik.com/premium-vector/vector-abstract-grainy-texture-gradient-background_296715-733.jpg");
+        setProfilePictureFile(null);
        
     }
 
@@ -135,7 +213,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                 }
 
                 setValue("imageFile", file);
-                setValue("profilePictureUrl", null);
+                setProfilePictureFile(file);
     
 
 
@@ -147,11 +225,15 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     }
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-
         processFile(file);
         
     };
 
+    const handleForm = (e : React.FormEvent) => {
+        e.preventDefault();
+        
+        handleSubmit(submit)(e);
+    }
    
 
    
@@ -175,38 +257,61 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
             >
             
             
-            <Input
-            {...register("imageFile")}
-            type="file"
-            ref={profilePictureInput}
-            accept="image/png, image/jpeg, image/webp, image/jpg"
-            multiple={false}
-            className="w-full  cursor-pointer border-2 invisible border-dashed border-default-100/80 hover:border-blue-700 items-center rounded-xl transition-all"
-            radius="md"
-            style={{display: "none"}}
-            variant="flat"
-            required={false}
+            <input
+                onChange={handleFileChange}
+                type="file"
+                ref={profilePictureInput}
+                accept="image/png, image/jpeg, image/webp, image/jpg"
+                multiple={false}
+                className="hidden"
             />
 
-           
+                <div className="w-full">
+                    
+                    {errors.dayOfBirth && (
+                        <p className="text-red-500 text-sm mt-1">{errors.dayOfBirth.message}</p>
+                    )}
+                    
+                </div>
 
-                <form  onSubmit={(e)=> { e.preventDefault(); handleSubmit(submit())}} className="w-full flex flex-col gap-3  mt-4">
-                <div>
-                    <h1 className="text-2xl font-semibold text-center">Create Account</h1>
-                    <p className="text-sm mb-4 font-normal opacity-60 ml-1 text-center">
-                        We need some information about you.
-                    </p>
-                </div>    
+                
+
+                <form   onSubmit={handleForm} className="w-full flex flex-col gap-3  mt-4">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-center">Create Account</h1>
+                        <p className="text-sm mb-4 font-normal opacity-60 ml-1 text-center">
+                            We need some information about you.
+                        </p>
+                     </div> 
+                        <div className="flex flex-col items-center justify-center gap-3 mb-2">
+                            {request.imageFile ? <FileAvatar file={request.imageFile} onRemove={clearPicture} onAdd={handleEditPictureClicked} /> : <Avatar className="transition-all" name={(isAvailable || request.username !== "") ? request.username : "adam" } size={70} variant="beam"/> }
+                                <Button
+                                    radius="md"
+                                    endContent={!request.imageFile && <ArrowUpIcon strokeWidth={2} className="size-4" />}
+                                    onPress={request.imageFile ? clearPicture : handleEditPictureClicked}
+                                    isDisabled={isGettingByUsername }
+                                    size="sm"
+                                    className={`w-fit backdrop-blur-xl ${request.imageFile && "bg-red-700 text-white "}  max-h-9 border border-default-100/20 transition-all text-xs font-semibold`}
+                                        
+                                >
+                                    <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
+                                    {request.imageFile ? "Reset": "Upload"}
+                                </Button>
+
+                        </div>  
+                     
+
                      <Input
                         type="text"
                         label="Username"
                         autoComplete="username"
                         labelPlacement="outside"
-                        value={watch("username")}
+                        value={request.username}
                         minLength={3}
                         maxLength={30}
                         required={true}
                         readOnly={isAvailable}
+                        isRequired={true}
                         pattern="^[a-zA-Z0-9._]{3,30}$"
                         endContent={<UserIcon />}
                         description="Dont put @, just your username"
@@ -233,17 +338,18 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                     setIsAvailable(false);
                                 } else {
                                    
-                                    await getByUsername({ username: watch("username") });
+                                    await getByUsername({ username: request.username});
                                      
                                 }
                             }}
-                            
-                            isDisabled={isGettingByUsername }
-                            className={`w-fit backdrop-blur-xl self-end  ${ isAvailable  ? " bg-blue-600 dark:bg-blue-700 text-white" : ""}  max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
+                            size="sm"
+                            radius="md"
+                            isDisabled={isGettingByUsername || request.username === "" }
+                            className={`w-fit backdrop-blur-xl self-end  ${ isAvailable  ? " bg-red-700 dark:bg-red-700 text-white" : ""}  max-h-9 border border-default-100/20 transition-all text-xs font-semibold`}
                                 
                         >
                             <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
-                            {isAvailable ? "Reset": "Check"}
+                            {isAvailable ? "Reset": "Check Availability"}
                         </Button>
                   
 
@@ -253,7 +359,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                         <>
                              <Input
                                 type="text"
-                                value={watch("fullName")}
+                                value={request.fullName}
                                 maxLength={30}
                                 minLength={10}
                                 required={true}
@@ -262,7 +368,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                 placeholder="What is your name in real life?"
                                 isInvalid={errors.fullName?.message !== undefined}
                                 errorMessage={errors.fullName?.message}
-
+                                isRequired={true}
                                description="This will not be used to identify you in the app"
                                 {...register("fullName")}
 
@@ -278,10 +384,11 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                 {...register("password")}
 
                                 labelPlacement="outside"
-                                value={watch("password")}
+                                value={request.password}
                                 placeholder="Your password"
                                 minLength={8}
                                 maxLength={30}
+                                isRequired={true}
                                 errorMessage={errors.password?.message}
                                 isInvalid={errors.password?.message !== undefined}
 
@@ -291,12 +398,13 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                             <Input
                                 {...register("confirmPassword")}
                                 type="password"
-                                value={watch("confirmPassword")}
+                                value={request.confirmPassword}
                                 label="Confirm Password"
                                 labelPlacement="outside"
                                 minLength={8}
                                 maxLength={30}
                                 required={true}
+                                isRequired={true}
                                 isInvalid={errors.confirmPassword?.message !== undefined}
                                 errorMessage={errors.confirmPassword?.message}
 
@@ -305,46 +413,26 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
 
 
                             />
-                            <div className="flex w-full items-center gap-2 opacity-40">
-                                <label className="text-xs opacity-50  font-semibold text-nowrap">Personalization</label>
-                                <hr className="border rounded-full dar:border-default-50 border-default-200 w-full"/>
-
-                            </div>
-                            <div className="flex w-full items-center gap-2">
-                                <Input
-                                    {...register("profilePictureUrl")}
-                                    type="url"
-                                    label="Profile Picture URL"
-                                    labelPlacement="outside"    
-                                    required={false}
-                                    disabled={watch("imageFile") !== null}
-                                    value={watch("profilePictureUrl") ?? ""}
-                                    placeholder="Insert your profile picture url"
-                                    description="Introduce a valid url"
-                                  
-                                />
-
-                                <div className="rounded-full bg-default-100">
-                                        <Image
-                                        isBlurred
-                                        className="rounded-full cursor-pointer bg-default-100 border-default/90 object-cover flex-shrink-0 max-h-[40px] max-w-[40px]"
-                                        src={!watch("profilePictureUrl") ? 
-                                            (file instanceof File ? window.URL.createObjectURL(file) : watch("profilePictureUrl")) 
-                                            : watch("profilePictureUrl")
-                                        }                   
-                                        onClick={watch("imageFile") ? clearPicture : handleEditPictureClicked}                
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
+                            <DateInput
+                                minValue={maxAge()}
+                                maxValue={minAge()}
+                                endContent={
+                                   <CakeIcon size={20} />
+                                }
                               
-                            </div>
-                            
+                                label="Day of birth"
+                                labelPlacement="outside"
+                                onChange={(e) => setValue("dayOfBirth", e ?? today(getLocalTimeZone()))}
+                                value={parseDate(request.dayOfBirth)}
+                                isRequired={true}
+                                placeholderValue={today(getLocalTimeZone())}
+                                />
+                                
 
                             <Button
-                            isDisabled={!isValid}
+                            isDisabled={!isValid || isCreatingUser || !ageIsValid()}
                             type="submit"
-                            spinner={isCreatingUser}
+                            isLoading={isCreatingUser}
                             className={`w-full backdrop-blur-xl bg-default-100/80  ${
                                 canProceed ? "opacity-50" : ""
                             } max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
@@ -360,6 +448,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                
                
             </form>
+
              <a
                     onClick={onClose}
                     className={`text-center mt-5 cursor-pointer hover:underline text-blue-600 dark:text-blue-700 text-sm font-semibold`}
@@ -371,6 +460,29 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
       
     );
 }
+
+interface FileAvatarProps {
+    file: File | null; 
+    onRemove: () => void;
+    onAdd: () => void;
+}
+
+const FileAvatar: React.FC<FileAvatarProps> = ({ file, onRemove, onAdd }) => (
+    <div className="rounded-full bg-default-100">
+            <Image
+            isBlurred
+            className="rounded-full cursor-pointer bg-default-100 border-default/90 object-cover flex-shrink-0 max-h-[70px] max-w-[70px]"
+            src={file instanceof File ? window.URL.createObjectURL(file) : ""}            
+            onClick={file ? onRemove : onAdd}                
+            width={70}
+            height={70}
+        />
+    </div>
+                              
+)
+
+
+
 
 
 const UserIcon = () => (

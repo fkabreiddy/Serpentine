@@ -13,15 +13,26 @@ public class User : BaseEntity
     
     public string? ProfilePictureUrl { get; set; }
     
-    [Required, MaxLength(30), MinLength(10), RegularExpression(@"^[a-zA-Z0-9]+$")]
+    [Required, MaxLength(30), MinLength(3)]
     public string FullName { get; set; } = null!;
-    
-    [Required, Range(16, 100)]
-    public int Age { get; set; }
-    
+
+    public DateTime DayOfBirth { get; set; } = DateTime.Now;
+
     public List<ChannelMember> MyChannels { get; set; } = new List<ChannelMember>();
-    
-    
+
+    private int GetAge(DateTime dateOfBirth)
+    {
+        DateTime hoy = DateTime.Now;
+        int edad = hoy.Year - dateOfBirth.Year;
+
+        // Si aún no ha cumplido años este año, se resta uno
+        if (dateOfBirth.Date > hoy.AddYears(-edad)) 
+        {
+            edad--;
+        }
+
+        return edad;
+    }
 
     public UserResponse ToResponse() => new()
     {
@@ -29,17 +40,18 @@ public class User : BaseEntity
         FullName = FullName,
         Username = Username,
         ProfilePictureUrl = ProfilePictureUrl ?? "",
-        Age = Age,
+        Age = GetAge(DayOfBirth),
     };
 
     public static User Create(CreateUserRequest request)
         => new()
         {
             FullName = request.FullName.Trim(),
-            Username = request.Username.Trim(),
+            Username = request.Username.Trim().ToLower(),
             Password = request.Password.Hash(),
             CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
+            UpdatedAt = DateTime.Now,
+            DayOfBirth = request.DayOfBirth
         };
 
 

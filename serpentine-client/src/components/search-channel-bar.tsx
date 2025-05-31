@@ -1,11 +1,16 @@
+import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import React, { ReactNode, useState } from "react";
+import IconButton from "./icon-button";
+import {X} from "lucide-react"
+
 
 interface SearchChannelBarProps {
     onSearch: (text: string) => void
+    onCancel?: () => void;
 }
 
-const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch}) => {
+const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel = () => {}}) => {
     const [searchText, setSearchText] = useState<string>("");
 
     React.useEffect(() => {
@@ -18,16 +23,27 @@ const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch}) => {
     };
 
     return (
-        <div className="flex w-full items-center gap-1">
-              <input
-           type="text"
-            className="w-full bg-transparent outline-none p-2"
-            value={searchText}
-            onChange={handleChange}
-            placeholder="Type to search a channel by name"
-        />
-        <SearchIcon/>
+        <div className="flex w-full items-start gap-3 animate-appearance-in">
+            <Input
+                
+                placeholder="Search something...."
+               value={searchText}
+                labelPlacement="outside"
+                autoComplete="current-password"
+                endContent={ <SearchIcon /> }
+                
+                description={"Type to serch channels by their name"}
+                onChange={handleChange}
+            />
+            <div>
+                 <div className="mt-[6px]"/>
+                <IconButton tootltipText="Cancel search">
+                    <X onClick={onCancel} className="size-[18px]"></X>
+                </IconButton>
+            </div>
+           
         </div>
+        
       
     )
 }

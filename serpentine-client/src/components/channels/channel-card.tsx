@@ -35,15 +35,18 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
         )}
 
         <ChannelCardMenu  isOpen={selected} >
-            <li   onContextMenu={(e) =>  {e.preventDefault(); setIsExpanded(false); setSelected(true);}}  className={`flex w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : " z-[-1] hover:bg-default-50/20"}   flex-col gap-2 border-b    transition-all cursor-pointer border-b-default-100 py-2 `}>
+            <div   onContextMenu={(e) =>  {e.preventDefault(); setIsExpanded(false); setSelected(true);}}  className={`flex  w-full max-w-full ${selected ? "relative z-50 scale-[105%] bg-default-100/50 border-none rounded-xl" : " z-[-1] "} ${isExpanded ? "" : "hover:bg-default-50/20"}  flex-col gap-1 bg-default-100/5 border-none rounded-md  mt-2  transition-all cursor-pointer border-b-default-100 pt-2 `}>
                 <div className="flex items-start w-full max-w-full gap-3 justify-between py-2 px-4">
                     <div className="flex text-ellipsis overflow-hidden  flex-col" onClick={() => {setIsExpanded(!isExpanded);}}>
-                        <p className="text-[13px] font-semibold opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">#{channel.name}</p>
+                        <p className="text-[13px] hover:underline font-semibold opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">#{channel.name}</p>
                         <span className="text-[11px]  opacity-30">Id.{channel.id}</span>
                     </div>
                     <div className="flex items-center gap-3">
                         {
-                            channel.myMember.isOwner && <p className="text-[11px] font-semibold text-default-300">Owned</p>
+                            channel.myMember.isOwner && 
+                            <p className="text-[10px] font-normal bg-default-50  px-2 py-[2px]  rounded-md opacity-80">
+                                Owned
+                            </p>
                         }
                         {
                             channel.myMember.isSilenced && <Mute/>
@@ -53,7 +56,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
                     </div>
                 </div>
                 {isExpanded ?
-                    <div className="flex items-end flex-col  ml-5 ">
+                    <ul className="flex items-end flex-col   ">
                             
                          {[...Array(4)].map((_, i) => (
 
@@ -67,7 +70,6 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
                                     className="flex flex-col items-end w-full relative "
                                 >
                                       <GroupCard key={`group-${i}`} cover={pictures[i]}  />
-                                    {i !== 3 && <hr className="w-[90%] border rounded-full  border-default-50/50"/>}
 
                                 </motion.div>
                                  
@@ -77,9 +79,9 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
                         ))}
                             
 
-                    </div> 
+                    </ul> 
                 : 
-                 <div className="flex items-center gap-3 py-2 px-4">
+                 <div className="flex items-center gap-3 py-3 px-4">
                     
                     {[...Array(4)].map((_, i) => (
                         <React.Fragment key={`mini-${i}`}>
@@ -92,7 +94,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
                     <p className="text-xs font-semibold opacity-45">+3</p>
                 </div>}
                
-            </li>
+            </div>
             
         </ChannelCardMenu>
 

@@ -3,6 +3,8 @@ import { Spinner } from "@heroui/spinner";
 import { AnimatedGridPattern } from "@/components/magicui/animated-grid-pattern";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { cn } from "@heroui/theme";
+import { FlickeringGrid } from "@/components/magicui/flickering-grid";
+import { BoxIcon } from "lucide-react";
 
 interface HomePageProps{
 
@@ -32,7 +34,8 @@ export default function HomePage () {
     else
     {
         return (
-            <div className="flex flex-col relative h-screen w-full items-center justify-center">
+            <div className="flex   flex-col relative h-screen w-full items-center justify-center">
+                <div  className="doodle-pattern"/>
                 {!currentChatId || currentChatId <= 0 ?
                     <></>
 
@@ -43,25 +46,12 @@ export default function HomePage () {
                 }
                 {!currentChatId || currentChatId <= 0 ?
                     <>
-                        <AnimatedGridPattern
-                            numSquares={30}
-                            maxOpacity={0.05}
-                            duration={3}
-                            repeatDelay={1}
-                            className={cn(
-                            "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
-                            "  h-screen opacity-60 left-[150px]  skew-y-12 fixed",
-                            )}
-                        />
+                      
+
 
                         <div className="flex items-center flex-col gap-2">
-
-                            <span>
-                                         ٩(*❛⊰❛)～❤
-
-                            </span>
                             <span className="text-md font-semibold">Welcome to serpentine</span>
-                            <span className="text-xs font-normal">How are you doing today?</span>
+                            <span className="text-xs font-normal">Select one group to display the messages</span>
                         </div>
                     </>
                     
