@@ -124,8 +124,8 @@ internal class GetByUserIdEndpointHandler(
             .AsSplitQuery()
             .Where(ch => ch.Members.Any(m => m.UserId == request.UserId))
             .OrderBy(ch => ch.Id)
-            .Take(request.Take)
             .Skip(request.Skip)
+            .Take(request.Take)
             .Select(ch => new Channel()
             {
                 Name = ch.Name,

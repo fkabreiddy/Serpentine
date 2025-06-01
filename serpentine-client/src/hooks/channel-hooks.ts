@@ -24,7 +24,53 @@ const handleApiErrors = (data: ApiResult<any>) => {
     
 };
 
+export function useCreateChannel() {
 
+    
+    const [channel, setChannel] = useState<ChannelResponse | null>(null);
+    const [creatingChannel, setCreatingChannel] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
+    const { post } = useFetch<ChannelResponse>();
+
+    useEffect(() => {
+       
+
+        if(!result)
+        {
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+           setChannel(result.data);
+           showToast({title:"Cheers!", description: `Your channel ${result.data.name} was creating successfully`})
+
+        } 
+        else {
+            
+            handleApiErrors(result);
+        }
+
+        setCreatingChannel(false);
+        setResult(null);
+
+
+    }, [result]);
+
+   
+    const createChannel = async (data: CreateChannelRequest) => {
+       
+        setResult(null);
+        setCreatingChannel(true);
+        setChannel(null);
+        const response = await post({endpoint: "channels/create", requireToken: true,}, data );
+        setResult(response);
+            
+        
+       
+    };
+
+    return { createChannel, channel, creatingChannel};
+}
 
 export function useGetChannelsByUserId() {
 
@@ -38,7 +84,6 @@ export function useGetChannelsByUserId() {
 
     useEffect(() => {
        
-       console.log("activated")
 
         if(!result)
         {
@@ -76,9 +121,11 @@ export function useGetChannelsByUserId() {
             
             data.skip = channelCount;
             const response = await get({endpoint: "channels/by-userId?", requireToken: true,}, data );
-            has = (response.data !== null && response.data.length >= 5);
+            has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
+            console.log("channels: ", response.data?.length)
+            console.log("has more:", has);
             
         }while (has);
 
@@ -87,5 +134,5 @@ export function useGetChannelsByUserId() {
        
     };
 
-    return { getChannelsByUserId, channels, loadingChannels, result, hasMore, isBusy};
+    return { getChannelsByUserId, channels, loadingChannels, setChannels, result, hasMore, isBusy};
 }

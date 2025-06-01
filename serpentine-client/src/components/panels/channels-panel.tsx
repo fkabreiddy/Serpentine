@@ -30,6 +30,8 @@ import Divider from "../divider";
 import { Tooltip } from "@heroui/tooltip";
 import IconButton from '../icon-button';
 import {Plus} from "lucide-react"
+import { CreateChannelDialog } from "../dialogs/create-channel-dialog";
+import { ChannelResponse } from "@/models/responses/channel-response";
 
 
 interface ChannelsPanelProps{
@@ -43,40 +45,7 @@ interface JoinChannelDrawerProps{
     openChanged : (change : boolean) => void
 }
 
-const JoinChannelDrawer:React.FC<JoinChannelDrawerProps> = () =>{
-    
-const [open, setOpen] = useState(false);
-  const isMobile = useIsMobile();
- 
- 
-  return (
-    <Drawer open={open}  onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-          <IconButton tootltipText="Create a channel" >
-                <Plus className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
 
-          </IconButton>      
-        </DrawerTrigger>
-      <DrawerContent className={cn(
-        `${isMobile ? "" : "absolute w-[25%] justify-self-end h-screen bottom-0 z-50   flex  flex-col   "} border backdrop-blur-xl bg-default-50 border-default-100`
- 
-        )}>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DrawerDescription>
-        </DrawerHeader>
-        <ProfileForm className="px-4" />
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  )
-}
  
 function ProfileForm({ className }: React.ComponentProps<"form">) {
   return (
@@ -99,12 +68,13 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
 
     const [filter, setFilter] = useState<string>("");
     const [isMounted, setIsMounted] = useState<boolean>(false);
-    const [joinChannelIsOpen, setJoinChannelIsOpen] = useState(false);
+    const [openCreateChannel, setOpenCreateChannel] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+    
 
     const {user} = useAuthStore();
 
-    const {getChannelsByUserId, channels, hasMore, loadingChannels, isBusy } = useGetChannelsByUserId();
+    const {getChannelsByUserId, setChannels, channels, hasMore, loadingChannels, isBusy } = useGetChannelsByUserId();
 
     useEffect(() => {
       setIsMounted(true);
@@ -123,7 +93,14 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
 
   const searchAgain = async () =>{
     
-   
+    if (user && !loadingChannels && !isBusy ) {
+      await fetchChannels();
+    }
+  }
+
+  function handleChannelCreated(channel : ChannelResponse){
+
+     setChannels(prev => [...prev, channel]);
   }
 
 
@@ -140,7 +117,7 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
 
     return(
 
-        <div className="w-[28%] rounded-r-xl border-r border-y max-md:border-y-0 max-md:rounded-b-none bg-neutral-100 dark:bg-neutral-900/20 max-md:w-full flex flex-col  border-defult-100 dark:border-default-50   overflow-auto h-screen scroll-smooth scrollbar-hide">
+        <div className="w-[28%]  rounded-r-xl border-r border-y max-md:border-y-0 max-md:rounded-b-none bg-neutral-100 dark:bg-neutral-900/20 max-md:w-full flex flex-col  border-defult-100 dark:border-default-50   overflow-auto h-screen scroll-smooth scrollbar-hide">
 
             <div className="  border-defult-100 dark:border-default-50 flex  justify-between gap-2 backdrop-blur-lg   px-4 py-3  z-[1] sticky top-0 items-center ">
                {showSearchBar ?                 
@@ -151,14 +128,14 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
                     <div className="flex items-center gap-3">
 
                       <IconButton onClick={()=> setShowSearchBar(true)} tootltipText="Search channels" >
-                        <SearchIcon  className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
+                      <SearchIcon  className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
 
                       </IconButton>
                       <IconButton tootltipText="Archived channels" >
-                        <ArchiveIcon className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
+                      <ArchiveIcon className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
 
                       </IconButton>
-                      <JoinChannelDrawer open={joinChannelIsOpen} openChanged={setJoinChannelIsOpen} />
+                      <CreateChannelDialog   onCreate={handleChannelCreated} />
 
                      
                     </div>
@@ -170,8 +147,7 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
                
             </div>
             
-            <ScrollShadow hideScrollBar className=" flex flex-col px-3 ">
-              
+            <ScrollShadow hideScrollBar offset={0} className="scroll-smooth p-3 " size={100}>
               {
                   (channels.length === 0 && loadingChannels === true) ? 
                     
@@ -182,6 +158,7 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
                   : 
 
                   <>
+
                      {(channels.length === 0 && hasMore === false && loadingChannels === false) ? (
                       <div className="flex items-center justify-center h-screen flex-col gap-1 px-3 ">
                         <PackageOpenIcon className="size-[30px] animate-bounce  opacity-30"/>
@@ -190,7 +167,7 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
 
                       </div>
                     ) : (
-                      <div className="h-full overflow-auto scrollbar-hide scroll-smooth">
+                      <>                        
                           {channels
                             .filter(ch => ch.name.toLowerCase().includes(filter.toLowerCase()))
                             .map((ch, i) => (
@@ -203,7 +180,7 @@ const ChannelsPanel: React.FC<ChannelsPanelProps> = () =>{
                         }
 
                       
-                      </div>
+                      </>
                     )}
                   </>
               

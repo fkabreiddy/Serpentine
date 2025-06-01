@@ -48,20 +48,22 @@ const handleTokenCheck = (): string | null => {
 
 const handleApiError = <T>(error: unknown): ApiResult<T> => {
   if (!isAxiosError(error)) {
-    
-    showToast({ title: "Oops", description: "Unknown error has occurred" });
+    showToast({ title: "Oops", description: "Something went wrong, try again later" });
     return createApiResult(false, 0, "");
   }
 
   const { response } = error as AxiosError<ApiResult<T>>;
+
   if (!response?.data) {
+    showToast({ title: "Oops", description: "Something went wrong, try again later" });
     return createApiResult(false, 0, "");
   }
 
   const result = response.data;
+
   if (result.statusCode === 500) {
     showToast({ title: "Oops", description: result.message });
-    return createApiResult(false, 0, "");
+    return result;
   }
 
   return result;

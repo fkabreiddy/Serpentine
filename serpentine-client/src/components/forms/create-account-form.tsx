@@ -9,14 +9,10 @@ import { Button } from '@heroui/button';
 import { Input } from "@heroui/input";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Image } from "@heroui/image";
-import { UploadCloud, UploadIcon } from "lucide-react";
-import {ArrowUpIcon, MagnifyingGlassIcon} from '@heroicons/react/24/solid'
-import Divider from "../divider";
+import {ArrowUpIcon} from '@heroicons/react/24/solid'
 import { DateInput } from "@heroui/date-input";
 import { CreateUserRequest } from "@/models/requests/user/create-user-request";
-import { CalendarIcon } from "lucide-react";
-import { parseDate, today, getLocalTimeZone, CalendarDate, parseAbsolute, } from "@internationalized/date";
-import { data } from "motion/react-client";
+import { parseDate, today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { CakeIcon } from "lucide-react";
 
 const minAge = () => {
@@ -177,7 +173,6 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
 
     const submit = async (data: z.infer<typeof createAccountSchema>) => {
         const formData = buildForm();
-        console.log("Submitting form data:", formData);
         await createUser(formData);
        
     };
