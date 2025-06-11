@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 using SerpentineApi.Identity;
@@ -103,7 +104,7 @@ internal class AuthenticateUserEndpoint : IEndpoint
 }
 
 internal class AuthenticateUserRequestHandler(
-    DbContextAccessor<User> dbContextAccessor
+    SerpentineDbContext context
 
     )
     : IEndpointHandler<AuthenticateUserRequest, OneOf<UserResponse, Failure>>
@@ -115,7 +116,7 @@ internal class AuthenticateUserRequestHandler(
     {
 
         var hashedPassword = request.Password.Hash();
-        var user = await dbContextAccessor.GetAnyAsync(
+        var user = await context.Users.AsNoTracking().FirstOrDefaultAsync(
             u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim() && u.Password == hashedPassword,
             cancellationToken: cancellationToken);
         

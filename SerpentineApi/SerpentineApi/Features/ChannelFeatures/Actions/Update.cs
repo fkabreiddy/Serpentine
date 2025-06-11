@@ -5,14 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using SerpentineApi.Features.UserFeatures.Actions;
+using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Helpers;
-using SerpentineApi.Identity;
 
 namespace SerpentineApi.Features.ChannelFeatures.Actions;
 
-public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
+public class UpdateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
 {
+    [Range(0, int.MaxValue),Required, FromBody, JsonPropertyName("channelId")]
+    public int ChannelId { get; set; }
+    
+    
+    
     [MaxLength(100),
      MinLength(3),
      RegularExpression(@"^[a-zA-Z0-9._]+$"), 
@@ -39,9 +43,9 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
 
 }
 
-public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequest>
+public class UpdateChannelRequestValidator : AbstractValidator<UpdateChannelRequest>
 {
-    public CreateChannelRequestValidator()
+    public UpdateChannelRequestValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
@@ -59,17 +63,17 @@ public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequ
     }
 }
 
-internal class CreateChannelEndpoint : IEndpoint
+internal class UpdateChannelEndpoint : IEndpoint
 {
     private readonly ChannelEndpointSettings _settings = new();
     
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(
-                _settings.BaseUrl + "/create",
+        app.MapPut(
+                _settings.BaseUrl + "/update",
                 async (
-                    [FromBody] CreateChannelRequest command,
-                    EndpointExecutor<CreateChannelEndpoint> executor,
+                    [FromBody] UpdateChannelRequest command,
+                    EndpointExecutor<UpdateChannelEndpoint> executor,
                     CancellationToken cancellationToken,
                     ISender sender,
                     HttpContext context
@@ -97,53 +101,61 @@ internal class CreateChannelEndpoint : IEndpoint
             .Experimental()
             .Accepts<CreateChannelRequest>(false, "application/json")
             .Produces<SuccessApiResult<ChannelResponse>>(200)
-            .Produces<ConflictApiResult>(409, "application/json")
+            .Produces<NotFoundApiResult>(404, "application/json")
             .Produces<BadRequestApiResult>(400, "application/json")
-            .WithDescription($"Creates a channel in the database. Requires a {nameof(CreateChannelRequest)}. Return {nameof(ChannelResponse)}")
+            .WithDescription($"Updates a channel in the database. Requires a {nameof(UpdateChannelRequest)}. Returns a {nameof(ChannelResponse)}")
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")
-            .WithName(nameof(CreateChannelEndpoint));
+            .WithName(nameof(UpdateChannelEndpoint));
     }
 }
 
-internal class CreateChannelRequestHandler(
+internal class UpdateChannelRequestChannel(
    SerpentineDbContext context
 
 )
-    : IEndpointHandler<CreateChannelRequest, OneOf<ChannelResponse, Failure>>
+    : IEndpointHandler<UpdateChannelRequest, OneOf<ChannelResponse, Failure>>
 {
     public async Task<OneOf<ChannelResponse, Failure>> HandleAsync(
-        CreateChannelRequest request,
+        UpdateChannelRequest request,
         CancellationToken cancellationToken = default
     )
     {
         if (request.CurrentUserId == 0)
             return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
         
-        var channel = Channel.Create(request);
+        if (await context.ChannelMembers.AnyAsync(cm =>
+                cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId && cm.IsOwner) == false)
+        {
+           
+                return new NotFoundApiResult("Channel not found");
+        }
+
         await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         
-        var exist = await context.Channels.AnyAsync(ch => ch.Name.ToLower() == channel.Name, cancellationToken:cancellationToken);
-      
-        if(exist)
-            return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
-        
-        var creation = await context.Channels.AddAsync(channel, cancellationToken);
-        
+        Channel? channel = await context.Channels.FirstOrDefaultAsync(ch => ch.Id == request.ChannelId, cancellationToken);
+
+        if (channel is null)
+            return new NotFoundApiResult("Channel not found");
+
+        channel.Update(request);
+
         await context.SaveChangesAsync(cancellationToken);
-        
-        await transaction.CommitAsync(cancellationToken);
-
-        var response = creation.Entity.ToResponse();
-        response.MyMember = creation.Entity.Members.FirstOrDefault(m => m.UserId == request.CurrentUserId)?.ToResponse() ?? new();
-
-        
         context.ChangeTracker.Clear();
         
-        if(response.Id == default)
-            return new BadRequestApiResult("Could not create a channel");
+        
+        List <Channel> channels =
+            await context.Channels.GetChannelsWithJustMyMembershipByChannelId(request.CurrentUserId, request.ChannelId,
+                cancellationToken);
 
-        return response;
+        if (channels.FirstOrDefault() is var response && response is null)
+        {
+           await transaction.RollbackAsync(cancellationToken);
+           return new NotFoundApiResult("Channel not found");
+        }
+
+       await transaction.CommitAsync(cancellationToken);
+        return response.ToResponse();
 
 
 

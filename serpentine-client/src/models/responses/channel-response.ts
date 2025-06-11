@@ -6,11 +6,13 @@ export class ChannelResponse extends BaseResponse {
   adultContent: boolean = false;
   myMember: ChannelMemberResponse = new ChannelMemberResponse();
   membersCount: number = 0;
-  readonly userIsOwner: boolean = this.myMember.isOwner;
+  readonly userIsOwner: boolean = false;
 
+  
  constructor(init?: Partial<ChannelResponse>) {
     super(init); 
     Object.assign(this, init);
+    this.userIsOwner = this.myMember.isOwner;
   }
 
 

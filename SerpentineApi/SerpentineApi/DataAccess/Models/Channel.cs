@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using SerpentineApi.Features.ChannelFeatures.Actions;
 
 namespace SerpentineApi.DataAccess.Models;
@@ -19,8 +20,13 @@ public class Channel : BaseEntity
     public List<ChannelMember> Members { get; set; } = new List<ChannelMember>();
 
     public int MembersCount { get; set; } = 0;
+
+    [NotMapped]
+    public ChannelMember MyMember { get; set; } = new();
     
-    public ChannelResponse ToResponse(int myUserId = 0) => new()
+    
+    
+    public ChannelResponse ToResponse() => new() //userId is the user that is making the request. Its appends the membership of that user in a channel.
     {
         Id = Id,
         CreatedAt = CreatedAt,
@@ -29,9 +35,11 @@ public class Channel : BaseEntity
         Description = Description,
         UpdatedAt = UpdatedAt,
         MembersCount = MembersCount,
-        MyMember = Members.FirstOrDefault(m => m.UserId == myUserId)?.ToResponse() ?? new(),
-        
+        MyMember = MyMember.ToResponse()
+
     };
+    
+    
 
     public static Channel Create(CreateChannelRequest request)
         => new()
@@ -44,5 +52,35 @@ public class Channel : BaseEntity
             MembersCount = 1,
             Members = [new(){UserId = request.CurrentUserId, IsOwner = true, LastAccess = DateTime.Now}]
         };
+
+    public bool Update(UpdateChannelRequest request)
+    {
+        bool hasBeenUpdated = false;
+
+        if (request.AdultContent != AdultContent)
+        {
+            AdultContent = request.AdultContent;
+            hasBeenUpdated = true;
+        }
+        
+        if (request.Name != Name)
+        {
+            Name = request.Name;
+            hasBeenUpdated = true;
+        }
+        
+        if (request.Description != Description)
+        {
+            Description = request.Description;
+            hasBeenUpdated = true;
+        }
+
+        if (hasBeenUpdated)
+        {
+            UpdatedAt = DateTime.Now;
+        }
+        return hasBeenUpdated;
+
+    }
 
 }

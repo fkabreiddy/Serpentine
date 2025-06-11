@@ -19,18 +19,18 @@ function App() {
         path="/" 
       />
 
-        <Route 
-          element={
-            <DefaultLayout>
-              <AuthorizeView>
-                <HomePage/> 
-              </AuthorizeView>
-            </DefaultLayout>
-           
-          } 
-          path="/home">
+      <Route 
+        element={
+          <DefaultLayout>
+            <AuthorizeView>
+              <HomePage/> 
+            </AuthorizeView>
+          </DefaultLayout>
           
-        </Route>
+        } 
+        path="/home">
+        
+      </Route>
 
     </Routes>
   );

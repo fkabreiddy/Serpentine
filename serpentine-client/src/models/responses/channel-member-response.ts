@@ -1,5 +1,6 @@
 export class ChannelMemberResponse extends BaseResponse {
-    channelId: number = 0;
+    
+  channelId: number = 0;
   userId: number = 0;
   isSilenced: boolean = false;
   isArchived: boolean = false;

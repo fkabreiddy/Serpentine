@@ -5,6 +5,8 @@ import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { cn } from "@heroui/theme";
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
 import { BoxIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import TrendingPosts from "@/components/trending-posts";
 
 interface HomePageProps{
 
@@ -15,7 +17,7 @@ export default function HomePage () {
     const [isMounted, setIsMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const {currentChatId} = useGlobalDataStore();
-
+    const isMobile = useIsMobile();
 
     useEffect(() =>{
         setIsMounted(true);
@@ -34,30 +36,27 @@ export default function HomePage () {
     else
     {
         return (
-            <div className="flex   flex-col relative h-screen w-full items-center justify-center">
-                <div  className="doodle-pattern"/>
-                {!currentChatId || currentChatId <= 0 ?
-                    <></>
-
-                    :
-                    <nav className="top-0 px-3  py-2 dark:bg-black bg-white z-20 flex items-center absolute border-b border-default-100 h-[50px] w-full">
-                        
-                    </nav>
-                }
-                {!currentChatId || currentChatId <= 0 ?
-                    <>
-                      
-
-
-                        <div className="flex items-center flex-col gap-2">
-                            <span className="text-md font-semibold">Welcome to serpentine</span>
-                            <span className="text-xs font-normal">Select one group to display the messages</span>
-                        </div>
-                    </>
+            <div className="flex   flex-col relative h-full w-full items-center justify-center">
+               
+                <>
                     
-                    :
-                    <></>
+
+
+                    <div className="flex items-center flex-col gap-2 ">
+                        <span className="text-md font-semibold">Welcome to serpentine</span>
+                        <span className="text-xs font-normal">Select one group to display the messages</span>
+                    </div>
+                </>
+                
+                {isMobile ||
+                    <div className="flex w-[30%] absolute right-[30px] flex-col p-3 rounded-lg ">
+                        <TrendingPosts/>
+
+                    </div> 
                 }
+                
+                    
+                    
             </div>
         );
     }

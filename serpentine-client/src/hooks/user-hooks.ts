@@ -39,6 +39,9 @@ export function useLoginUser() {
 
     useEffect(() => {
 
+        if(result.data === null)
+            return;
+
         if (result.data && result.statusCode === 200) {
 
             let token = result.data.token;

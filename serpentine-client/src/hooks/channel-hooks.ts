@@ -82,6 +82,7 @@ export function useGetChannelsByUserId() {
     const [isBusy, setIsBusy] = useState<boolean>(false);
     const { get } = useFetch<ChannelResponse[]>();
 
+   
     useEffect(() => {
        
 
@@ -89,6 +90,8 @@ export function useGetChannelsByUserId() {
         {
             return;
         }
+
+        
 
         if (result.data && result.statusCode === 200) {
            setChannels(prev => [...prev, ...(result.data || [])]);
@@ -124,9 +127,6 @@ export function useGetChannelsByUserId() {
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
-            console.log("channels: ", response.data?.length)
-            console.log("has more:", has);
-            
         }while (has);
 
         setIsBusy(false);

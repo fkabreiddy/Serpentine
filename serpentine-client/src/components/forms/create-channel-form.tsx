@@ -87,7 +87,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
     }, [watch("name"), watch("description"), watch("adultContent")])
 
     return (
-        <div className="flex flex-col gap-4 w-[300px] max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
+        <div className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
             <div className="">
                 <h2 className="text-md font-semibold max-md:text-center">Creating a Channel</h2>
                 <p className="text-xs opacity-45 max-md:text-center">Creating a channel makes you the owner of it. Be sure that your channel name is unique when creating it. You can change any information previously</p>

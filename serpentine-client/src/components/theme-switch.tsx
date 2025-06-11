@@ -10,18 +10,18 @@ export interface ThemeSwitchProps {
 
 export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const { theme, setTheme } = useTheme("dark");
+  const { theme, setTheme } = useTheme("light");
 
   useEffect(() => {
     setIsMounted(true);
     const mode = localStorage.getItem("heroui-theme");
-    setTheme(mode ?? "dark");
+    setTheme(mode ?? "light");
   }, []);
 
   if (!isMounted) return <div className="w-6 h-6" />;
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
-  const isDark = theme === "dark";
+  const isDark = theme === "light";
 
   return (
     <div className="cursor-pointer" onClick={toggleTheme}>

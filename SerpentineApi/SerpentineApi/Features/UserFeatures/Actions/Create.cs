@@ -162,6 +162,8 @@ internal class CreateUserRequestHandler(
             return new ConflictApiResult("An user with the same username already exist");
         }
         
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
 
         var result = await context.Users.AddAsync(User.Create(request), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -177,16 +179,21 @@ internal class CreateUserRequestHandler(
                     result.Entity.ProfilePictureUrl = imageUploaded.Data;
 
                 }
+                else
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return new BadRequestApiResult("We could't create your account. Try changing your profile picture");
+                }
             }
            
 
             await context.SaveChangesAsync(cancellationToken);
-            
             context.ChangeTracker.Clear();
-            
+
         }
         else
         {
+            await transaction.RollbackAsync(cancellationToken);
             return new BadRequestApiResult("Could not create user");
         }
 
@@ -195,9 +202,11 @@ internal class CreateUserRequestHandler(
 
         if (user is null)
         {
+            await transaction.RollbackAsync(cancellationToken);
             return new BadRequestApiResult("Could not create user");
         }
-        
+
+        await transaction.CommitAsync(cancellationToken);
         return user.ToResponse();
     }
 }

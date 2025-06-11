@@ -19,7 +19,7 @@ const GroupCardMini:React.FC<GroupCardMiniProps> = ({cover = null, index}) =>{
             className="flex flex-col gap-1 relative"
         >
              <div className="rounded-full bg-default-50 w-5 h-5 flex items-center hover:bg-blue-600 z-[0]  hover:text-white cursor-pointer transition-all justify-center">
-                {cover === "" || cover === null ? <HashIcon/> : <Image isBlurred  className="h-5 w-5 rounded-full z-[0]" src={cover}/>}
+                {cover === "" || cover === null ? <HashIcon/> : <Image   className="h-5 w-5 rounded-full z-[0]" src={cover}/>}
             </div>
         </motion.div>
        

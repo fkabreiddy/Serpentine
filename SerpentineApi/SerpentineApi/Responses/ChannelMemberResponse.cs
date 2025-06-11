@@ -9,7 +9,8 @@ public class ChannelMemberResponse : BaseResponse
     public bool IsArchived { get; set; }
     public bool IsOwner { get; set; }
     public DateTime LastAccess { get; set; } = DateTime.Now;
-    
-    
+
+    public string UserProfilePictureUrl { get; set; } = "";
+
 
 }

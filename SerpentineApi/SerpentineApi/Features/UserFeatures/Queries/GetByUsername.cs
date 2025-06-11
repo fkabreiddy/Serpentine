@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 
@@ -93,7 +94,7 @@ internal class GetUserByUsernameEndpoint : IEndpoint
 }
 
 internal class GetUserByUsernameRequestHandler(
-    DbContextAccessor<User> dbContextAccessor
+    SerpentineDbContext context
 
     )
     : IEndpointHandler<GetUserByNameRequest, OneOf<UserResponse, Failure>>
@@ -103,9 +104,7 @@ internal class GetUserByUsernameRequestHandler(
         CancellationToken cancellationToken = default
     )
     {
-
-      
-        var user = await dbContextAccessor.GetAnyAsync(
+        var user = await context.Users.FirstOrDefaultAsync(
             u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim(),
             cancellationToken: cancellationToken);
 

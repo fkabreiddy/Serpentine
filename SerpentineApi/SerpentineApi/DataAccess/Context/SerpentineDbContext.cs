@@ -20,6 +20,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         modelBuilder.Entity<Channel>(t =>
         {
             t.HasIndex(u => u.Name).IsUnique();
+            t.Ignore(u => u.MyMember);
             
         });
         

@@ -1,0 +1,126 @@
+﻿using System.Data;
+using System.Text.Json.Serialization;
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using SerpentineApi.Helpers;
+
+namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
+
+public class CreateChannelMemberRequest : IRequest<OneOf<ChannelMemberResponse, Failure>>
+{
+    [Required, Range(1, int.MaxValue), JsonPropertyName("channelId"), FromBody]
+    public int ChannelId { get; set; } = 0;
+
+    [JsonIgnore, BindNever]
+    public int CurrentUserId { get; private set; } = 0;
+
+    public void SetCurrentUserId(int currentUserId)
+    {
+        CurrentUserId = currentUserId;
+    }
+}
+
+public class CreateChannelMemberRequestValidator : AbstractValidator<CreateChannelMemberRequest>
+{
+    public CreateChannelMemberRequestValidator()
+    {
+        RuleFor(x => x.ChannelId)
+            .GreaterThanOrEqualTo(1).WithMessage("The id of the channel must be greater or equal to 1.");
+    }
+}
+
+public class CreateChannelMemberEndpoint : IEndpoint
+{
+    private readonly ChannelMemberEndpointSettings _settings = new();
+
+
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost(
+                _settings.BaseUrl + "/create",
+                async (
+                    [FromBody] CreateChannelMemberRequest request,
+                    HttpContext context,
+                    CancellationToken token,
+                    ISender sender,
+                    EndpointExecutor<CreateChannelMemberEndpoint> endpointExecutor
+                ) =>
+                {
+                    return await endpointExecutor.ExecuteAsync<ChannelResponse>(async () =>
+                    {
+                        request.SetCurrentUserId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User) ??
+                                                 throw new UnauthorizedAccessException());
+
+                        var result = await sender.SendAndValidateAsync(request, token);
+
+                        if (result.IsT1)
+                        {
+                            var failure = result.AsT1;
+
+                            return ResultsBuilder.Match(failure);
+                        }
+
+                        var success = result.AsT0;
+
+                        return ResultsBuilder.Match<ChannelMemberResponse>(new SuccessApiResult<ChannelMemberResponse>(success));
+                    });
+                }
+            )
+            .WithName(nameof(CreateChannelMemberEndpoint))
+            .WithDescription(
+                $"Joins an user to a channel by creating the relation. \n Requires a {nameof(CreateChannelMemberRequest)}. \n Returns a {nameof(ChannelMemberResponse)}. \n Requires Authorization.")
+            .RequireCors()
+            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .Experimental()
+            .Accepts<CreateChannelMemberRequest>("application/json")
+            .WithOpenApi()
+            .WithTags(new []{"POST", $"{nameof(ChannelMember)}"})
+            .DisableAntiforgery()
+            .Produces<ConflictApiResult>(409,"application/json")
+            .Produces<ServerErrorApiResult>(500, "application/json")
+            .Produces<SuccessApiResult<ChannelResponse>>(200, "application/json")
+            .Produces<BadRequestApiResult>(400, "application/json");
+
+    }
+}
+
+internal class
+    CreateChannelMemberEndpointHandler (
+        SerpentineDbContext context
+        ): 
+    IEndpointHandler<CreateChannelMemberRequest, OneOf<ChannelMemberResponse, Failure>>
+{
+    public async Task<OneOf<ChannelMemberResponse, Failure>> HandleAsync(CreateChannelMemberRequest request, CancellationToken cancellationToken)
+    {
+        var exists = await context.ChannelMembers.AnyAsync(cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId, cancellationToken);
+
+        if (exists)
+        {
+            return new ConflictApiResult("You already belong to this channel");
+        }
+        
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
+        var creation = await context.ChannelMembers.AddAsync(ChannelMember.Create(request), cancellationToken);
+
+        if (creation.Entity.Id <= 0)
+            return new BadRequestApiResult("Couldn't join the channel. Try again later.");
+        
+        var channelMember = await context.ChannelMembers.FirstOrDefaultAsync(ch => ch.Id == creation.Entity.Id, cancellationToken);
+
+        if (channelMember is null)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return new BadRequestApiResult("Couldn't join the channel. Try again later.");
+
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return channelMember.ToResponse();
+    }
+}

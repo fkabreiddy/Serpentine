@@ -14,7 +14,7 @@ public static class DbContextDependency
                 warning.Ignore(RelationalEventId.PendingModelChangesWarning)
             );
         });
-        services.AddScoped(typeof(DbContextAccessor<>));
+        
 
         return services;
 

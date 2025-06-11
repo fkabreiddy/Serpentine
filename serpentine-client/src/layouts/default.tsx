@@ -1,9 +1,12 @@
-import ChannelsPanel from "@/components/panels/channels-panel";
-import ProfilePanel from "@/components/panels/profile-panel";
+import SideBar from "@/components/panels/side-bar";
+import AppBar from "@/components/panels/app-bar";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useIsMobile } from '../hooks/use-mobile';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@heroui/use-theme";
+import { useLayoutStore } from "@/contexts/layout-context";
+import IconButton from "@/components/icon-button";
+import { MenuIcon, X } from "lucide-react";
 
 export default function DefaultLayout({
   children,
@@ -12,53 +15,57 @@ export default function DefaultLayout({
 }) {
 
   const { theme, setTheme } = useTheme("dark");
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setTheme("dark");
+    setTheme("light");
   }, []);
 
   const {currentChatId} = useGlobalDataStore();
   const isMobile = useIsMobile();
+  const [sidebarExpanded, setSideBarExpanded] = useState<boolean>(isMobile);
+  const [sideBarWidth, setSideBarWidth] = useState("0px");
+  const [appBarHeight, setAppBarHeight] = useState("0px");
+  const {layout, setLayout} = useLayoutStore();
+
+  useEffect(() => {
+    setIsMounted(true);
+    const updateDimensions = () => {
+      const appBar = document.getElementById("app-bar");
+      const sideBar = document.getElementById("side-bar");
+      if (appBar) setAppBarHeight(getComputedStyle(appBar).height);
+      if (sideBar) setSideBarWidth(getComputedStyle(sideBar).width);
+    };
+
+    if (isMounted) {
+      updateDimensions();
+    }
+  }, [isMounted]);
+
+   const changeSidebarState = () =>{
+        setLayout({sideBarExpanded : !layout.sideBarExpanded})
+    }
 
   return (
-    <div className="relative max-md:flex-col flex w-screen  h-screen">
+    <>
+     <AppBar />
 
-      
-      {isMobile ? 
-        <>
+      <div className="flex w-100vw relative ">
+        <SideBar />
+       
+        <main className="flex flex-col animate-[width] " style={{width: `calc(100% - ${sideBarWidth})`, marginTop: appBarHeight}} >
+          {children}
 
-          {currentChatId && currentChatId >= 1 || 
-            <>
-              <ChannelsPanel/>
-              {currentChatId && currentChatId >= 1 &&
-                <div className="w-full rounded-md m-3">
-                  {children}
-
-                </div>
-
-              }
-              <ProfilePanel/>
-            </>
-          }
-
-          
-         
-        </>
-        :
-        <>
-          <ProfilePanel/>
-          <ChannelsPanel/>
-          <div className=" w-[77%] h-screen   ">
-            {children}
-
-          </div>
-        </>
-        
-      }
+        </main>
+       
+      </div>
+       
+    </>
+     
+    
      
 
     
       
-    </div>
   );
 }

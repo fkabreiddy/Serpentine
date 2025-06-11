@@ -20,7 +20,6 @@ public class ResultsBuilder
 
             case UnauthorizedApiResult:
                 return Results.Unauthorized();
-
           
             case ValidationApiResult:
                 return Results.UnprocessableEntity(apiResult);

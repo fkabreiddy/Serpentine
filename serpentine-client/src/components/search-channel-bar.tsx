@@ -23,7 +23,6 @@ const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel =
     };
 
     return (
-        <div className="flex w-full items-start gap-3 animate-appearance-in">
             <Input
                 
                 placeholder="Search something...."
@@ -31,18 +30,11 @@ const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel =
                 labelPlacement="outside"
                 autoComplete="current-password"
                 endContent={ <SearchIcon /> }
+                className="max-w-[250px]"
                 
-                description={"Type to serch channels by their name"}
                 onChange={handleChange}
             />
-            <div>
-                 <div className="mt-[6px]"/>
-                <IconButton tootltipText="Cancel search">
-                    <X onClick={onCancel} className="size-[18px]"></X>
-                </IconButton>
-            </div>
-           
-        </div>
+            
         
       
     )

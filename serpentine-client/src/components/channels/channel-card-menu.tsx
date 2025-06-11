@@ -20,106 +20,109 @@ interface ChannelCardMenuProps{
 const ChannelCardMenu:React.FC<ChannelCardMenuProps> = ({onClose, imOwner = false, isOpen = false, children}) =>{
 
     return (
-    <Popover onClose={onClose} backdrop="transparent" isOpen={isOpen} placement="bottom"  showArrow={true}>
-      <PopoverTrigger>
-        {children}
-      </PopoverTrigger>
-      <PopoverContent className="backdrop-blur-2xl bg-default-50/30 border-default-100">
-        
-       <Listbox variant="flat" aria-label="Actions" onAction={(key) => alert(key)}>
-       
-        <ListboxItem key="Information" className="">
-            <div className="flex w-full items-center gap-4 justify-between">
-                <div >
-                   <p className="text-[13px] font-normal">About</p>  
+    <>
+        <Popover shouldBlockScroll={true} onClose={onClose} shouldCloseOnInteractOutside={()=>{onClose(); return false;}}  isOpen={isOpen} placement="right"  showArrow={true}>
+            <PopoverTrigger>
+                {children}
+            </PopoverTrigger>
+            <PopoverContent  className="backdrop-blur-2xl bg-default-50/30 border-default-100">
+                
+            <Listbox variant="flat" aria-label="Actions" onAction={(key) => alert(key)}>
+            
+                <ListboxItem key="Information" className="">
+                    <div className="flex w-full items-center gap-4 justify-between">
+                        <div >
+                        <p className="text-[13px] font-normal">About</p>  
 
-                </div>
-                <AboutIcon/>
-
-
-            </div>
-          
-           
-        </ListboxItem>
-
-        <ListboxItem key="add"  className="rounded-md">
-            <div className="flex w-full items-center gap-4 justify-between">
-                <div >
-                   <p className="text-[13px] font-normal">Add Group</p>  
-                    <p className="text-xs opacity-50">Create a new group for this channel</p>
-
-                </div>
-                <AddIcon/>
+                        </div>
+                        <AboutIcon/>
 
 
-            </div>
-          
-           
-        </ListboxItem>
+                    </div>
+                
+                
+                </ListboxItem>
+
+                <ListboxItem key="add"  className="rounded-md">
+                    <div className="flex w-full items-center gap-4 justify-between">
+                        <div >
+                        <p className="text-[13px] font-normal">Add Group</p>  
+                            <p className="text-xs opacity-50">Create a new group for this channel</p>
+
+                        </div>
+                        <AddIcon/>
+
+
+                    </div>
+                
+                
+                </ListboxItem>
 
 
 
-        <ListboxItem key="notification"  className="rounded-md">
-            <div className="flex w-full items-center gap-4 justify-between">
-                <div >
-                   <p className="text-[13px] font-normal">Deactivate Notifications</p>  
-                    <p className="text-xs opacity-50 max-w-[250px]">When disabled you wont recieve notifications from this channel</p>
+                <ListboxItem key="notification"  className="rounded-md">
+                    <div className="flex w-full items-center gap-4 justify-between">
+                        <div >
+                        <p className="text-[13px] font-normal">Deactivate Notifications</p>  
+                            <p className="text-xs opacity-50 max-w-[250px]">When disabled you wont recieve notifications from this channel</p>
 
-                </div>
-                <NotificationIcon/>
-
-
-            </div>
-          
-           
-        </ListboxItem>
+                        </div>
+                        <NotificationIcon/>
 
 
-        <ListboxItem key="archive"  className="rounded-md">
-            <div className="flex w-full items-center gap-4 justify-between">
-                <div >
-                   <p className="text-[13px] font-normal">Archive Notifications</p>  
-                    <p className="text-xs opacity-50 max-w-[250px]">You wont recieve notifications from this channel and it wont appear on this view</p>
-
-                </div>
-                <ArchiveIcon/>
+                    </div>
+                
+                
+                </ListboxItem>
 
 
-            </div>
-          
-           
-        </ListboxItem>
-        {imOwner ? <ListboxItem key="delete" color="danger"  className="rounded-md">
-            <div className="flex w-full items-center gap-4 justify-between">
-                <div >
-                   <p className="text-[13px] font-normal">Delete Channel</p>  
+                <ListboxItem key="archive"  className="rounded-md">
+                    <div className="flex w-full items-center gap-4 justify-between">
+                        <div >
+                        <p className="text-[13px] font-normal">Archive Notifications</p>  
+                            <p className="text-xs opacity-50 max-w-[250px]">You wont recieve notifications from this channel and it wont appear on this view</p>
 
-                </div>
+                        </div>
+                        <ArchiveIcon/>
 
 
-            </div>
-          
-           
-        </ListboxItem> :
-         <ListboxItem key="delete" color="danger"  className="rounded-md">
-            <div className="flex w-full items-center gap-4 justify-between">
-                <div >
-                   <p className="text-[13px] font-normal">Leave Channel</p>  
+                    </div>
+                
+                
+                </ListboxItem>
+                {imOwner ? <ListboxItem key="delete" color="danger"  className="rounded-md">
+                    <div className="flex w-full items-center gap-4 justify-between">
+                        <div >
+                        <p className="text-[13px] font-normal">Delete Channel</p>  
 
-                </div>
+                        </div>
 
 
-            </div>
-          
-           
-        </ListboxItem>
-        }
-        
-      
-      </Listbox>
-      </PopoverContent>
-    </Popover>
+                    </div>
+                
+                
+                </ListboxItem> :
+                <ListboxItem key="delete" color="danger"  className="rounded-md">
+                    <div className="flex w-full items-center gap-4 justify-between">
+                        <div >
+                        <p className="text-[13px] font-normal">Leave Channel</p>  
+
+                        </div>
+
+
+                    </div>
+                
+                
+                </ListboxItem>
+                }
+                
+            
+            </Listbox>
+            </PopoverContent>
+            </Popover>
     
+    </>
+   
   )
 }
 

@@ -105,7 +105,7 @@ internal class DeleteChannelEndpointHandler(
         var userHasPermission = await context.ChannelMembers.AnyAsync(x => x.UserId == request.CurrentUserId && x.ChannelId == request.ChannelId && x.IsOwner, cancellationToken);
 
         if (!userHasPermission)
-            return new UnauthorizedApiResult("You are not the owner of this channel");
+            return new NotFoundApiResult("The channel you are looking for do not exist or you don't have the permission to delete it");
         
         await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 

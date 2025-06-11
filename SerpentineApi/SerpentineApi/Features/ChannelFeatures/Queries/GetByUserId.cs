@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using SerpentineApi.DataAccess.Context.EntityExtensions;
 
 namespace SerpentineApi.Features.ChannelFeatures.Queries;
 using System.Text.Json.Serialization;
@@ -14,11 +16,8 @@ using SerpentineApi.Helpers;
 public class GetByUserIdRequest : IRequest<OneOf<List<ChannelResponse>, Failure>>
 {
 
-    [Required, 
-    FromQuery(Name = "userId"),
-    JsonPropertyName("userId"),
-    Range(1, int.MaxValue)]
-    public int UserId { get; set; } = 0;
+    [BindNever, JsonIgnore]
+    public int CurrentUserId { get; private set; }
     
     [Required, 
      FromQuery(Name = "take"),
@@ -32,6 +31,11 @@ public class GetByUserIdRequest : IRequest<OneOf<List<ChannelResponse>, Failure>
      Range(0, int.MaxValue )]
     public int Skip { get; set; } = 0;
 
+    public void SetCurentUerId(int userId)
+    {
+        CurrentUserId = userId;
+    }
+
   
 }
 
@@ -39,10 +43,7 @@ public class GetByUserIdValidator : AbstractValidator<GetByUserIdRequest>
 {
     public GetByUserIdValidator()
     {
-        RuleFor(x => x.UserId)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("UserId should be greater or equal to 1.");
-
+       
         RuleFor(x => x.Take)
             .InclusiveBetween(1, 5)
             .WithMessage("Take should be between 1 and 5");
@@ -66,13 +67,14 @@ internal class GetByUserIdEndpoint : IEndpoint
                     [AsParameters] GetByUserIdRequest command,
                     EndpointExecutor<GetByUserIdEndpoint> executor,
                      CancellationToken cancellationToken,
-                     ISender sender
+                     ISender sender,
+                    HttpContext context
                 ) =>
                 {
                     return await executor.ExecuteAsync<List<ChannelResponse>>(async () =>
                     {
-                        
 
+                        command.SetCurentUerId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User) ?? throw new UnauthorizedAccessException());
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {
@@ -115,33 +117,18 @@ internal class GetByUserIdEndpointHandler(
         CancellationToken cancellationToken = default
     )
     {
-        if (request.UserId == default)
+        if (request.CurrentUserId == default)
             return new BadRequestApiResult("UserId should be greater than 0");
 
-        var channels = await context.Channels
-            .Include(ch => ch.Members.Where(m => m.UserId == request.UserId))
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Where(ch => ch.Members.Any(m => m.UserId == request.UserId))
-            .OrderBy(ch => ch.Id)
-            .Skip(request.Skip)
-            .Take(request.Take)
-            .Select(ch => new Channel()
-            {
-                Name = ch.Name,
-                Id =  ch.Id,
-                CreatedAt = ch.CreatedAt,
-                UpdatedAt = ch.UpdatedAt,
-                AdultContent = ch.AdultContent,
-                Description = ch.Description,
-                MembersCount = ch.Members.Count,
-                Members = ch.Members
-              
-            })
-            .ToListAsync(cancellationToken);
+        List<Channel> channels = await context.Channels.GetChannelsWithJustMyMembershipByUserId(
+            request.CurrentUserId,
+            cancellationToken,
+            request.Skip,
+            request.Take
+        );
 
 
-        return channels.Select(ch => ch.ToResponse(request.UserId)).ToList();
+        return channels.Select(ch => ch.ToResponse()).ToList();
     }
 
   

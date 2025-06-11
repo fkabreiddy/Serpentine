@@ -1,27 +1,17 @@
-import React, {useState, useEffect} from "react"
+import {useState} from "react"
 
-import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Button } from "@/components/ui/button"
 
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import IconButton from "../icon-button"
 import { Plus } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover"
 import CreateChannelForm from "../forms/create-channel-form"
 import { ChannelResponse } from "@/models/responses/channel-response"
-import { channel } from "diagnostics_channel"
+import DrawerButton from "../sidebar-button"
+import Modal from "../modal"
 
 interface CreateChannelDialogProps{
 
@@ -37,6 +27,7 @@ export function CreateChannelDialog({onCreate}:CreateChannelDialogProps) {
 
 
 
+
   function handleCreate(channel:ChannelResponse){
 
     onCreate(channel);
@@ -47,33 +38,28 @@ export function CreateChannelDialog({onCreate}:CreateChannelDialogProps) {
 
   if (!isMobile) {
     return (
-      <Popover isOpen={open} onOpenChange={setOpen}  offset={10} placement="bottom" showArrow={true}>
-        <PopoverTrigger>
-            <button>
-                 <IconButton onClick={()=>{setOpen(true);}} tootltipText="Create a channel" >
-                    <Plus className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
-                </IconButton>  
-            </button>
-                     
-
+      <>
+        <DrawerButton  text="Create a channel" onClick={()=> setOpen(true)} >
+                  <Plus className="size-[18px]  cursor-pointer group-hover:text-blue-500 transition-all"/>
+        </DrawerButton>  
+       {open && 
+        <Modal onClose={()=>{setOpen(false)}}>
           
-        </PopoverTrigger>
-      <PopoverContent className="p-3 w-full border-default-50/50 border rounded-xl bg-transparent backdrop-blur-2xl">
-
-        <CreateChannelForm onCreate={handleCreate}/>
-
-      </PopoverContent>
-    </Popover>
+            <CreateChannelForm onCreate={handleCreate}/>
+            
+        </Modal>}
+      </>
+      
+     
     )
   }
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-       <IconButton onClick={()=>{setOpen(true);}} tootltipText="Create a channel" >
-            <Plus className="size-[18px]  cursor-pointer hover:text-yellow-500 transition-all"/>
-       
-        </IconButton>   
+       <DrawerButton onClick={()=>{setOpen(true);}} text="Create a channel" >
+          <Plus className="size-[18px]  cursor-pointer group-hover:text-blue-500 transition-all"/>
+        </DrawerButton>  
       </DrawerTrigger>
       <DrawerContent className="p-3 py-4 w-full flex flex-col items-center  border-default-50/50 border rounded-xl bg-transparent backdrop-blur-md">
         

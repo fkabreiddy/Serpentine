@@ -1,4 +1,11 @@
-export default function SerpentineBanner() {
+import React from "react"
+
+interface SerpentineBannerProps
+{
+    fontSize: number;
+}
+
+export default function SerpentineBanner({fontSize = 1700}:SerpentineBannerProps) {
 
     return(
         <>
@@ -7,7 +14,7 @@ export default function SerpentineBanner() {
 
             <div className="absolute perspective-dramatic  inset-0 flex justify-center items-center z-10">
                 <p
-                style={{ fontSize: "1700px", lineHeight:1  }}
+                style={{ fontSize: fontSize +"px", lineHeight:1  }}
                 className=" select-none rotate-[-40deg] outlined-text rainbow rainbow_text_animated font-bold"
                 >
                      S

@@ -1,4 +1,7 @@
-﻿namespace SerpentineApi.DataAccess.Models;
+﻿using SerpentineApi.Features.ChannelFeatures.Actions;
+using SerpentineApi.Features.ChannelMemberFeatures.Actions;
+
+namespace SerpentineApi.DataAccess.Models;
 
 public class ChannelMember : BaseEntity
 {
@@ -21,6 +24,13 @@ public class ChannelMember : BaseEntity
         IsOwner = IsOwner,
         IsSilenced = IsSilenced,
         IsArchived = IsArchived
+    };
+
+    public static ChannelMember Create(CreateChannelMemberRequest request) => new()
+    {
+        ChannelId = request.ChannelId,
+        UserId = request.CurrentUserId,
+        IsOwner = false
     };
 
 }
