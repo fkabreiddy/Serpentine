@@ -8,7 +8,7 @@ import { UserResponse } from '@/models/responses/user-response';
 import { GetByUsernameRequest } from '@/models/requests/user/get-by-username';
 import { useAuthStore } from '@/contexts/authentication-context';
 import { useNavigate } from 'react-router-dom';
-import { HookState } from '@/models/api-result';
+import { handleApiErrors, handleApiSuccess } from '@/helpers/api-results-handler-helper';
 
 
 const initialApiState = <T>(): ApiResult<T> => ({
@@ -19,16 +19,7 @@ const initialApiState = <T>(): ApiResult<T> => ({
     data: null
 });
 
-const handleApiErrors = (data: ApiResult<any>) => {
-    data.errors?.forEach(error => {
-        showToast({
-            title: "Error",
-            description: error,
-            
-        });
-    });
-    
-};
+
 
 export function useLoginUser() {
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -46,7 +37,7 @@ export function useLoginUser() {
 
             let token = result.data.token;
             login(token, ()=>{}, ()=>{navigate("/home")});
-            showToast({ title: "Login Success", description: "You have successfully logged in" });
+            handleApiSuccess(result);
             setIsLoggingIn(false);
             navigate("/home")
 
@@ -79,7 +70,7 @@ export function useCreateUser() {
 
     useEffect(() => {
         if (result.data && result.isSuccess) {
-            showToast({ title: "Creation Successful", description: "Your account was created successfully" });
+            handleApiSuccess(result);
         }
         else{
             handleApiErrors(result);
@@ -110,7 +101,7 @@ export function useGetByUsername() {
         if (!result.statusCode || result.statusCode === 401) return;
 
         if (result.data && result.isSuccess) {
-            showToast({ title: "Oops!", description: "This username is already taken" });
+            handleApiErrors(result);
             
         } else if (result.statusCode === 404) {
             setIsAvailable(true);

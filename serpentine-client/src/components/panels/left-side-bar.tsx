@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {ScrollShadow} from "@heroui/scroll-shadow";
-import { HomeIcon, InfoIcon, Plug } from "lucide-react";
+import { ArrowLeft, ArrowRight, HomeIcon, InfoIcon, Plug } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import SideBarButton from '../sidebar-button';
@@ -8,6 +8,7 @@ import ChannelsContainer from "../channels-container";
 import { motion } from "motion/react";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useCloseSession } from "@/hooks/user-hooks";
+import IconButton from "../icon-button";
 
 
 interface LeftSideBarProps{
@@ -25,10 +26,10 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   const navigate = useNavigate();
   const [isMounted, setIsMounted] = useState<boolean>(false);
-   const {layout, setCurrentRightBarView} = useLayoutStore();
+   const {layout, setLayout, setCurrentRightBarView} = useLayoutStore();
     const {closeSession} = useCloseSession();
    
-
+ 
  
 
 
@@ -47,7 +48,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   return(
 
     <ScrollShadow hideScrollBar offset={0} id="side-bar" className={` ${layout.sideBarExpanded ? "w-[250px]" : "w-[80px]"} h-scren   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
-            
+       
           
           
         <div className="flex flex-col items-center gap-3  ">

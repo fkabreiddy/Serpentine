@@ -21,7 +21,7 @@ public class Channel : BaseEntity
 
     public string? ChannelCover {get; set;}
 
-    public string? ChannelPicture {get; set;}
+    public string? ChannelBanner {get; set;}
 
     [NotMapped]
     public int MembersCount { get; set; } = 0;
@@ -41,7 +41,7 @@ public class Channel : BaseEntity
         UpdatedAt = UpdatedAt,
         MembersCount = MembersCount,
         MyMember = MyMember.ToResponse(),
-        ChannelBanner = ChannelPicture ?? "",
+        ChannelBanner = ChannelBanner ?? "",
         ChannelCover = ChannelCover ?? ""
 
     };

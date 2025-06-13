@@ -4,6 +4,9 @@ import { useFetch } from '../helpers/axios-helper';
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { showToast } from '../helpers/sonner-helper';
 import { set } from "date-fns";
+import { useSound } from 'react-sounds';
+import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
+
 
 const initialApiState = <T>(): ApiResult<T> => ({
     statusCode: 0,
@@ -13,20 +16,10 @@ const initialApiState = <T>(): ApiResult<T> => ({
     data: null
 });
 
-const handleApiErrors = (data: ApiResult<any>) => {
-   
-    data.errors?.forEach(error => {
-        showToast({
-            title: "Validation Error",
-            description: error,
-        });
-    });
-    
-};
+
 
 export function useCreateChannel() {
 
-    
     const [channel, setChannel] = useState<ChannelResponse | null>(null);
     const [creatingChannel, setCreatingChannel] = useState<boolean>(false);
     const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
@@ -42,7 +35,7 @@ export function useCreateChannel() {
 
         if (result.data && result.statusCode === 200) {
            setChannel(result.data);
-           showToast({title:"Cheers!", description: `Your channel ${result.data.name} was creating successfully`})
+           handleApiSuccess(result);
 
         } 
         else {

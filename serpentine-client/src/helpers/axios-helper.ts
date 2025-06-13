@@ -32,19 +32,6 @@ const createApiResult = <T>(
 });
 
 
-const handleTokenCheck = (): string | null => {
-
-  const decoded = decode();
-  if (!decoded) {
-    useAuthStore.getState().logout();
-    showToast({
-      title: "Session Expired",
-      description: "Your session has expired, login again",
-    });
-    return null;
-  }
-  return getToken();
-};
 
 const handleApiError = <T>(error: unknown): ApiResult<T> => {
   if (!isAxiosError(error)) {
@@ -82,12 +69,7 @@ export function useFetch<T>() {
   ): Promise<ApiResult<T>> => {
     try {
      
-      if (requireToken) {
-        const token = handleTokenCheck();
-        if (!token) {
-          return createApiResult(false, 401, "Session Expired", ["Session Expired"]);
-        }
-      }
+     
 
       const config = {
         headers: getAuthHeaders(requireToken ? getToken() : null, contentType),

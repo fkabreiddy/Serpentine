@@ -30,7 +30,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
 
         <div  className={`flex justify-between my-1  w-full max-w-full px-2 group  gap-1   transition-all cursor-pointer border-default-100  `}>
             <div className="flex items-center w-full max-w-full gap-3  ">
-                <Tooltip content={channel.name} placement="right" isDisabled={layout.sideBarExpanded} >
+                <Tooltip content={channel.name} size={"sm"} showArrow={true} placement="right" isDisabled={layout.sideBarExpanded} >
                      <Image src="https://img.freepik.com/premium-vector/vector-abstract-grainy-texture-gradient-background_296715-733.jpg" className="shrink-0 size-6"/>
 
                 </Tooltip>

@@ -23,10 +23,7 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
     const {layout, setLayout} = useLayoutStore()
     const {closeSession} = useCloseSession();
 
-    const changeSidebarState = () =>{
-        setLayout({sideBarExpanded : !layout.sideBarExpanded})
-    }
-
+  
     
     useEffect(()=>{
 
@@ -49,11 +46,8 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
             
             <div className="doodle-pattern "/>
 
-            <div className="absolute top-[15px] -left-[15px]">
-                <IconButton onClick={changeSidebarState}  tootltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
-                {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
-                </IconButton>
-            </div>
+             
+           
             <div/>
             <SearchChannelBar onSearch={setFilter} /> 
 

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@heroui/use-theme";
 import { CurrentRightBarViews, useLayoutStore } from "@/contexts/layout-context";
 import IconButton from "@/components/icon-button";
-import { MenuIcon, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, MenuIcon, X } from "lucide-react";
 import RightSideBar from "@/components/panels/right-side-bar";
 
 export default function DefaultLayout({
@@ -51,14 +51,18 @@ export default function DefaultLayout({
     <div className="w-screen h-screen flex">
         <LeftSideBar />
 
-      
+        <div className={`absolute top-[15px] !z-[50] ${layout.sideBarExpanded ? "left-[150px]" : "left-[50px]"}`}>
+                <IconButton onClick={changeSidebarState}  tootltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
+                    {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
+                </IconButton>
+            </div>
 
         {isMobile && currentRightBarView !== CurrentRightBarViews.TrendingPosts ? 
           <></> :
 
           <div className="flex flex-col w-full h-screen  ">
-            <AppBar />
-              <main className="flex flex-col animate-[width] bg-white  dark:bg-black  w-full h-full overflow-auto "  >
+              <AppBar />
+              <main className="flex flex-col animate-[width] bg-white  dark:bg-black  float-left h-full overflow-auto "  >
               {children}
 
             </main> 

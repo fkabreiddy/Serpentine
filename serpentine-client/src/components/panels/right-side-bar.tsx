@@ -50,7 +50,7 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
 
   return(
 
-    <ScrollShadow hideScrollBar offset={0}  className={`h-scren ${isMobile ? "w-[100%]": "w-[30%]"}  bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col items-center border-l  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
+    <ScrollShadow hideScrollBar offset={0}  className={`h-scren ${isMobile ? "w-[100%]": "w-[35%]"}  bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col items-center border-l  border-default-100 p-3 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
         
         {currentRightBarView !== CurrentRightBarViews.TrendingPosts && 
         <div className="absolute top-2 right-2">
