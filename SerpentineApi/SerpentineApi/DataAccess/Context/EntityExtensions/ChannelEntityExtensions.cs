@@ -22,6 +22,8 @@ public static class ChannelEntityExtensions
             AdultContent = ch.AdultContent,
             Description = ch.Description,
             MembersCount = ch.Members.Count,
+            ChannelPicture = ch.ChannelPicture,
+            ChannelCover = ch.ChannelCover,
             Members = ch.Members,
             MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new()
 
@@ -50,6 +52,8 @@ public static class ChannelEntityExtensions
             AdultContent = ch.AdultContent,
             Description = ch.Description,
             MembersCount = ch.Members.Count,
+            ChannelPicture = ch.ChannelPicture,
+            ChannelCover = ch.ChannelCover,
             Members = ch.Members,
             MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new()
             

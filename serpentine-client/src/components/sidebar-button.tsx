@@ -13,12 +13,12 @@ export default function SideBarButton({ text, children, ...rest}:SideBarButtonPr
         <>
             <button
              {...rest}
-                className={`$ cursor-pointer group items-center w-full  flex gap-2 hover:opacity-100 opacity-70 dark:opacity-90 rounded-lg  hover:dark:bg-default-100/30  hover:bg-neutral-100 dark:!text-white text-black  p-2 transition-all text-sm font-semibold`}
+                className={`$ cursor-pointer group items-center ${layout.sideBarExpanded ? "w-full" : "w-fit"}  flex gap-2 hover:opacity-100 opacity-70 dark:opacity-90 rounded-lg  hover:dark:bg-default-100/30  hover:bg-neutral-100 dark:!text-white text-black  p-2 transition-colors text-sm font-semibold`}
             >
                 {children}
 
                 {layout.sideBarExpanded && 
-                    <label className='font-normal group-hover:text-blue-500 text-[13px] opacity-100'>{text}</label>
+                    <label className='font-normal group-hover:text-blue-600 text-[13px] opacity-100'>{text}</label>
                 }
             </button>
         </>

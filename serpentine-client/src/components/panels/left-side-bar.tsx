@@ -10,7 +10,7 @@ import { useLayoutStore } from "@/contexts/layout-context";
 import { useCloseSession } from "@/hooks/user-hooks";
 
 
-interface ChannelsPanelProps{
+interface LeftSideBarProps{
 
 }
 
@@ -21,26 +21,15 @@ interface JoinChannelDrawerProps{
 }
 
 
-const SideBar: React.FC<ChannelsPanelProps> = () =>{
+const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   const navigate = useNavigate();
   const [isMounted, setIsMounted] = useState<boolean>(false);
-   const [appBarHeight, setAppBarHeight] = useState("0");
-   const {layout} = useLayoutStore();
-       const {closeSession} = useCloseSession();
+   const {layout, setCurrentRightBarView} = useLayoutStore();
+    const {closeSession} = useCloseSession();
    
 
-  useEffect(() => {
-    setIsMounted(true);
-    const updateDimensions = () => {
-      const appBar = document.getElementById("app-bar");
-      if (appBar) setAppBarHeight(getComputedStyle(appBar).height);
-    };
-
-    if (isMounted) {
-      updateDimensions();
-    }
-  }, [isMounted]);
+ 
 
 
 
@@ -57,7 +46,7 @@ const SideBar: React.FC<ChannelsPanelProps> = () =>{
 
   return(
 
-    <ScrollShadow hideScrollBar offset={0} id="side-bar" style={{marginTop: appBarHeight, height: `calc(100vh - ${appBarHeight})`}} className={` ${layout.sideBarExpanded ? "w-[250px]" : "50px"}   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
+    <ScrollShadow hideScrollBar offset={0} id="side-bar" className={` ${layout.sideBarExpanded ? "w-[250px]" : "w-[80px]"} h-scren   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
             
           
           
@@ -121,4 +110,4 @@ const SideBar: React.FC<ChannelsPanelProps> = () =>{
   )
 }
 
-export default SideBar;
+export default LeftSideBar;

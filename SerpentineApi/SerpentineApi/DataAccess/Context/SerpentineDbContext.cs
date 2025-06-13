@@ -21,6 +21,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         {
             t.HasIndex(u => u.Name).IsUnique();
             t.Ignore(u => u.MyMember);
+            t.Ignore(u => u.MembersCount);
             
         });
         

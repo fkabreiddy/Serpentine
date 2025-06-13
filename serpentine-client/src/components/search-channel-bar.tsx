@@ -30,7 +30,7 @@ const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel =
                 labelPlacement="outside"
                 autoComplete="current-password"
                 endContent={ <SearchIcon /> }
-                className="max-w-[250px]"
+                className="w-[60%] max-md:w-full"
                 
                 onChange={handleChange}
             />

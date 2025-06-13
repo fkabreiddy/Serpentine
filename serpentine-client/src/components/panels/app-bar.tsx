@@ -6,7 +6,7 @@ import Avatar from "boring-avatars";
 import { useCloseSession } from '../../hooks/user-hooks';
 import { Image } from "@heroui/image";
 import IconButton from "../icon-button";
-import { MenuIcon, Plug, X } from "lucide-react";
+import { AlignLeft, AlignRight, ArrowLeft, ArrowRight, MenuIcon, Plug, X } from "lucide-react";
 import SearchChannelBar from "../search-channel-bar";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { ThemeSwitch } from "../theme-switch";
@@ -45,11 +45,16 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
     return(
 
-        <nav id="app-bar" className="max-md:h-fit z-[10]  bg-white dark:bg-black   fixed w-full    border border-default-100 flex items-center px-3 py-2  justify-between gap-3 h-fit transition-all">
-            <IconButton onClick={changeSidebarState} tootltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
-                {!layout.sideBarExpanded ? <MenuIcon className="shrink-0 size-4"/> : <X className="shrink-0 size-4"/>}
-            </IconButton>
+        <nav id="app-bar" className=" z-[10]  bg-white dark:bg-black   sticky top-0 w-full    border-b border-default-100 flex items-center px-3 py-2  justify-between gap-3 h-fit transition-all">
             
+            <div className="doodle-pattern "/>
+
+            <div className="absolute top-[15px] -left-[15px]">
+                <IconButton onClick={changeSidebarState}  tootltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
+                {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
+                </IconButton>
+            </div>
+            <div/>
             <SearchChannelBar onSearch={setFilter} /> 
 
            

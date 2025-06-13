@@ -48,12 +48,7 @@ export default function HomePage () {
                     </div>
                 </>
                 
-                {isMobile ||
-                    <div className="flex w-[30%] absolute right-[30px] flex-col p-3 rounded-lg ">
-                        <TrendingPosts/>
-
-                    </div> 
-                }
+                
                 
                     
                     

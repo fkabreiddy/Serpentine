@@ -1,6 +1,6 @@
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Spinner } from "@heroui/spinner";
-import { Minimize, PackageOpenIcon, X } from "lucide-react";
+import { Minimize, PackageOpenIcon, Plus, X } from "lucide-react";
 import React, { useEffect } from "react";
 import ChannelCard from "./channels/channel-card";
 import { useAuthStore } from "@/contexts/authentication-context";
@@ -10,7 +10,8 @@ import { CreateChannelDialog } from "./dialogs/create-channel-dialog";
 import { Expand } from "lucide-react";
 import IconButton from "./icon-button";
 import ChannelSkeleton from "./skeletons/channel-skeleton";
-import { useLayoutStore } from "@/contexts/layout-context";
+import { CurrentRightBarViews, useLayoutStore } from "@/contexts/layout-context";
+import SideBarButton from "./sidebar-button";
 
 interface ChannelContainerProps{
 }
@@ -19,10 +20,19 @@ export default function ChannelsContainer(){
 
     const [showChannels, setShowChannels] = React.useState<boolean>(true);
     const {user} = useAuthStore();
-    const {layout} = useLayoutStore();
+    const {layout, setCurrentRightBarView, newChannel, setNewChannel } = useLayoutStore();
     const {getChannelsByUserId, setChannels, channels, hasMore, loadingChannels, isBusy } = useGetChannelsByUserId();
 
     
+    useEffect(()=>{
+
+        if(newChannel)
+        {
+            handleChannelCreated(newChannel)
+            setNewChannel(null);
+
+        }
+    },[newChannel])
     
     const hasFetched = React.useRef(false);
 
@@ -46,7 +56,7 @@ export default function ChannelsContainer(){
     }
 
     return(
-        <div className={`${showChannels ? "h-full" : "h-fit"} w-full flex flex-col gap-2 `} >
+        <div className={`${showChannels ? "h-full" : "h-fit"}  ${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col gap-2 `} >
            
            {layout.sideBarExpanded && 
                 <div className="w-full flex mb-2 px-3 items-center justify-between">
@@ -60,8 +70,9 @@ export default function ChannelsContainer(){
                 
                 </div>
             } 
-            <CreateChannelDialog onCreate={handleChannelCreated}/>
-            
+            <SideBarButton  text="Create a channel" onClick={()=> setCurrentRightBarView(CurrentRightBarViews.CrateChannelForm)} >
+                  <Plus className="size-[18px]  cursor-pointer group-hover:text-blue-500 transition-all"/>
+            </SideBarButton>              
             {(channels && showChannels) &&
                     
                 channels.map((ch, i) => (

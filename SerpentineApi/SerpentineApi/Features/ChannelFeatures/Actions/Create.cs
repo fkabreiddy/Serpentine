@@ -32,6 +32,12 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [BindNever, JsonIgnore]
     public int CurrentUserId { get; private set; }
 
+    [FromForm, JsonPropertyName("channelBanner"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
+    public IFormFile? ChannelBanner {get; set;}
+
+    [FromForm, JsonPropertyName("channelCover"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
+    public IFormFile? ChannelCover {get; set;}
+
     public void SetCurrentUserId(int? userId)
     {
         CurrentUserId = userId ?? 0;

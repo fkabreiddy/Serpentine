@@ -1,12 +1,13 @@
-import SideBar from "@/components/panels/side-bar";
+import LeftSideBar from "@/components/panels/left-side-bar";
 import AppBar from "@/components/panels/app-bar";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useIsMobile } from '../hooks/use-mobile';
 import { useEffect, useState } from "react";
 import { useTheme } from "@heroui/use-theme";
-import { useLayoutStore } from "@/contexts/layout-context";
+import { CurrentRightBarViews, useLayoutStore } from "@/contexts/layout-context";
 import IconButton from "@/components/icon-button";
 import { MenuIcon, X } from "lucide-react";
+import RightSideBar from "@/components/panels/right-side-bar";
 
 export default function DefaultLayout({
   children,
@@ -26,7 +27,7 @@ export default function DefaultLayout({
   const [sidebarExpanded, setSideBarExpanded] = useState<boolean>(isMobile);
   const [sideBarWidth, setSideBarWidth] = useState("0px");
   const [appBarHeight, setAppBarHeight] = useState("0px");
-  const {layout, setLayout} = useLayoutStore();
+  const {layout, setLayout, currentRightBarView} = useLayoutStore();
 
   useEffect(() => {
     setIsMounted(true);
@@ -47,20 +48,30 @@ export default function DefaultLayout({
     }
 
   return (
-    <>
-     <AppBar />
+    <div className="w-screen h-screen flex">
+        <LeftSideBar />
 
-      <div className="flex w-100vw relative ">
-        <SideBar />
-       
-        <main className="flex flex-col animate-[width] " style={{width: `calc(100% - ${sideBarWidth})`, marginTop: appBarHeight}} >
-          {children}
+      
 
-        </main>
+        {isMobile && currentRightBarView !== CurrentRightBarViews.TrendingPosts ? 
+          <></> :
+
+          <div className="flex flex-col w-full h-screen  ">
+            <AppBar />
+              <main className="flex flex-col animate-[width] bg-white  dark:bg-black  w-full h-full overflow-auto "  >
+              {children}
+
+            </main> 
+
+          </div>
+         
+        }
        
-      </div>
+
+       {isMobile && currentRightBarView === CurrentRightBarViews.TrendingPosts ? <></> :    <RightSideBar/> }
+ 
        
-    </>
+    </div>
      
     
      
