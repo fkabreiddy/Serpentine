@@ -3,9 +3,9 @@ import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import * as motion from "motion/react-client";
 import LoginUserRequest from "@/models/requests/user/login-user-request";
-import { useLoginUser } from "../../hooks/user-hooks";
 import { Input } from "@heroui/input";
-import Divider from "../divider";
+import { useLoginUser } from "@/hooks/user-hooks";
+import Divider from "@/components/common/divider";
 
 interface LoginFormProps {
     onViewChange: () => void;

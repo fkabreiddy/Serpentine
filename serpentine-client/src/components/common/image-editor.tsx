@@ -12,7 +12,6 @@ interface PhotoEditorProps {
 const PhotoEditor : React.FC<PhotoEditorProps> = ({open, onClose, file, onSaveImage}) => {
   const [parentFile, setParentFile] = useState<File>();
   const [showModal, setShowModal] = useState(false);
-  const [editedFile, setEditedFile] = useState<File | null>(null);
 
   // Show modal if file is selected
   const showModalHandler = () => {

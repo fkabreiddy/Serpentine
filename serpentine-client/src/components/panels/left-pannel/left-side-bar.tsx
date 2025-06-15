@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {ScrollShadow} from "@heroui/scroll-shadow";
-import { ArrowLeft, ArrowRight, HomeIcon, InfoIcon, Plug } from "lucide-react";
+import { HomeIcon, InfoIcon, Plug } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
-import SideBarButton from '../sidebar-button';
-import ChannelsContainer from "../channels-container";
 import { motion } from "motion/react";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useCloseSession } from "@/hooks/user-hooks";
-import IconButton from "../icon-button";
+import ChannelsContainer from "@/components/channels/common/channels-container";
+import SideBarButton from "./sidebar-button";
 
 
 interface LeftSideBarProps{
@@ -26,7 +25,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   const navigate = useNavigate();
   const [isMounted, setIsMounted] = useState<boolean>(false);
-   const {layout, setLayout, setCurrentRightBarView} = useLayoutStore();
+   const {layout, setLayout} = useLayoutStore();
     const {closeSession} = useCloseSession();
    
  

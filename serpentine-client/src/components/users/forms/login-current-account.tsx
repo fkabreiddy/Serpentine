@@ -5,7 +5,7 @@ import { Button } from "@heroui/button";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { getToken } from "@/helpers/jwt-helper";
 import { useNavigate } from "react-router-dom";
-import Divider from "../divider";
+import Divider from "@/components/common/divider";
 interface LoginWithCurrentAccountProps{
     username: string,
     profilePicture: string | null,

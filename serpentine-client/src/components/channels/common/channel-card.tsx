@@ -1,16 +1,9 @@
 import React, {useState} from "react";
-import GroupCardMini from "../groups/group-card-mini";
-import { picture } from "motion/react-client";
-import ChannelCardMenu from "./channel-card-menu";
-import GroupCard from "../groups/group-card";
-import { motion } from "motion/react";
 import { ChannelResponse } from "@/models/responses/channel-response";
-import { Badge } from "../ui/badge";
-import { InfoIcon, KeyIcon, LucideLoaderPinwheel } from "lucide-react";
+import { KeyIcon } from "lucide-react";
 import { Image } from "@heroui/image";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { Tooltip } from "@heroui/tooltip";
-import { showToast } from '../../helpers/sonner-helper';
 
 interface ChannelCardProps{
     index : number,
@@ -19,7 +12,6 @@ interface ChannelCardProps{
 
 const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
 
-    const [selected, setSelected] = useState(false);
     const {layout} = useLayoutStore();
   
 

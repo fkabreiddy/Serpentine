@@ -1,24 +1,15 @@
 import { ChannelResponse } from '@/models/responses/channel-response';
+import { RightPanelView } from '@/models/right-panel-view';
 import { create } from 'zustand';
 
 interface Layout {
     sideBarExpanded: boolean;
-    primaryColorBg: string
-    primaryColorText: string
-
-}
-
-export enum CurrentRightBarViews{
-
-    CrateChannelForm,
-    TrendingPosts
+    currentRightPanelView: RightPanelView | RightPanelView.DefaultView
 }
 
 interface LayoutState {
     layout: Layout;
     setLayout: (updates: Partial<Layout>) => void;
-    currentRightBarView : CurrentRightBarViews | CurrentRightBarViews.TrendingPosts
-    setCurrentRightBarView: (view : CurrentRightBarViews) => void;
     setNewChannel: (channel: ChannelResponse | null) => void;
     newChannel: ChannelResponse | null
     
@@ -26,11 +17,12 @@ interface LayoutState {
 
 export const useLayoutStore = create<LayoutState>((set) => ({
     layout: {
-        primaryColorBg: "bg-green-700 dark:bg-green-800",
-        primaryColorText: "text-green-700 dark:text-green-800",
-        sideBarExpanded: false
+        sideBarExpanded: false,
+        currentRightPanelView: RightPanelView.DefaultView
+
     },
     newChannel: null,
+    
     setNewChannel: (channel : ChannelResponse | null) => {
 
         set((state)=>({
@@ -40,14 +32,7 @@ export const useLayoutStore = create<LayoutState>((set) => ({
         ))
     },
     
-    currentRightBarView: CurrentRightBarViews.TrendingPosts,
-    setCurrentRightBarView: (view: CurrentRightBarViews = CurrentRightBarViews.TrendingPosts) => {
-        set((state) => ({
-            ...state,
-            currentRightBarView: view
-
-        }));
-    },
+   
     
     setLayout: (updates: Partial<Layout>) => {
         set((state) => ({

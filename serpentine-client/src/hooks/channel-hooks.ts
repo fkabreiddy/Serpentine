@@ -6,6 +6,7 @@ import { showToast } from '../helpers/sonner-helper';
 import { set } from "date-fns";
 import { useSound } from 'react-sounds';
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
+import { CreateChannelRequest } from "@/models/requests/channels/create-channel-request";
 
 
 const initialApiState = <T>(): ApiResult<T> => ({

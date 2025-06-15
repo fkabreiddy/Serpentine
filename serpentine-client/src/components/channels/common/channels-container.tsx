@@ -1,17 +1,15 @@
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { Spinner } from "@heroui/spinner";
-import { Minimize, PackageOpenIcon, Plus, X } from "lucide-react";
+import { Minimize, Plus } from "lucide-react";
 import React, { useEffect } from "react";
-import ChannelCard from "./channels/channel-card";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useGetChannelsByUserId } from "@/hooks/channel-hooks";
 import { ChannelResponse } from "@/models/responses/channel-response";
-import { CreateChannelDialog } from "./dialogs/create-channel-dialog";
 import { Expand } from "lucide-react";
-import IconButton from "./icon-button";
-import ChannelSkeleton from "./skeletons/channel-skeleton";
-import { CurrentRightBarViews, useLayoutStore } from "@/contexts/layout-context";
-import SideBarButton from "./sidebar-button";
+import {useLayoutStore } from "@/contexts/layout-context";
+import { RightPanelView } from "@/models/right-panel-view";
+import IconButton from "@/components/common/icon-button";
+import SideBarButton from "@/components/panels/left-pannel/sidebar-button";
+import ChannelSkeleton from "../skeletons/channel-skeleton";
+import ChannelCard from "./channel-card";
 
 interface ChannelContainerProps{
 }
@@ -20,7 +18,7 @@ export default function ChannelsContainer(){
 
     const [showChannels, setShowChannels] = React.useState<boolean>(true);
     const {user} = useAuthStore();
-    const {layout, setCurrentRightBarView, newChannel, setNewChannel } = useLayoutStore();
+    const {layout, setLayout, newChannel, setNewChannel } = useLayoutStore();
     const {getChannelsByUserId, setChannels, channels, hasMore, loadingChannels, isBusy } = useGetChannelsByUserId();
 
     
@@ -70,7 +68,7 @@ export default function ChannelsContainer(){
                 
                 </div>
             } 
-            <SideBarButton  text="Create a channel" onClick={()=> setCurrentRightBarView(CurrentRightBarViews.CrateChannelForm)} >
+            <SideBarButton  text="Create a channel" onClick={()=> setLayout({currentRightPanelView: RightPanelView.CreateChannelFormView})} >
                   <Plus className="size-[18px]  cursor-pointer group-hover:text-blue-500 transition-all"/>
             </SideBarButton>              
             {(channels && showChannels) &&

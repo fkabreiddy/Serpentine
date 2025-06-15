@@ -11,7 +11,7 @@ import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Image } from "@heroui/image";
 import {ArrowUpIcon} from '@heroicons/react/24/solid'
 import { DateInput } from "@heroui/date-input";
-import { CreateUserRequest } from "@/models/requests/user/create-user-request";
+import { createAccountSchema, CreateUserRequest } from "@/models/requests/user/create-user-request";
 import { parseDate, today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { CakeIcon } from "lucide-react";
 
@@ -36,37 +36,6 @@ interface CreateAccountFormProps {
     onClose: () => void
 }
 
-const createAccountSchema = z.object({
-    fullName: z.string()
-        .min(3, "Your name must be at least 3 characters")
-        .max(30, "Your name must be less than 30 characters")
-        .regex(/^[a-zA-Z\s]+$/, "Full name can only contain letters and spaces")
-        .default(""),
-  
-    username: z.string()
-        .min(3, "Username must be at least 3 characters")
-        .max(30, "Username must be less than 30 characters")
-        .regex(/^[a-zA-Z0-9._]{3,30}$/, "Username can only contain letters, numbers, dots and underscores")
-        .default(""),
-
-    password: z.string()
-        .min(8, "Password must be at least 8 characters")
-        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-        .regex(/\d/, "Password must contain at least one number")
-        .regex(/[\W_]/, "Password must contain at least one special character")
-        .default(""),
-           
-    confirmPassword: z.string().default(""),
-
-    imageFile: z.instanceof(File).nullable().default(null),
-    dayOfBirth: z.instanceof(CalendarDate).default(today(getLocalTimeZone()))
-
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-});
-
-
 
 
 
@@ -78,12 +47,17 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
             setValue,
             watch,
             formState: { errors, isValid },
-        } = useForm<z.infer<typeof createAccountSchema>>({
+        } = useForm({
             
             resolver: zodResolver(createAccountSchema),
             mode: "onChange",
             defaultValues: {
-                imageFile:null
+                imageFile:null,
+                username: "",
+                dayOfBirth: today(getLocalTimeZone()),
+                password: "",
+                confirmPassword:"",
+                fullName: ""
             }
             
 
@@ -97,49 +71,15 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     const profilePictureInput = useRef<HTMLInputElement>(null);
     const {createUser, result, isCreatingUser} = useCreateUser();
     const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
-    const [request, setRequest] = useState<CreateUserRequest>({
-        username: watch("username"),
-        fullName: watch("fullName"),
-        password: watch("password"),
-        dayOfBirth: today(getLocalTimeZone()).toString(),
-        confirmPassword: watch("confirmPassword"),
-        imageFile: watch("imageFile") as FileType | null,
-    });
+   
 
     const ageIsValid = () =>{
 
-        return watch("dayOfBirth") <= minAge() &&  watch("dayOfBirth") >= maxAge()
+        return (watch("dayOfBirth") ?? today(getLocalTimeZone())  <= minAge()) &&  (watch("dayOfBirth") ?? today(getLocalTimeZone())  >= maxAge())
     }
 
 
-    useEffect(() => {
-        setRequest({
-            username: watch("username"),
-            fullName: watch("fullName"),
-            password: watch("password"),
-            confirmPassword: watch("confirmPassword"),
-            dayOfBirth: today(getLocalTimeZone()).toString(),
-            imageFile: watch("imageFile") as FileType | null,
-        });
-
-        const date = watch("dayOfBirth");
-
-        if(date) {
-            setRequest((prev) => ({
-            ...prev,
-                dayOfBirth: date.toString()
-            }));
-        }
-        else
-        {
-             setRequest((prev) => ({
-            ...prev,
-                dayOfBirth:  today(getLocalTimeZone()).toString()
-            }));
-        }
-
-    }, [watch("username"), watch("fullName"), watch("password"), watch("dayOfBirth"), watch("confirmPassword"), watch("imageFile")]);
-
+    
 
     const handleEditPictureClicked = () => {
         profilePictureInput.current?.click();
@@ -149,16 +89,16 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     const buildForm = () : FormData =>{
 
         const formData = new FormData();
-        formData.append('username', request.username);
-        formData.append('fullName', request.fullName);
-        formData.append('password', request.password);
-        formData.append('confirmPassword', request.confirmPassword);
-        formData.append("dayOfBirth", request.dayOfBirth);
+        formData.append('username', watch("username") ?? "");
+        formData.append('fullName', watch("fullName") ?? "");
+        formData.append('password', watch("password") ?? "");
+        formData.append('confirmPassword', watch("confirmPassword") ?? "");
+        formData.append("dayOfBirth", watch("dayOfBirth")?.toString() ?? "");
      
 
-        if (request.imageFile) {
+        if (watch("imageFile") ) {
 
-            formData.append('imageFile', request.imageFile);
+            formData.append('imageFile', watch("imageFile") as FileType ?? "");
         }
 
         return formData;
@@ -171,7 +111,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
         }
     },[result]);
 
-    const submit = async (data: z.infer<typeof createAccountSchema>) => {
+    const submit = async (data: CreateUserRequest) => {
         const formData = buildForm();
         await createUser(formData);
        
@@ -224,11 +164,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
         
     };
 
-    const handleForm = (e : React.FormEvent) => {
-        e.preventDefault();
-        
-        handleSubmit(submit)(e);
-    }
+    
    
 
    
@@ -271,7 +207,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
 
                 
 
-                <form   onSubmit={handleForm} className="w-full flex flex-col gap-3  mt-4">
+                <form   onSubmit={handleSubmit((data)=> submit(data))} className="w-full flex flex-col gap-3  mt-4">
                     <div>
                         <h1 className="text-2xl font-semibold text-center">Create Account</h1>
                         <p className="text-sm mb-4 font-normal opacity-60 ml-1 text-center">
@@ -279,18 +215,18 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                         </p>
                      </div> 
                         <div className="flex flex-col items-center justify-center gap-3 mb-2">
-                            {request.imageFile ? <FileAvatar file={request.imageFile} onRemove={clearPicture} onAdd={handleEditPictureClicked} /> : <Avatar className="transition-all" name={(isAvailable || request.username !== "") ? request.username : "adam" } size={70} variant="beam"/> }
+                            {watch("imageFile") ? <FileAvatar file={watch("imageFile") as FileType} onRemove={clearPicture} onAdd={handleEditPictureClicked} /> : <Avatar className="transition-all" name={(isAvailable || watch("username") !== "") ? watch("username") : "adam" } size={70} variant="beam"/> }
                                 <Button
                                     radius="md"
-                                    endContent={!request.imageFile && <ArrowUpIcon strokeWidth={2} className="size-4" />}
-                                    onPress={request.imageFile ? clearPicture : handleEditPictureClicked}
+                                    endContent={!watch("imageFile") && <ArrowUpIcon strokeWidth={2} className="size-4" />}
+                                    onPress={watch("imageFile") ? clearPicture : handleEditPictureClicked}
                                     isDisabled={isGettingByUsername }
                                     size="sm"
-                                    className={`w-fit backdrop-blur-xl ${request.imageFile && "bg-red-700 text-white "}  max-h-9 border border-default-100/20 transition-all text-xs font-semibold`}
+                                    className={`w-fit backdrop-blur-xl ${watch("imageFile") && "bg-red-700 text-white "}  max-h-9 border border-default-100/20 transition-all text-xs font-semibold`}
                                         
                                 >
                                     <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
-                                    {request.imageFile ? "Reset": "Upload"}
+                                    {watch("imageFile") ? "Reset": "Upload"}
                                 </Button>
 
                         </div>  
@@ -301,7 +237,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                         label="Username"
                         autoComplete="username"
                         labelPlacement="outside"
-                        value={request.username}
+                        value={watch("username")}
                         minLength={3}
                         maxLength={30}
                         required={true}
@@ -333,13 +269,13 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                     setIsAvailable(false);
                                 } else {
                                    
-                                    await getByUsername({ username: request.username});
+                                    await getByUsername({ username: watch("username") ?? ""});
                                      
                                 }
                             }}
                             size="sm"
                             radius="md"
-                            isDisabled={isGettingByUsername || request.username === "" }
+                            isDisabled={isGettingByUsername || watch("username") === "" }
                             className={`w-fit backdrop-blur-xl self-end  ${ isAvailable  ? " bg-red-700 dark:bg-red-700 text-white" : ""}  max-h-9 border border-default-100/20 transition-all text-xs font-semibold`}
                                 
                         >
@@ -354,7 +290,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                         <>
                              <Input
                                 type="text"
-                                value={request.fullName}
+                                value={watch("fullName")}
                                 maxLength={30}
                                 minLength={10}
                                 required={true}
@@ -379,7 +315,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                 {...register("password")}
 
                                 labelPlacement="outside"
-                                value={request.password}
+                                value={watch("password")}
                                 placeholder="Your password"
                                 minLength={8}
                                 maxLength={30}
@@ -393,7 +329,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                             <Input
                                 {...register("confirmPassword")}
                                 type="password"
-                                value={request.confirmPassword}
+                                value={watch("confirmPassword")}
                                 label="Confirm Password"
                                 labelPlacement="outside"
                                 minLength={8}
@@ -418,7 +354,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                 label="Day of birth"
                                 labelPlacement="outside"
                                 onChange={(e) => setValue("dayOfBirth", e ?? today(getLocalTimeZone()))}
-                                value={parseDate(request.dayOfBirth)}
+                                value={parseDate(watch("dayOfBirth")?.toString() ?? today(getLocalTimeZone()).toString())}
                                 isRequired={true}
                                 placeholderValue={today(getLocalTimeZone())}
                                 />

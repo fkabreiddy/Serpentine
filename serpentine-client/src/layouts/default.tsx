@@ -15,37 +15,21 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
 
-  const { theme, setTheme } = useTheme("dark");
-  const [isMounted, setIsMounted] = useState(false);
+  const { setTheme } = useTheme("dark");
 
   useEffect(() => {
-    setTheme("light");
+    setTheme("dark");
   }, []);
 
-  const {currentChatId} = useGlobalDataStore();
   const isMobile = useIsMobile();
-  const [sidebarExpanded, setSideBarExpanded] = useState<boolean>(isMobile);
-  const [sideBarWidth, setSideBarWidth] = useState("0px");
-  const [appBarHeight, setAppBarHeight] = useState("0px");
+  
   const {layout, setLayout, currentRightBarView} = useLayoutStore();
 
-  useEffect(() => {
-    setIsMounted(true);
-    const updateDimensions = () => {
-      const appBar = document.getElementById("app-bar");
-      const sideBar = document.getElementById("side-bar");
-      if (appBar) setAppBarHeight(getComputedStyle(appBar).height);
-      if (sideBar) setSideBarWidth(getComputedStyle(sideBar).width);
-    };
+  
 
-    if (isMounted) {
-      updateDimensions();
-    }
-  }, [isMounted]);
-
-   const changeSidebarState = () =>{
-        setLayout({sideBarExpanded : !layout.sideBarExpanded})
-    }
+  const changeSidebarState = () =>{
+      setLayout({sideBarExpanded : !layout.sideBarExpanded})
+  }
 
   return (
     <div className="w-screen h-screen flex">

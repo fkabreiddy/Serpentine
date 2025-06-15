@@ -3,13 +3,12 @@ import { motion } from 'motion/react';
 import { useAuthStore } from "@/contexts/authentication-context";
 import { Spinner } from "@heroui/spinner";
 import Avatar from "boring-avatars";
-import { useCloseSession } from '../../hooks/user-hooks';
 import { Image } from "@heroui/image";
-import IconButton from "../icon-button";
-import { AlignLeft, AlignRight, ArrowLeft, ArrowRight, MenuIcon, Plug, X } from "lucide-react";
-import SearchChannelBar from "../search-channel-bar";
 import { useLayoutStore } from "@/contexts/layout-context";
-import { ThemeSwitch } from "../theme-switch";
+import { useCloseSession } from "@/hooks/user-hooks";
+import IconButton from "@/components/common/icon-button";
+import SearchChannelBar from "@/components/search-channel-bar";
+import { ThemeSwitch } from "@/components/theme-switch";
 
 
 interface ProfilePanelProps{
@@ -20,7 +19,6 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
     const {userPofilePicture, user, username, setUser, isAuthenticated } = useAuthStore();
     const [filter, setFilter] = React.useState<string>("");
-    const {layout, setLayout} = useLayoutStore()
     const {closeSession} = useCloseSession();
 
   
@@ -60,21 +58,16 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
                 {!isAuthenticated ? 
                     <Spinner variant="spinner"/> : 
                 
-                    <>
-                            <div className="cursor-pointer flex items-center justify-center rounded-full   transition-all text-sm font-semibold">
-                                {userPofilePicture ? 
-                                        <Image isBlurred src="userProfilePicture" width={30} height={30} className="shrink-0 min-w-[30px] min-h-[30px] max-md:!w-[23px] max-md:!h-[23px] rounded-full"/> 
+                    <div className="cursor-pointer flex items-center justify-center rounded-full   transition-all text-sm font-semibold">
+                        {userPofilePicture ? 
+                                <Image isBlurred src="userProfilePicture" width={30} height={30} className="shrink-0 min-w-[30px] min-h-[30px] max-md:!w-[23px] max-md:!h-[23px] rounded-full"/> 
 
-                                    :
-                                        <Avatar size={30} className="max-md:!w-[23px] max-md:!h-[23px]" variant="beam" name={username ?? "adam"}/>
+                            :
+                                <Avatar size={30} className="max-md:!w-[23px] max-md:!h-[23px]" variant="beam" name={username ?? "adam"}/>
 
 
-                                }
-                            </div>
-                    
-                            
-
-                    </> 
+                        }
+                    </div>
                         
                 }
                 
@@ -89,7 +82,7 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
 const NotificationsIcon = () =>(
 
-   <IconButton tootltipText="Notifications">
+   <IconButton onClick={()=>{}} tootltipText="Notifications">
          <motion.div
             key="notifications-icon"
             whileHover={{ rotate: 30 }}

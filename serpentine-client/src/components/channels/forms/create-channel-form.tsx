@@ -2,66 +2,52 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { Input, Textarea } from "@heroui/input";
 import React, { useEffect, useState } from "react";
 import {z} from "zod"
-import {useForm} from "react-hook-form"
+import { useForm} from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
 import {Checkbox} from "@heroui/checkbox"
 import { useCreateChannel } from "@/hooks/channel-hooks";
+import { CreateChannelRequest, createChannelSchema } from "@/models/requests/channels/create-channel-request";
 
 interface CreateChannelFormProps {
 
     onCreate: (channel: ChannelResponse) => void;
 }
 
-const createChannelSchema = z.object({
-  name: z.string()
-    .min(3, { message: "The name of the channel must contain at least 3 characters" })
-    .max(100, { message: "The name of the channel must contain at less than 100 characters" })
-    .regex(/^[a-zA-Z0-9._]+$/, { message: "the name must contain just letters, numbers, dots and underscores" }),
-    
-  description: z.string()
-    .min(10, { message: "The description must be larger than 10 characters" })
-    .max(500, { message: "the description must not exceed 500 characters" }),
-    
-  adultContent: z.boolean().default(false),
-});
+
+
 const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
 
     const {channel, createChannel, creatingChannel} = useCreateChannel();
     const {
         register,
         handleSubmit,
-        setValue,
         watch,
         formState: { errors, isValid },
-    } = useForm<z.infer<typeof createChannelSchema>>({
+    } = useForm({
         
         resolver: zodResolver(createChannelSchema),
         mode: "onChange",
+        
         defaultValues: {
-            adultContent:false
+            adultContent:false,
+            description: "",
+            name:""
         }
         
 
     });
 
-    const [request, setRequest] = useState<CreateChannelRequest>({
-        name: "",
-        description: "",
-        adultContent: false
-    })
+   
 
-    const submit = async (data: z.infer<typeof createChannelSchema>) => {
+    const submit = async (data:  CreateChannelRequest) => {
        
-        await createChannel(request);
+        await createChannel(data);
            
     };
+    
 
-    const handleForm = (e : React.FormEvent) => {
-        e.preventDefault();
-        
-        handleSubmit(submit)(e);
-    }
+  
 
     useEffect(()=>{
 
@@ -76,16 +62,6 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
         
         
 
-    useEffect(()=>{
-
-        setRequest({
-            name: watch("name"),
-            description: watch("description"),
-            adultContent: watch("adultContent")
-        })
-
-    }, [watch("name"), watch("description"), watch("adultContent")])
-
     return (
         <div className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
             <div className="">
@@ -93,14 +69,14 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                 <p className="text-xs opacity-45 max-md:text-center">Creating a channel makes you the owner of it. Be sure that your channel name is unique when creating it. You can change any information previously</p>
             </div>
              
-              <form onSubmit={handleForm}  className="w-full flex flex-col gap-3 mt-4">
+              <form onSubmit={handleSubmit(data => submit(data))}  className="w-full flex flex-col gap-3 mt-4">
                 <Input
                     label="Channel name"
                     type="text"
                     placeholder="my.awesome.channel"
                     minLength={3}
                     maxLength={100}
-                    value={request.name}
+                    value={watch("name")}
                     labelPlacement="outside"
                     
                     isRequired={true}
@@ -117,7 +93,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                     placeholder="Type something"
                     minLength={10}
                     maxLength={500}
-                    value={request.description}
+                    value={watch("description")}
                     maxRows={4}
                     labelPlacement="outside"
                     isRequired={true}
@@ -130,7 +106,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                 />
 
 
-                <Checkbox isSelected={request.adultContent} onValueChange={(e) => setValue("adultContent", e) } size="sm">
+                <Checkbox isSelected={watch("adultContent")} {...register("adultContent")} size="sm">
                     Has adult content
                 </Checkbox>
                 <p className="text-xs opacity-45">Adult content channels must not be visible for some users.</p>
