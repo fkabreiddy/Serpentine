@@ -6,7 +6,6 @@ import { cn } from "@heroui/theme";
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
 import { BoxIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import TrendingPosts from "@/components/trending-posts";
 
 interface HomePageProps{
 

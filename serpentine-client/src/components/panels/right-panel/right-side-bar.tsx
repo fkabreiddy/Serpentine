@@ -6,6 +6,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { RightPanelView } from "@/models/right-panel-view";
 import CreateChannelForm from "@/components/channels/forms/create-channel-form";
 import IconButton from "@/components/common/icon-button";
+import DefaultView from "./default-view";
 
 
 
@@ -43,17 +44,23 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
 
   return(
 
-    <ScrollShadow hideScrollBar offset={0}  className={`h-scren ${isMobile ? "w-[100%]": "w-[35%]"}  bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col items-center border-l  border-default-100 p-3 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
+    <ScrollShadow hideScrollBar offset={0}  className={`h-scren ${isMobile ? "w-[100%]": "!min-w-[300px] !max-w-[300px]"}  bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col items-center border-l  border-default-100 p-3 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
         {layout.currentRightPanelView !== RightPanelView.DefaultView && 
-        <div className="absolute top-2 right-2">
-          <IconButton tootltipText="Close" onClick={()=>setLayout({currentRightPanelView: RightPanelView.DefaultView})}>
-            <X className="size-[18px]"/>
-          </IconButton>
-        </div>
+          <div className="absolute top-2 right-2">
+            <IconButton tootltipText="Close" onClick={()=>setLayout({currentRightPanelView: RightPanelView.DefaultView})}>
+              <X className="size-[18px]"/>
+            </IconButton>
+          </div>
         }
         <div className="mt-4"/>
         {layout.currentRightPanelView === RightPanelView.CreateChannelFormView && <CreateChannelForm  onCreate={setNewChannel}/>}
-        {layout.currentRightPanelView === RightPanelView.DefaultView && <></> }
+        {layout.currentRightPanelView === RightPanelView.DefaultView && 
+          <div className=" h-full w-full flex items-center justify-center">
+              
+             <DefaultView/>
+
+          </div> 
+        }
 
         
     </ScrollShadow>

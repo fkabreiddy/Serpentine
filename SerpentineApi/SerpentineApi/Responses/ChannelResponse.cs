@@ -13,9 +13,9 @@ public class ChannelResponse : BaseResponse
 
     public int MembersCount { get; set; } = 0;
 
-    public string ChannelCover {get; set;} = "";
+    public string CoverPicture {get; set;} = "";
 
-    public string ChannelBanner {get; set;} = "";
+    public string BannerPicture {get; set;} = "";
 
 
    

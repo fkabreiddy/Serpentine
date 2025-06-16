@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useTheme } from "@heroui/use-theme";
 import { Lightbulb, MoonIcon, SunIcon } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
-import IconButton from "./icon-button";
+import IconButton from "./common/icon-button";
 export interface ThemeSwitchProps {
   className?: string;
 }
@@ -37,7 +37,7 @@ interface LightBulbIconProps {
 const LightbulbIcon = ({theme } : LightBulbIconProps) =>(
 
     
-   <IconButton tootltipText={theme + " mode"}>
+   <IconButton onClick={()=>{}} tootltipText={theme + " mode"}>
               <motion.div
                   key="setting-icon"
                   whileHover={{ rotate: 30 }}

@@ -2,27 +2,37 @@
 
 public interface IApiResult
 {
-   public string Message { get; set; }
-   public int StatusCode { get; }
-   public bool IsSuccess {get;  }
+    public string Message { get; set; }
+    public int StatusCode { get; }
+    public bool IsSuccess { get; }
+
+    public List<string> Errors { get; set; }
    
-   public List<string> Errors { get; set; }
+       public string ResultTitle { get; set; } 
+
 }
 
 public class SuccessApiResult<T> : IApiResult
 {
-   
+
 
     public SuccessApiResult(T data)
     {
         Data = data;
     }
+    public SuccessApiResult(T data, string message)
+    {
+        Data = data;
+        Message = message;
+    }
 
     public T Data { get; set; }
     public bool IsSuccess { get; private set; } = true;
-    public string Message { get; set; } = "Success";
+    public string Message { get; set; } = "Everything went well";
     public int StatusCode { get; private set; } = 200;
     public List<string> Errors { get; set; } = new();
+
+    public string ResultTitle { get; set; } = "Success";
 
    
 }
@@ -35,6 +45,9 @@ public abstract class Failure : IApiResult
     public bool IsSuccess { get; private set; } = false;
 
     public List<string> Errors { get; set; } = [];
+
+    public string ResultTitle { get; set; } = "Failure";
+
 
     public void Build(string message, int statusCode, List<string>? messages = null)
     {

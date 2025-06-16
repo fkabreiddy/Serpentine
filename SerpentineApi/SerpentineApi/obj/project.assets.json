@@ -2484,6 +2484,19 @@
             "rid": "win"
           }
         }
+      },
+      "Ulid/1.3.4": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Ulid.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Ulid.dll": {
+            "related": ".xml"
+          }
+        }
       }
     }
   },
@@ -7636,6 +7649,28 @@
         "system.windows.extensions.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "Ulid/1.3.4": {
+      "sha512": "6IaGquwjjfW+BoHSV844y12Uy2kxbboYNmsibxr2lotcSPAA3LKy1CKcAQ8JOdAdL4xMoDNXA1oxG41w7fbr6Q==",
+      "type": "package",
+      "path": "ulid/1.3.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net6.0/Ulid.dll",
+        "lib/net6.0/Ulid.xml",
+        "lib/net7.0/Ulid.dll",
+        "lib/net7.0/Ulid.xml",
+        "lib/net8.0/Ulid.dll",
+        "lib/net8.0/Ulid.xml",
+        "lib/netstandard2.0/Ulid.dll",
+        "lib/netstandard2.0/Ulid.xml",
+        "lib/netstandard2.1/Ulid.dll",
+        "lib/netstandard2.1/Ulid.xml",
+        "ulid.1.3.4.nupkg.sha512",
+        "ulid.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -7649,7 +7684,8 @@
       "Microsoft.EntityFrameworkCore.Tools >= 9.0.5",
       "OneOf >= 3.0.271",
       "Riok.Mapperly >= 4.2.1",
-      "Scalar.AspNetCore >= 2.4.2"
+      "Scalar.AspNetCore >= 2.4.2",
+      "Ulid >= 1.3.4"
     ]
   },
   "packageFolders": {
@@ -7664,6 +7700,7 @@
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
       "outputPath": "C:\\Proyectos\\Serpentine\\SerpentineApi\\SerpentineApi\\obj\\",
       "projectStyle": "PackageReference",
+      "UsingMicrosoftNETSdk": false,
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
@@ -7689,8 +7726,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.200"
+      }
     },
     "frameworks": {
       "net9.0": {
@@ -7737,6 +7773,10 @@
           "Scalar.AspNetCore": {
             "target": "Package",
             "version": "[2.4.2, )"
+          },
+          "Ulid": {
+            "target": "Package",
+            "version": "[1.3.4, )"
           }
         },
         "imports": [

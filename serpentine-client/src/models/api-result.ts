@@ -1,7 +1,8 @@
 class ApiResult<T> {
   constructor(
     public statusCode: number = 404,
-    public message: string = "Bad Request",
+    public resultTitle: string = "Ouch!",
+    public message: string = "Something went wrong",
     public errors: string[] = [],
     public isSuccess: boolean = false,
     public data: T | null = null

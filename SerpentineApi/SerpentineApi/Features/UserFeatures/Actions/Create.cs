@@ -122,7 +122,7 @@ public class CreateUserEndpoint : IEndpoint
 
                         var user = result.AsT0;
 
-                        return Results.Ok(new SuccessApiResult<UserResponse>(user));
+                        return Results.Ok(new SuccessApiResult<UserResponse>(user, "Account created successfully. Try logging in with it."));
                     });
                 }
             )

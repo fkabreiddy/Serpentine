@@ -1,13 +1,14 @@
-import LeftSideBar from "@/components/panels/left-side-bar";
-import AppBar from "@/components/panels/app-bar";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useIsMobile } from '../hooks/use-mobile';
 import { useEffect, useState } from "react";
 import { useTheme } from "@heroui/use-theme";
-import { CurrentRightBarViews, useLayoutStore } from "@/contexts/layout-context";
-import IconButton from "@/components/icon-button";
+import {  useLayoutStore } from "@/contexts/layout-context";
 import { ArrowLeft, ArrowRight, MenuIcon, X } from "lucide-react";
-import RightSideBar from "@/components/panels/right-side-bar";
+import IconButton from "@/components/common/icon-button";
+import AppBar from "@/components/panels/app-bar/app-bar";
+import LeftSideBar from "@/components/panels/left-pannel/left-side-bar";
+import RightSideBar from "@/components/panels/right-panel/right-side-bar";
+import { RightPanelView } from "@/models/right-panel-view";
 
 export default function DefaultLayout({
   children,
@@ -23,7 +24,7 @@ export default function DefaultLayout({
 
   const isMobile = useIsMobile();
   
-  const {layout, setLayout, currentRightBarView} = useLayoutStore();
+  const {layout, setLayout} = useLayoutStore();
 
   
 
@@ -35,13 +36,13 @@ export default function DefaultLayout({
     <div className="w-screen h-screen flex">
         <LeftSideBar />
 
-        <div className={`absolute top-[15px] !z-[50] ${layout.sideBarExpanded ? "left-[150px]" : "left-[50px]"}`}>
+        <div className={`absolute top-[15px] !z-[50] ${layout.sideBarExpanded ? "left-[230px]" : "left-[70px]"}`}>
                 <IconButton onClick={changeSidebarState}  tootltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
                     {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
                 </IconButton>
             </div>
 
-        {isMobile && currentRightBarView !== CurrentRightBarViews.TrendingPosts ? 
+        {isMobile && layout.currentRightPanelView !== RightPanelView.DefaultView ? 
           <></> :
 
           <div className="flex flex-col w-full h-screen  ">
@@ -56,7 +57,7 @@ export default function DefaultLayout({
         }
        
 
-       {isMobile && currentRightBarView === CurrentRightBarViews.TrendingPosts ? <></> :    <RightSideBar/> }
+       {isMobile && layout.currentRightPanelView === RightPanelView.DefaultView ? <></> :    <RightSideBar/> }
  
        
     </div>

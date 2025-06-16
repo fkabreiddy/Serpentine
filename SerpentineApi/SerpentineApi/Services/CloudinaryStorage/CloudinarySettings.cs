@@ -8,5 +8,6 @@ public class CloudinarySettings
 public enum CloudinaryFolders
 {
     ProfilePictures,
-    GroupPictures,
+    ChannelBanners,
+    ChannelCovers
 }

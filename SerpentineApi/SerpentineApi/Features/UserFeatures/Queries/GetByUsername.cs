@@ -71,7 +71,7 @@ internal class GetUserByUsernameEndpoint : IEndpoint
                         var user = result.AsT0;
 
                         
-                        return Results.Ok(new SuccessApiResult<UserResponse>(user));
+                        return Results.Ok(new SuccessApiResult<UserResponse>(user, $"A user was found with the username: {user.Username}"));
                     });
                 }
         )

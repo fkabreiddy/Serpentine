@@ -32,7 +32,7 @@ public class CloudinaryService
         var extension = Path.GetExtension(image.FileName).ToLower();
 
         if (!allowedExtensions.Contains(extension))
-            return ("the file format is not correct. Images only.",ImageVerificationResult.ImageFormat);
+            return ("the file format is not correct. Images only.", ImageVerificationResult.ImageFormat);
 
         if (image.Length > MaxFileSizeInBytes)
             return ("Image size is over 10mb.", ImageVerificationResult.ImageSize);
@@ -48,7 +48,7 @@ public class CloudinaryService
     )
     {
         if (VerifyImage(image) is var reason && reason.Item2 != ImageVerificationResult.Success)
-            return new InternalResult<string>(false, message: reason.Item1);
+            return new InternalResult<string>(false, message: "Error with the image format or size", errors: [reason.Item1]);
 
         await using var stream = image.OpenReadStream();
 
@@ -76,10 +76,10 @@ public class CloudinaryService
                 || uploadResult.SecureUrl?.AbsoluteUri is null
             )
             {
-                return new (false, message: "Could not obtain the image url. Try again later.");
+                return new (false, message: "Error uploading the image", errors: ["Could not obtain the image url. Try again later."]);
             }
 
-            return new(true, data:uploadResult.SecureUrl.AbsoluteUri);
+            return new(true, data: uploadResult.SecureUrl.AbsoluteUri);
         }
 
         return null;

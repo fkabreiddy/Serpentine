@@ -46,7 +46,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   return(
 
-    <ScrollShadow hideScrollBar offset={0} id="side-bar" className={` ${layout.sideBarExpanded ? "w-[250px]" : "w-[80px]"} h-scren   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
+    <ScrollShadow hideScrollBar offset={0} id="side-bar" className={` ${layout.sideBarExpanded ? "!max-w-[250px] !min-w-[250px]" : "!max-w-[80px] !min-w-[80px]"} h-scren   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
        
           
           

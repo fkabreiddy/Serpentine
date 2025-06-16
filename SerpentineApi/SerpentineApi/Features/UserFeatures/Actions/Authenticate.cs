@@ -80,7 +80,7 @@ internal class AuthenticateUserEndpoint : IEndpoint
                             return Results.BadRequest(new BadRequestApiResult(){Message = "Error creating token"});
                         }
                         
-                        return Results.Ok(new SuccessApiResult<Jwt>(token));
+                        return Results.Ok(new SuccessApiResult<Jwt>(token, "Login Successful. Welcome to Serpentine"));
                     });
                 }
         )

@@ -4,6 +4,9 @@ import { KeyIcon } from "lucide-react";
 import { Image } from "@heroui/image";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { Tooltip } from "@heroui/tooltip";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
+import { RightPanelView } from "@/models/right-panel-view";
+import Avatar from "boring-avatars";
 
 interface ChannelCardProps{
     index : number,
@@ -12,7 +15,14 @@ interface ChannelCardProps{
 
 const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
 
-    const {layout} = useLayoutStore();
+    const {layout, setLayout} = useLayoutStore();
+    const {setCurrentChannelId} = useGlobalDataStore();
+    
+    const setCurrentChannelIntoGlobalState = (channelId: number) =>{
+
+        setCurrentChannelId(channelId);
+        setLayout({currentRightPanelView: RightPanelView.DefaultView})
+    }
   
 
 
@@ -20,14 +30,24 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
     <>
        
 
-        <div  className={`flex justify-between my-1  w-full max-w-full px-2 group  gap-1   transition-all cursor-pointer border-default-100  `}>
-            <div className="flex items-center w-full max-w-full gap-3  ">
+        <div  className={`flex justify-between my-1  w-full max-w-full px-2 group  gap-2   transition-all cursor-pointer  `}>
+            <div className="flex items-center  max-w-[80%] gap-3  ">
                 <Tooltip content={channel.name} size={"sm"} showArrow={true} placement="right" isDisabled={layout.sideBarExpanded} >
-                     <Image src="https://img.freepik.com/premium-vector/vector-abstract-grainy-texture-gradient-background_296715-733.jpg" className="shrink-0 size-6"/>
+                   
+                   <div>
+                        {channel.channelCoverPicture ? 
+                            <Image src={channel.channelCoverPicture} className="shrink-0 min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] "/> :
+
+                            <Avatar size={24} className="max-md:!w-[24px] max-md:!h-[24px]" variant="marble" name={channel.name}/>
+
+                            
+                        } 
+                   </div>
+                    
 
                 </Tooltip>
                
-               {layout.sideBarExpanded && <p className="text-[13px] group-hover:underline group-hover:text-blue-500 transition-all font-normal opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">#{channel.name}</p>}
+               {layout.sideBarExpanded && <p onClick={()=> setCurrentChannelIntoGlobalState(channel.id)} className="text-[13px] group-hover:underline group-hover:text-blue-500 transition-all font-normal opacity-80 whitespace-nowrap overflow-hidden text-ellipsis w-auto">#{channel.name}</p>}
                 
             </div>
             

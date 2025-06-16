@@ -20,13 +20,15 @@ const DEFAULT_CONTENT_TYPE = "application/json";
 const createApiResult = <T>(
   isSuccess: boolean,
   statusCode: number,
-  message: string,
+  resultTitle: string = "Oops!",
+  message: string = "Something went bad",
   errors: string[] = [],
   data: T | null = null
 ): ApiResult<T> => ({
   isSuccess,
   statusCode,
   message,
+  resultTitle,
   errors,
   data,
 });
@@ -36,7 +38,7 @@ const createApiResult = <T>(
 const handleApiError = <T>(error: unknown): ApiResult<T> => {
   if (!isAxiosError(error)) {
     showToast({ title: "Oops", description: "Something went wrong, try again later" });
-    return createApiResult(false, 0, "");
+    return createApiResult(false, 500, "");
   }
 
   const { response } = error as AxiosError<ApiResult<T>>;
@@ -96,7 +98,7 @@ export function useFetch<T>() {
       }
 
       if (response.data.statusCode === 401) {
-        return createApiResult(false, 401, "Oops", ["Your session has expired, please login again"]);
+        return createApiResult(false, 401, "Oops", "Session Expired", ["Your session has expired, please login again"]);
       }
 
       return response.data;

@@ -1,8 +1,20 @@
-interface LoginUserRequest {
+import z from "zod";
 
-    userName: string; // Mín: 3, Máx: 30, only words, numbers, dots and underscores
-    password: string; // Mín: 8, Max: 30, at least one uppercase letter, one number and one symbol
+export const loginUserSchema = z.object({
 
-}
 
-export default LoginUserRequest;
+    username: z.string()
+        .max(30, "Your name must be less than 30 characters")
+        .regex(/^[a-zA-Z0-9._]{3,30}$/, "Username can only contain letters, numbers, dots and underscores")
+        .default(""),
+        
+    password: z.string()
+        .min(8, "Password must be at least 8 characters")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/\d/, "Password must contain at least one number")
+        .regex(/[\W_]/, "Password must contain at least one special character")
+        .default(""),
+})
+
+export type LoginUserRequest = z.output<typeof loginUserSchema>
+

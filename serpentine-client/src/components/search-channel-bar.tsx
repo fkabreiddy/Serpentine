@@ -1,7 +1,6 @@
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import React, { ReactNode, useState } from "react";
-import IconButton from "./icon-button";
 import {X} from "lucide-react"
 
 

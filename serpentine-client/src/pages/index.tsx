@@ -1,11 +1,11 @@
-import LoginForm from "@/components/forms/login-form";
-import SerpentineBanner from "@/components/serpentine-banner";
 import LoginLayout from "@/layouts/login-layout";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/contexts/authentication-context";
-import CreateAccountForm from "@/components/forms/create-account-form";
 import { Spinner } from "@heroui/spinner";
-import LoginWithCurrentAccount from "@/components/forms/login-current-account";
+import SerpentineBanner from "@/components/common/serpentine-banner";
+import CreateAccountForm from "@/components/users/forms/create-account-form";
+import LoginWithCurrentAccount from "@/components/users/forms/login-current-account";
+import LoginForm from "@/components/users/forms/login-form";
 
 export default function IndexPage() {
 
@@ -49,7 +49,7 @@ export default function IndexPage() {
     <LoginLayout>
      <div className="w-full relative h-screen max-sm:h-fit flex max-sm:flex-col items-center justify-center ">
         <div className="w-full z-[0] static  h-full">
-          <SerpentineBanner/>
+          <SerpentineBanner fontSize={1700}/>
         </div>
         <div className="w-screen backdrop-opacity-90 h-screen backdrop-blur-xl absolute z-[1]">
             <div className="grain w-4 h-4 absolute inset-0"></div>

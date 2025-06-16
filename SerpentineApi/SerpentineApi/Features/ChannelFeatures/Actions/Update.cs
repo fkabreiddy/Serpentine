@@ -144,11 +144,9 @@ internal class UpdateChannelRequestChannel(
         context.ChangeTracker.Clear();
         
         
-        List <Channel> channels =
-            await context.Channels.GetChannelsWithJustMyMembershipByChannelId(request.CurrentUserId, request.ChannelId,
-                cancellationToken);
+        Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(request.ChannelId, request.CurrentUserId,  cancellationToken);
 
-        if (channels.FirstOrDefault() is var response && response is null)
+        if (response is null)
         {
            await transaction.RollbackAsync(cancellationToken);
            return new NotFoundApiResult("Channel not found");

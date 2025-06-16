@@ -8,7 +8,7 @@ public class Channel : BaseEntity
 {
     [MaxLength(100),
      MinLength(3),
-     RegularExpression(@"^[a-zA-Z0-9._]+$"), 
+     RegularExpression(@"^[a-zA-Z0-9_]+$"), 
      Required]
     public string Name { get; set; } = null!;
 
@@ -19,9 +19,9 @@ public class Channel : BaseEntity
     
     public List<ChannelMember> Members { get; set; } = new List<ChannelMember>();
 
-    public string? ChannelCover {get; set;}
+    public string? CoverPicture {get; set;}
 
-    public string? ChannelBanner {get; set;}
+    public string? BannerPicture {get; set;}
 
     [NotMapped]
     public int MembersCount { get; set; } = 0;
@@ -31,7 +31,7 @@ public class Channel : BaseEntity
     
     
     
-    public ChannelResponse ToResponse() => new() //userId is the user that is making the request. Its appends the membership of that user in a channel.
+    public ChannelResponse ToResponse() => new() 
     {
         Id = Id,
         CreatedAt = CreatedAt,
@@ -41,8 +41,8 @@ public class Channel : BaseEntity
         UpdatedAt = UpdatedAt,
         MembersCount = MembersCount,
         MyMember = MyMember.ToResponse(),
-        ChannelBanner = ChannelBanner ?? "",
-        ChannelCover = ChannelCover ?? ""
+        BannerPicture = BannerPicture ?? "",
+        CoverPicture = CoverPicture ?? ""
 
     };
     

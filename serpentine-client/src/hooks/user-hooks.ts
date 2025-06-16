@@ -1,6 +1,6 @@
 import { useEffect, useState, useTransition } from 'react';
 import { useFetch } from "@/helpers/axios-helper";
-import LoginUserRequest from '@/models/requests/user/login-user-request';
+import {LoginUserRequest} from '@/models/requests/user/login-user-request';
 import { showToast } from '@/helpers/sonner-helper';
 import ApiResult from '@/models/api-result';
 import { JWTResponse } from '@/models/responses/jwt-response';
@@ -23,14 +23,14 @@ const initialApiState = <T>(): ApiResult<T> => ({
 
 export function useLoginUser() {
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
-    const [result, setResult] = useState<ApiResult<JWTResponse>>(initialApiState());
+    const [result, setResult] = useState<ApiResult<JWTResponse> | null>(null);
     const navigate = useNavigate();
     const { post } = useFetch<JWTResponse>();
     const {login} = useAuthStore();
 
     useEffect(() => {
 
-        if(result.data === null)
+        if(!result)
             return;
 
         if (result.data && result.statusCode === 200) {
@@ -41,9 +41,6 @@ export function useLoginUser() {
             setIsLoggingIn(false);
             navigate("/home")
 
-
-        } else if (result.statusCode === 404) {
-            showToast({ title: "Login Failed", description: "Invalid username or password" });
         } else {
             handleApiErrors(result);
         }
@@ -53,7 +50,7 @@ export function useLoginUser() {
     }, [result]);
 
     const loginUser = async (user: LoginUserRequest) => {
-        setResult(initialApiState());
+        setResult(null);
         setIsLoggingIn(true);
         const response = await post({endpoint: "user/authenticate", requireToken: false}, user);
         setResult(response);
@@ -65,10 +62,14 @@ export function useLoginUser() {
 export function useCreateUser() {
   
     const [isCreatingUser, setIsCreatingUser] = useState<boolean>(false);
-    const [result, setResult] = useState<ApiResult<UserResponse>>(initialApiState);
+    const [result, setResult] = useState<ApiResult<UserResponse> | null>(null);
     const { post } = useFetch<UserResponse>();
 
     useEffect(() => {
+
+        if(!result)
+            return;
+
         if (result.data && result.isSuccess) {
             handleApiSuccess(result);
         }
@@ -80,31 +81,33 @@ export function useCreateUser() {
     }, [result]);
 
     const createUser = async (user: FormData) => {
-        setResult(initialApiState());
+        setResult(null);
         setIsCreatingUser(true);
         const response = await post({endpoint:"user/create", requireToken: false, contentType:"multipart/form-data"}, user);
         setResult(response);
     };
 
-    return { createUser,result, isCreatingUser };
+    return { createUser, result, isCreatingUser };
 }
 
 export function useGetByUsername() {
    
     const [isAvailable, setIsAvailable] = useState<boolean>(false);
-    const [result, setResult] = useState<ApiResult<UserResponse>>(initialApiState);
+    const [result, setResult] = useState<ApiResult<UserResponse> | null>(initialApiState);
     const [isGettingByUsername, setIsGettingByUsername] = useState<boolean>(false);
     const { get } = useFetch<UserResponse>();
 
     useEffect(() => {
 
-        if (!result.statusCode || result.statusCode === 401) return;
+        if (!result) 
+            return;
 
         if (result.data && result.isSuccess) {
-            handleApiErrors(result);
+            handleApiErrors({data: null, message: "Error", statusCode: 409, isSuccess: false, errors: ["This username is already in use"]});
             
         } else if (result.statusCode === 404) {
             setIsAvailable(true);
+            handleApiSuccess({data: null, message: "Your username is available", statusCode: 200, isSuccess: true, errors: []})
         }
         else
         {
@@ -118,7 +121,7 @@ export function useGetByUsername() {
 
     const getByUsername = async (data: GetByUsernameRequest) => {
 
-        setResult(initialApiState());
+        setResult(null);
         setIsGettingByUsername(true);
         setIsAvailable(false);
         const response = await get({endpoint: "user/by-username?", requireToken: false,}, data );

@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Features.UserFeatures.Actions;
 using SerpentineApi.Helpers;
 using SerpentineApi.Identity;
+using SerpentineApi.Services.CloudinaryStorage;
 
 namespace SerpentineApi.Features.ChannelFeatures.Actions;
 
@@ -32,11 +34,11 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [BindNever, JsonIgnore]
     public int CurrentUserId { get; private set; }
 
-    [FromForm, JsonPropertyName("channelBanner"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
-    public IFormFile? ChannelBanner {get; set;}
+    [FromForm, JsonPropertyName("bannerPictureFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
+    public IFormFile? BannerPictureFile {get; set;}
 
-    [FromForm, JsonPropertyName("channelCover"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
-    public IFormFile? ChannelCover {get; set;}
+    [FromForm, JsonPropertyName("coverPictureFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
+    public IFormFile? CoverPictureFile {get; set;}
 
     public void SetCurrentUserId(int? userId)
     {
@@ -113,7 +115,8 @@ internal class CreateChannelEndpoint : IEndpoint
 }
 
 internal class CreateChannelRequestHandler(
-   SerpentineDbContext context
+   SerpentineDbContext context,
+   CloudinaryService cloudinaryService
 
 )
     : IEndpointHandler<CreateChannelRequest, OneOf<ChannelResponse, Failure>>
@@ -135,20 +138,62 @@ internal class CreateChannelRequestHandler(
             return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
         
         var creation = await context.Channels.AddAsync(channel, cancellationToken);
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        if (request.CoverPictureFile is not null)
+        {
+            if (await cloudinaryService.UploadImage(request.CoverPictureFile,
+                    CloudinaryFolders.ChannelCovers.ToString(), creation.Entity.Id.ToString())
+                is var coverUploadResponse && coverUploadResponse.IsSuccess)
+            {
+                creation.Entity.CoverPicture = coverUploadResponse.Data;
+            }
+            else
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return new BadRequestApiResult(coverUploadResponse.Message, coverUploadResponse.Errors );
+            }
+        }
+        
+        if (request.BannerPictureFile is not null)
+        {
+            if (await cloudinaryService.UploadImage(request.BannerPictureFile,
+                        CloudinaryFolders.ChannelBanners.ToString(), creation.Entity.Id.ToString())
+                    is var bannerUploadResponse && bannerUploadResponse.IsSuccess)
+            {
+                creation.Entity.BannerPicture = bannerUploadResponse.Data;
+            }
+            else
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return new BadRequestApiResult(bannerUploadResponse.Message, bannerUploadResponse.Errors );
+            }
+        }
         
         await context.SaveChangesAsync(cancellationToken);
         
         await transaction.CommitAsync(cancellationToken);
 
-        var response = creation.Entity.ToResponse();
+        var entity = creation.Entity.ToResponse();
 
         
         context.ChangeTracker.Clear();
         
-        if(response.Id == default)
+        if(entity.Id == default)
             return new BadRequestApiResult("Could not create a channel");
 
-        return response;
+        Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
+            entity.Id,
+            request.CurrentUserId,
+            cancellationToken
+            
+        );
+
+        if (response is null)
+            return new NotFoundApiResult("We could not find the channel you created. Try again.");
+
+        return response.ToResponse();
 
 
 

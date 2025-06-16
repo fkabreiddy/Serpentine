@@ -2,32 +2,43 @@ import * as React from "react";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import * as motion from "motion/react-client";
-import LoginUserRequest from "@/models/requests/user/login-user-request";
+import {LoginUserRequest, loginUserSchema} from "@/models/requests/user/login-user-request";
 import { Input } from "@heroui/input";
 import { useLoginUser } from "@/hooks/user-hooks";
 import Divider from "@/components/common/divider";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 interface LoginFormProps {
     onViewChange: () => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onViewChange }) => {
-    const [loginUserRequest, setLoginUserRequest] = React.useState<LoginUserRequest>({
-        userName: "",
-        password: "",
+   
+     const {
+        register,
+        handleSubmit,
+        
+        watch,
+        formState: { errors, isValid },
+    } = useForm({
+        
+        resolver: zodResolver(loginUserSchema),
+        mode: "onChange",
+        defaultValues: {
+            username: "",
+            password: "",
+            
+        }
+        
+
     });
 
     const { loginUser, isLoggingIn } = useLoginUser();
-    const isInvalid = isLoggingIn || !loginUserRequest.password || !loginUserRequest.userName;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setLoginUserRequest((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await loginUser(loginUserRequest);
+    
+    const submit = async (data: LoginUserRequest) => {
+        await loginUser(data);
     };
 
     return (
@@ -39,11 +50,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onViewChange }) => {
         >
             <p className="text-2xl my-2 font-bold opacity-60">Welcome to Serpentine</p>
 
-            <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3 mt-4">
+            <form onSubmit={handleSubmit((data)=> submit(data))} className="w-full flex flex-col gap-3 mt-4">
                 <Input
                     label="Username"
                     type="text"
-                    name="userName"
+                    value={watch("username")}
                     placeholder="Enter your user name"
                     endContent={<UserIcon />}
                     minLength={3}
@@ -51,13 +62,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onViewChange }) => {
                     labelPlacement="outside"
                     autoComplete="username"
                     description="Not need to put @"
-                    onChange={handleChange}
+                    {...register("username")}
+                    errorMessage={errors.username?.message}
+                    isInvalid={errors.username?.message !== undefined}
                 />
 
                 <Input
                     label="Password"
                     type="password"
-                    name="password"
+                    value={watch("password")}
                     placeholder="Enter your password"
                     minLength={8}
                     maxLength={30}
@@ -65,16 +78,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onViewChange }) => {
                     autoComplete="current-password"
                     endContent={<PasswordIcon/>}
                     description="Password must be at least 8 characters."
-                    onChange={handleChange}
+                    {...register("password")}
+                     errorMessage={errors.password?.message}
+                    isInvalid={errors.password?.message !== undefined}
                 />
 
                 
                 <Button
-                    isDisabled={isInvalid || isLoggingIn}
+                    isDisabled={!isValid || isLoggingIn}
                     type="submit"
                     isLoading={isLoggingIn}
                     className={`w-full backdrop-blur-xl bg-default-100/80 ${
-                        isInvalid ? "opacity-50" : ""
+                        !isValid ? "opacity-50" : ""
                     } max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
                 >
                     <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
