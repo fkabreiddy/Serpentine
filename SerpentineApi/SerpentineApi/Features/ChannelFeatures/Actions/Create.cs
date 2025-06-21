@@ -32,7 +32,7 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     public bool AdultContent { get; set; } = false;
 
     [BindNever, JsonIgnore]
-    public int CurrentUserId { get; private set; }
+    public Ulid CurrentUserId { get; private set; }
 
     [FromForm, JsonPropertyName("bannerPictureFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
     public IFormFile? BannerPictureFile {get; set;}
@@ -40,9 +40,9 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [FromForm, JsonPropertyName("coverPictureFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
     public IFormFile? CoverPictureFile {get; set;}
 
-    public void SetCurrentUserId(int? userId)
+    public void SetCurrentUserId(Ulid userId)
     {
-        CurrentUserId = userId ?? 0;
+        CurrentUserId = userId;
     }
 
 }
@@ -103,6 +103,8 @@ internal class CreateChannelEndpoint : IEndpoint
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .RequireCors()
             .Stable()
+            .WithOpenApi()
+            .WithTags(new []{"POST", $"{nameof(Channel)}"})
             .Accepts<CreateChannelRequest>(false, "application/json")
             .Produces<SuccessApiResult<ChannelResponse>>(200)
             .Produces<ConflictApiResult>(409, "application/json")
@@ -126,75 +128,69 @@ internal class CreateChannelRequestHandler(
         CancellationToken cancellationToken = default
     )
     {
-        if (request.CurrentUserId == 0)
-            return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
-        
-        var channel = Channel.Create(request);
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        
-        var exist = await context.Channels.AnyAsync(ch => ch.Name.ToLower() == channel.Name, cancellationToken:cancellationToken);
-      
-        if(exist)
-            return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
-        
-        var creation = await context.Channels.AddAsync(channel, cancellationToken);
-
-        await context.SaveChangesAsync(cancellationToken);
-
-        if (request.CoverPictureFile is not null)
-        {
-            if (await cloudinaryService.UploadImage(request.CoverPictureFile,
-                    CloudinaryFolders.ChannelCovers.ToString(), creation.Entity.Id.ToString())
-                is var coverUploadResponse && coverUploadResponse.IsSuccess)
-            {
-                creation.Entity.CoverPicture = coverUploadResponse.Data;
-            }
-            else
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                return new BadRequestApiResult(coverUploadResponse.Message, coverUploadResponse.Errors );
-            }
-        }
-        
-        if (request.BannerPictureFile is not null)
-        {
-            if (await cloudinaryService.UploadImage(request.BannerPictureFile,
-                        CloudinaryFolders.ChannelBanners.ToString(), creation.Entity.Id.ToString())
-                    is var bannerUploadResponse && bannerUploadResponse.IsSuccess)
-            {
-                creation.Entity.BannerPicture = bannerUploadResponse.Data;
-            }
-            else
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                return new BadRequestApiResult(bannerUploadResponse.Message, bannerUploadResponse.Errors );
-            }
-        }
-        
-        await context.SaveChangesAsync(cancellationToken);
-        
-        await transaction.CommitAsync(cancellationToken);
-
-        var entity = creation.Entity.ToResponse();
 
         
-        context.ChangeTracker.Clear();
+             if (request.CurrentUserId.ToString() == "")
+                    return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
+                
+             var channel = Channel.Create(request);
+                
+                
+             var exist = await context.Channels.AnyAsync(ch => ch.Name.ToLower() == channel.Name, cancellationToken:cancellationToken);
+              
+             if(exist)
+                 return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
+                
+             var creation = await context.Channels.AddAsync(channel, cancellationToken);
+             
+             if (request.CoverPictureFile is not null)
+             {
+                 if (await cloudinaryService.UploadImage(request.CoverPictureFile,
+                             CloudinaryFolders.ChannelCovers.ToString(), creation.Entity.Id.ToString())
+                         is var coverUploadResponse && coverUploadResponse.IsSuccess)
+                 {
+                     creation.Entity.CoverPicture = coverUploadResponse.Data;
+                 }
+                 else
+                 {
+                     return new BadRequestApiResult(coverUploadResponse.Message, coverUploadResponse.Errors );
+                 }
+             }
+                
+             if (request.BannerPictureFile is not null)
+             {
+                 if (await cloudinaryService.UploadImage(request.BannerPictureFile,
+                             CloudinaryFolders.ChannelBanners.ToString(), creation.Entity.Id.ToString())
+                         is var bannerUploadResponse && bannerUploadResponse.IsSuccess)
+                 {
+                     creation.Entity.BannerPicture = bannerUploadResponse.Data;
+                 }
+                 else
+                 {
+                     return new BadRequestApiResult(bannerUploadResponse.Message, bannerUploadResponse.Errors );
+                 }
+             }
+                
+            await context.SaveChangesAsync(cancellationToken);
+
+             context.ChangeTracker.Clear();
+
+
+             Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
+                 creation.Entity.Id,
+                 request.CurrentUserId,
+                 cancellationToken
+                    
+             );
+
+             if (response is null)
+             {
+                 return new NotFoundApiResult("We could not find the channel you created. Try again.");
+
+             }
+             return response.ToResponse();
+
         
-        if(entity.Id == default)
-            return new BadRequestApiResult("Could not create a channel");
-
-        Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
-            entity.Id,
-            request.CurrentUserId,
-            cancellationToken
-            
-        );
-
-        if (response is null)
-            return new NotFoundApiResult("We could not find the channel you created. Try again.");
-
-        return response.ToResponse();
-
 
 
 

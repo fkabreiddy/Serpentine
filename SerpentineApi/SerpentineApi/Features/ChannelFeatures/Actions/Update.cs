@@ -12,8 +12,8 @@ namespace SerpentineApi.Features.ChannelFeatures.Actions;
 
 public class UpdateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
 {
-    [Range(0, int.MaxValue),Required, FromBody, JsonPropertyName("channelId")]
-    public int ChannelId { get; set; }
+    [Required, FromBody, JsonPropertyName("channelId")]
+    public Ulid ChannelId { get; set; }
     
     
     
@@ -34,11 +34,11 @@ public class UpdateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     public bool AdultContent { get; set; } = false;
 
     [BindNever, JsonIgnore]
-    public int CurrentUserId { get; private set; }
+    public Ulid CurrentUserId { get; private set; }
 
-    public void SetCurrentUserId(int? userId)
+    public void SetCurrentUserId(Ulid userId)
     {
-        CurrentUserId = userId ?? 0;
+        CurrentUserId = userId;
     }
 
 }
@@ -98,6 +98,8 @@ internal class UpdateChannelEndpoint : IEndpoint
             .DisableAntiforgery()
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .RequireCors()
+            .WithOpenApi()
+            .WithTags(new []{"PUT", $"{nameof(Channel)}"})
             .Experimental()
             .Accepts<CreateChannelRequest>(false, "application/json")
             .Produces<SuccessApiResult<ChannelResponse>>(200)
@@ -121,7 +123,7 @@ internal class UpdateChannelRequestChannel(
         CancellationToken cancellationToken = default
     )
     {
-        if (request.CurrentUserId == 0)
+        if (request.CurrentUserId.ToString() == "")
             return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
         
         if (await context.ChannelMembers.AnyAsync(cm =>
@@ -131,7 +133,6 @@ internal class UpdateChannelRequestChannel(
                 return new NotFoundApiResult("Channel not found");
         }
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         
         Channel? channel = await context.Channels.FirstOrDefaultAsync(ch => ch.Id == request.ChannelId, cancellationToken);
 
@@ -148,11 +149,9 @@ internal class UpdateChannelRequestChannel(
 
         if (response is null)
         {
-           await transaction.RollbackAsync(cancellationToken);
            return new NotFoundApiResult("Channel not found");
         }
 
-       await transaction.CommitAsync(cancellationToken);
         return response.ToResponse();
 
 

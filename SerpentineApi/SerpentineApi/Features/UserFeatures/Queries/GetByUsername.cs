@@ -78,6 +78,8 @@ internal class GetUserByUsernameEndpoint : IEndpoint
         .DisableAntiforgery()
         .AllowAnonymous()
         .RequireCors()
+        .WithOpenApi()
+        .WithTags(new []{"GET", $"{nameof(User)}"})
         .Accepts<GetUserByNameRequest>(false, "application/json")
         .Produces<SuccessApiResult<UserResponse>>(200)
         .Produces<NotFoundApiResult>(404)

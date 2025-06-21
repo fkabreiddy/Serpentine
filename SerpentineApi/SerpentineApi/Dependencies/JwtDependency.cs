@@ -83,7 +83,7 @@ public static class JwtDependency
                         {
                             context.Response.StatusCode = 401;
                             context.Response.ContentType = "application/json";
-                            await context.Response.WriteAsJsonAsync(new UnauthorizedApiResult());
+                            await context.Response.WriteAsJsonAsync(new UnauthorizedApiResult("The token or the Authorization header is missing"));
                         });
 
 

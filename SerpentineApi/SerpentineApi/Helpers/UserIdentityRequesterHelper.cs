@@ -11,7 +11,7 @@ public static class UserIdentityRequesterHelper
     /// </summary>
     /// <param name="user">Claims principal from the current HttpContext</param>
     /// <returns>The user Id from the HttpContext</returns>
-    public static int? GetUserIdFromClaims(ClaimsPrincipal user)
+    public static Ulid GetUserIdFromClaims(ClaimsPrincipal user)
     {
         var subClaim = user.FindFirst(JwtRegisteredClaimNames.Sub);
         if (subClaim == null)
@@ -20,9 +20,9 @@ public static class UserIdentityRequesterHelper
             subClaim = user.FindFirst(ClaimTypes.NameIdentifier);
         }
 
-        if (subClaim != null && int.TryParse(subClaim.Value, out int userId))
+        if (subClaim != null && Ulid.TryParse(subClaim.Value, out Ulid uid))
         {
-            return userId;
+            return uid;
         }
 
         throw new UnauthorizedAccessException();

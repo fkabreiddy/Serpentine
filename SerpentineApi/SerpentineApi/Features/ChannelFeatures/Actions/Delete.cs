@@ -14,17 +14,17 @@ public class DeleteChannelRequest : IRequest<OneOf<bool, Failure>>
 {
     [Required, 
      JsonPropertyName("channelId"), 
-     FromQuery(Name = "channelId"),
-     Range(1, int.MaxValue)
+     FromQuery(Name = "channelId")
+     
     ]
-    public int ChannelId { get; set; }
+    public Ulid ChannelId { get; set; }
     
     [BindNever, JsonIgnore]
-    public int CurrentUserId { get; private set; }
+    public Ulid CurrentUserId { get; private set; }
 
-    public void SetCurrentUserId(int? userId)
+    public void SetCurrentUserId(Ulid userId)
     {
-        CurrentUserId = userId ?? default;
+        CurrentUserId = userId;
     }
     
     
@@ -35,7 +35,7 @@ public class DeleteChannelRequestValidator : AbstractValidator<DeleteChannelRequ
     public DeleteChannelRequestValidator()
     {
         RuleFor(x => x.ChannelId)
-            .GreaterThanOrEqualTo(1).WithMessage("Channel Id should be equal of greater than 0");
+            .NotEmpty().WithMessage("Channel Id should be equal of greater than 0");
 
 
     }
@@ -79,6 +79,8 @@ public class DeleteChannelEndpoint : IEndpoint
         .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
         .RequireCors()
         .DisableAntiforgery()
+        .WithOpenApi()
+        .WithTags(new []{"DELETE", $"{nameof(Channel)}"})
         .WithName(nameof(DeleteChannelEndpoint))
         .WithDescription($"Deletes a channel by id. Requires authorization. Requires a {nameof(DeleteChannelRequest)}. Returns a boolean value (true/false)")
         .Produces<SuccessApiResult<bool>>(200, "application/json")
@@ -87,7 +89,7 @@ public class DeleteChannelEndpoint : IEndpoint
         .Produces<ServerErrorApiResult>(500, "application/json")
         .Produces<ValidationApiResult>(422, "application/json")
         .Produces<NotFoundApiResult>(404, "application/json")
-        .Experimental()
+        .Stable()
         .Accepts<DeleteChannelRequest>(false, "application/json");
     }
 }
@@ -99,7 +101,7 @@ internal class DeleteChannelEndpointHandler(
 {
     public async Task<OneOf<bool, Failure>> HandleAsync(DeleteChannelRequest request, CancellationToken cancellationToken)
     {
-        if (request.CurrentUserId <= 0)
+        if (request.CurrentUserId.ToString() == "")
             return new UnauthorizedApiResult("You are not allowed to do this action");
         
         var userHasPermission = await context.ChannelMembers.AnyAsync(x => x.UserId == request.CurrentUserId && x.ChannelId == request.ChannelId && x.IsOwner, cancellationToken);
@@ -107,11 +109,9 @@ internal class DeleteChannelEndpointHandler(
         if (!userHasPermission)
             return new NotFoundApiResult("The channel you are looking for do not exist or you don't have the permission to delete it");
         
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
-       var deletedRows = await context.Channels.Where(ch => ch.Id == request.ChannelId).ExecuteDeleteAsync(cancellationToken);
+        var deletedRows = await context.Channels.Where(ch => ch.Id == request.ChannelId).ExecuteDeleteAsync(cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
 
         return deletedRows >= 1;
         

@@ -17,7 +17,7 @@ public class GetByUserIdRequest : IRequest<OneOf<List<ChannelResponse>, Failure>
 {
 
     [BindNever, JsonIgnore]
-    public int CurrentUserId { get; private set; }
+    public Ulid CurrentUserId { get; private set; }
     
     [Required, 
      FromQuery(Name = "take"),
@@ -31,7 +31,7 @@ public class GetByUserIdRequest : IRequest<OneOf<List<ChannelResponse>, Failure>
      Range(0, int.MaxValue )]
     public int Skip { get; set; } = 0;
 
-    public void SetCurentUerId(int userId)
+    public void SetCurentUerId(Ulid userId)
     {
         CurrentUserId = userId;
     }
@@ -74,7 +74,7 @@ internal class GetByUserIdEndpoint : IEndpoint
                     return await executor.ExecuteAsync<List<ChannelResponse>>(async () =>
                     {
 
-                        command.SetCurentUerId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User) ?? throw new UnauthorizedAccessException());
+                        command.SetCurentUerId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {
@@ -91,6 +91,8 @@ internal class GetByUserIdEndpoint : IEndpoint
         .DisableAntiforgery()
         .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
         .Experimental()
+        .WithOpenApi()
+        .WithTags(new []{"GET", $"{nameof(Channel)}"})
         .RequireCors()
         .Accepts<GetByUserIdRequest>(false, "application/json")
         .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
@@ -117,7 +119,7 @@ internal class GetByUserIdEndpointHandler(
         CancellationToken cancellationToken = default
     )
     {
-        if (request.CurrentUserId == default)
+        if (string.IsNullOrEmpty(request.CurrentUserId.ToString()))
             return new BadRequestApiResult("UserId should be greater than 0");
 
         List<Channel> channels = await context.Channels.GetChannelsWithJustMyMembershipByUserId(
@@ -128,7 +130,8 @@ internal class GetByUserIdEndpointHandler(
         );
 
 
-        return channels.Select(ch => ch.ToResponse()).ToList();
+        var response =  channels.Select(ch => ch.ToResponse()).ToList();
+        return response;
     }
 
   

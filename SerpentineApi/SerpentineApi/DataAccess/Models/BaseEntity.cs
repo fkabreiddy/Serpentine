@@ -2,8 +2,7 @@
 
 public abstract class BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
+    [Key] public Ulid Id { get; set; } = Ulid.NewUlid();
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;

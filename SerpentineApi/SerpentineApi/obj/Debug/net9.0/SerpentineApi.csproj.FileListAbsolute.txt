@@ -171,3 +171,4 @@ C:\Proyectos\Serpentine\SerpentineApi\SerpentineApi\obj\Debug\net9.0\refint\Serp
 C:\Proyectos\Serpentine\SerpentineApi\SerpentineApi\obj\Debug\net9.0\SerpentineApi.pdb
 C:\Proyectos\Serpentine\SerpentineApi\SerpentineApi\obj\Debug\net9.0\SerpentineApi.genruntimeconfig.cache
 C:\Proyectos\Serpentine\SerpentineApi\SerpentineApi\obj\Debug\net9.0\ref\SerpentineApi.dll
+C:\Proyectos\Serpentine\SerpentineApi\SerpentineApi\bin\Debug\net9.0\Ulid.dll

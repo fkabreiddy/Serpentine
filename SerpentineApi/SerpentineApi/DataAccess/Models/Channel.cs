@@ -51,6 +51,7 @@ public class Channel : BaseEntity
     public static Channel Create(CreateChannelRequest request)
         => new()
         {
+            
             Name = request.Name.ToLower().Trim(),
             Description = request.Description.Trim(),
             AdultContent = request.AdultContent,

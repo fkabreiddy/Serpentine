@@ -6,7 +6,7 @@ import { NavigateFunction, useNavigate } from 'react-router-dom';
 
 interface AuthState {
   username: string | null;
-  userId: number | null;
+  userId: string | null;
   user: JwtPayload | null;
   userPofilePicture:string | null
   isAuthenticated: boolean;
@@ -28,13 +28,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     setToken(token);
     const payload : JwtPayload | null = decode();
     let username: string | null = null;
-    let userId: number | null = null;
+    let userId: string | null = null;
     let pfp : string | null = null;
 
     if(payload)
     {
         username = payload.nickname;
-        userId = parseInt(payload.sub);
+        userId = payload.sub;
         pfp = payload.picture;
     }
 
@@ -64,13 +64,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   ) =>{
     const payload : JwtPayload | null = decode();
     let username: string | null = null;
-    let userId: number | null = null;
+    let userId: string | null = null;
     let pfp : string | null = null;
 
     if(payload)
     {
         username = payload.nickname;
-        userId = parseInt(payload.sub);
+        userId = payload.sub;
         pfp = payload.picture;
     }
 

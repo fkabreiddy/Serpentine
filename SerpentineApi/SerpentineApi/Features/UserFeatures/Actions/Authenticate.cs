@@ -87,6 +87,8 @@ internal class AuthenticateUserEndpoint : IEndpoint
         .DisableAntiforgery()
         .AllowAnonymous()
         .RequireCors()
+        .WithOpenApi()
+        .WithTags(new []{"POST", $"{nameof(User)}"})
         .Accepts<AuthenticateUserRequest>(false, "application/json")
         .Produces<SuccessApiResult<Jwt>>(200, "application/json")
         .Produces<NotFoundApiResult>(404, "application/json")

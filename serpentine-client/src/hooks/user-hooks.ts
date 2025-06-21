@@ -15,6 +15,7 @@ const initialApiState = <T>(): ApiResult<T> => ({
     statusCode: 0,
     message: "",
     isSuccess: false,
+    resultTitle: "",
     errors: [],
     data: null
 });
@@ -52,7 +53,7 @@ export function useLoginUser() {
     const loginUser = async (user: LoginUserRequest) => {
         setResult(null);
         setIsLoggingIn(true);
-        const response = await post({endpoint: "user/authenticate", requireToken: false}, user);
+        const response = await post({endpoint: "user/authenticate"}, user);
         setResult(response);
     };
 
@@ -83,7 +84,7 @@ export function useCreateUser() {
     const createUser = async (user: FormData) => {
         setResult(null);
         setIsCreatingUser(true);
-        const response = await post({endpoint:"user/create", requireToken: false, contentType:"multipart/form-data"}, user);
+        const response = await post({endpoint:"user/create", contentType:"multipart/form-data"}, user);
         setResult(response);
     };
 
@@ -103,11 +104,11 @@ export function useGetByUsername() {
             return;
 
         if (result.data && result.isSuccess) {
-            handleApiErrors({data: null, message: "Error", statusCode: 409, isSuccess: false, errors: ["This username is already in use"]});
+            handleApiErrors({data: null, message: "Another user with this username is already in use", resultTitle: "Conflict",  statusCode: 409, isSuccess: false, errors: ["This username is already in use"]});
             
         } else if (result.statusCode === 404) {
             setIsAvailable(true);
-            handleApiSuccess({data: null, message: "Your username is available", statusCode: 200, isSuccess: true, errors: []})
+            handleApiSuccess({data: null, message: "Your username is available", resultTitle: "Got it", statusCode: 200, isSuccess: true, errors: []})
         }
         else
         {
@@ -124,7 +125,7 @@ export function useGetByUsername() {
         setResult(null);
         setIsGettingByUsername(true);
         setIsAvailable(false);
-        const response = await get({endpoint: "user/by-username?", requireToken: false,}, data );
+        const response = await get({endpoint: "user/by-username?"}, data );
         setResult(response);
 
        

@@ -5,7 +5,6 @@ export const createAccountSchema = z.object({
     fullName: z.string()
         .min(3, "Your name must be at least 3 characters")
         .max(30, "Your name must be less than 30 characters")
-        .regex(/^[a-zA-Z\s]+$/, "Full name can only contain letters and spaces")
         .default(""),
   
     username: z.string()

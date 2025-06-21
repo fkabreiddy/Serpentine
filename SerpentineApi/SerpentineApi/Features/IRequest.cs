@@ -1,6 +1,22 @@
-﻿namespace SerpentineApi.Features;
+﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-public class IRequest<TResponse>
+namespace SerpentineApi.Features;
+
+public  interface IRequest<TResponse>
 {
     
+}
+
+public abstract class RequestWithUserCredentials
+{
+    
+    [JsonIgnore, BindNever]
+    public Ulid CurrentUserId { get; private set; }
+
+    public void SetUserId(Ulid userId)
+    {
+        CurrentUserId = userId;
+    }
 }

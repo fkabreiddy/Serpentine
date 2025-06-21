@@ -1,5 +1,5 @@
 abstract class BaseResponse {
-    id: number = 0;
+    id: string = "";
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 

@@ -4,9 +4,10 @@ namespace SerpentineApi.DataAccess.Context.EntityExtensions;
 
 public static class ChannelEntityExtensions
 {
-   public static async Task<List<Channel>> GetChannelsWithJustMyMembershipByUserId(this DbSet<Channel> channelsContext, int userId, CancellationToken token = default, int skip = 0, int take = 1)
+   public static async Task<List<Channel>> GetChannelsWithJustMyMembershipByUserId(this DbSet<Channel> channelsContext, Ulid userId, CancellationToken token = default, int skip = 0, int take = 1)
    {
-      var channels = await channelsContext.Include(ch => ch.Members.Where(m => m.UserId == userId))
+      var channels = await channelsContext
+         .Include(ch => ch.Members.Where(m => m.UserId == userId))
          .AsNoTracking()
          .AsSplitQuery()
          .Where(ch => ch.Members.Any(m => m.UserId == userId))
@@ -34,9 +35,11 @@ public static class ChannelEntityExtensions
       return channels;
    }
 
-   public static async Task<Channel?> GetChannelsWithJustMyMembershipByChannelId(this DbSet<Channel> channelsContext, int channelId, int userId,  CancellationToken token = default)
+   public static async Task<Channel?> GetChannelsWithJustMyMembershipByChannelId(this DbSet<Channel> channelsContext, Ulid channelId, Ulid userId,  CancellationToken token = default)
    {
-      var channel = await channelsContext.Include(ch => ch.Members.Where(m => m.UserId == userId))
+      var channel = await channelsContext
+         .Include(ch => ch.Members.Where(m => m.UserId == userId))
+         
          .AsNoTracking()
          .AsSplitQuery()
          .Where(ch => ch.Members.Any(m => m.UserId == userId) && ch.Id == channelId)

@@ -14,6 +14,7 @@ const initialApiState = <T>(): ApiResult<T> => ({
     message: "",
     isSuccess: false,
     errors: [],
+    resultTitle: "",
     data: null
 });
 
@@ -56,7 +57,7 @@ export function useCreateChannel() {
         setResult(null);
         setCreatingChannel(true);
         setChannel(null);
-        const response = await post({endpoint: "channels/create", requireToken: true,}, data );
+        const response = await post({endpoint: "channels/create"}, data );
         setResult(response);
             
         
@@ -117,7 +118,7 @@ export function useGetChannelsByUserId() {
 
             
             data.skip = channelCount;
-            const response = await get({endpoint: "channels/by-userId?", requireToken: true,}, data );
+            const response = await get({endpoint: "channels/by-userId?" }, data );
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);

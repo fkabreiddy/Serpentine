@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="@." uuid="5c1e9ad1-ffc7-447a-a806-299b3b52b304">
+    <data-source source="LOCAL" name="@. [2]" uuid="9a0718ce-d1b0-4ef8-b3c7-cb0fcf45e90f">
       <driver-ref>sqlserver.jb</driver-ref>
       <synchronize>true</synchronize>
       <configured-by-url>true</configured-by-url>
       <jdbc-driver>com.jetbrains.jdbc.sqlserver.SqlServerDriver</jdbc-driver>
-      <jdbc-url>Server=.; Database=SerpentineDatabase; Persist Security Info=False; TrustServerCertificate=True; Integrated Security=True</jdbc-url>
+      <jdbc-url>Server=.; Database=SerpentineDb; Persist Security Info=False; TrustServerCertificate=True; Integrated Security=True</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

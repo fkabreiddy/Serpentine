@@ -74,8 +74,8 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
    
 
     const ageIsValid = () =>{
-
-        return (watch("dayOfBirth") ?? today(getLocalTimeZone())  <= minAge()) &&  (watch("dayOfBirth") ?? today(getLocalTimeZone())  >= maxAge())
+        const birthDate = watch("dayOfBirth") ?? today(getLocalTimeZone());
+        return birthDate <= minAge() && birthDate >= maxAge();
     }
 
 
@@ -113,6 +113,8 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
 
     const submit = async (data: CreateUserRequest) => {
         const formData = buildForm();
+
+      
         await createUser(formData);
        
     };

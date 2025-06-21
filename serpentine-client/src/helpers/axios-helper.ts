@@ -6,10 +6,8 @@ import { getToken, decode } from "./jwt-helper";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useNavigate } from "react-router-dom";
 import HttpVerbsEnum from '../models/http-verbs-enum';
-
 interface RequestConfig {
   endpoint: string;
-  requireToken?: boolean;
   contentType?: string;
 }
 
@@ -36,51 +34,45 @@ const createApiResult = <T>(
 
 
 const handleApiError = <T>(error: unknown): ApiResult<T> => {
+
   if (!isAxiosError(error)) {
     showToast({ title: "Oops", description: "Something went wrong, try again later" });
     return createApiResult(false, 500, "");
   }
 
   const { response } = error as AxiosError<ApiResult<T>>;
-
+  
   if (!response?.data) {
-    showToast({ title: "Oops", description: "Something went wrong, try again later" });
+    showToast({ title: "Oops", description: "Something went wrong, try again later"});
     return createApiResult(false, 0, "");
   }
 
-  const result = response.data;
+  
 
-  if (result.statusCode === 500) {
-    showToast({ title: "Oops", description: result.message });
-    return result;
-  }
-
-  return result;
+  return response.data;
 };
 
 export function useFetch<T>() {
-  const getAuthHeaders = (token: string | null, contentType: string) => ({
-    "Content-Type": contentType,
-    Authorization: token ? `Bearer ${token}` : "",
-  });
+ 
+  const {logout} = useAuthStore();
+  const navigate = useNavigate();
+ 
 
   const handleRequest = async (
-    { endpoint, requireToken = true, contentType = DEFAULT_CONTENT_TYPE }: RequestConfig,
+    { endpoint,  contentType = DEFAULT_CONTENT_TYPE }: RequestConfig,
     method: HttpVerbsEnum,
     data?: any
   ): Promise<ApiResult<T>> => {
     try {
      
      
-
-      const config = {
-        headers: getAuthHeaders(requireToken ? getToken() : null, contentType),
-      };
+      const config = {headers:  {'Content-Type': contentType, Accept: contentType, Authorization: `Bearer ${getToken() ?? ""}`}}
+      
 
       let response;
       switch (method) {
         case HttpVerbsEnum.Post:
-          response = await api.post<ApiResult<T>>(endpoint, data, config);
+        response = await api.post<ApiResult<T>>(endpoint, data, config);
           break;
         case HttpVerbsEnum.Get:
             const queryString = new URLSearchParams(data).toString() 
@@ -97,9 +89,15 @@ export function useFetch<T>() {
           throw new Error(`Unsupported HTTP method: ${method}`);
       }
 
-      if (response.data.statusCode === 401) {
-        return createApiResult(false, 401, "Oops", "Session Expired", ["Your session has expired, please login again"]);
+
+      if (response.status === 401) {
+        logout();
+        navigate("/");
+        showToast({title: "Session expired", description: "Your session has expired. Login again." })
+        return createApiResult(false, 401, response.data.message, "Session Expired", ["Your session has expired, please login again"]);
+
       }
+      
 
       return response.data;
     } catch (error) {
@@ -109,6 +107,9 @@ export function useFetch<T>() {
 
   return {
     post: (config: RequestConfig, body: unknown) => handleRequest(config, HttpVerbsEnum.Post, body),
+    put: (config: RequestConfig, body: unknown) => handleRequest(config, HttpVerbsEnum.Put, body),
     get: (config: RequestConfig, data: any) => handleRequest(config, HttpVerbsEnum.Get, data),
+    delete: (config: RequestConfig, data: any) => handleRequest(config, HttpVerbsEnum.Delete, data),
+
   };
 }

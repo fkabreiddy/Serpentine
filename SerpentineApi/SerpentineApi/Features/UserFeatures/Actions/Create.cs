@@ -129,6 +129,8 @@ public class CreateUserEndpoint : IEndpoint
             .DisableAntiforgery()
             .AllowAnonymous()
             .RequireCors()
+            .WithOpenApi()
+            .WithTags(new []{"POST", $"{nameof(User)}"})
             .WithDescription($"Creates an user. Not requires authorization. Accepts an {nameof(CreateUserRequest)}. Returns a ApiResult with an {nameof(UserResponse)}")
             .Accepts<AuthenticateUserRequest>(false, "multipart/form-data")
             .Produces<SuccessApiResult<UserResponse>>(200, "application/json")
@@ -162,51 +164,29 @@ internal class CreateUserRequestHandler(
             return new ConflictApiResult("An user with the same username already exist");
         }
         
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
-
-        var result = await context.Users.AddAsync(User.Create(request), cancellationToken);
+        User creation = User.Create(request);
+        var result = await context.Users.AddAsync(creation, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         
-        if (result.Entity.Id > 0)
+        if (request.ImageFile is not null)
         {
-            if (request.ImageFile is not null)
+             if(await cloudinaryService.UploadImage(request.ImageFile, CloudinaryFolders.ProfilePictures.ToString(), result.Entity.Id.ToString()) is var imageUpload 
+                && imageUpload.TaskSucceded())
+             {
+
+                result.Entity.ProfilePictureUrl = imageUpload.Data;
+
+             }
+            else
             {
-                var imageUploaded = await cloudinaryService.UploadImage(request.ImageFile, CloudinaryFolders.ProfilePictures.ToString(), result.Entity.Id.ToString());
-                if (imageUploaded.TaskSucceded())
-                {
-
-                    result.Entity.ProfilePictureUrl = imageUploaded.Data;
-
-                }
-                else
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    return new BadRequestApiResult("We could't create your account. Try changing your profile picture");
-                }
+                return new BadRequestApiResult(imageUpload.Message, imageUpload.Errors);
             }
-           
-
-            await context.SaveChangesAsync(cancellationToken);
-            context.ChangeTracker.Clear();
-
         }
-        else
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            return new BadRequestApiResult("Could not create user");
-        }
+       
 
-
-        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == result.Entity.Id, cancellationToken);
-
-        if (user is null)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            return new BadRequestApiResult("Could not create user");
-        }
-
-        await transaction.CommitAsync(cancellationToken);
-        return user.ToResponse();
+        await context.SaveChangesAsync(cancellationToken);
+        context.ChangeTracker.Clear();
+        return result.Entity.ToResponse();
     }
 }
