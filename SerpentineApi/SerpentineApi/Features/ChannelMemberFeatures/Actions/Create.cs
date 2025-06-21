@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,7 +31,7 @@ public class CreateChannelMemberRequestValidator : AbstractValidator<CreateChann
     public CreateChannelMemberRequestValidator()
     {
         RuleFor(x => x.ChannelId)
-            .NotEmpty().WithMessage("The id of the channel must not be empty.");
+            .Must(x => UlidHelper.IsValid(x)).WithMessage("The id of the channel must not be empty.");
     }
 }
 
@@ -80,6 +81,7 @@ public class CreateChannelMemberEndpoint : IEndpoint
             .WithOpenApi()
             .WithTags(new []{"POST", $"{nameof(ChannelMember)}"})
             .DisableAntiforgery()
+            .Produces<NotFoundApiResult>(404, "application/json")
             .Produces<ConflictApiResult>(409,"application/json")
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<SuccessApiResult<ChannelResponse>>(200, "application/json")
@@ -96,12 +98,22 @@ internal class
 {
     public async Task<OneOf<ChannelMemberResponse, Failure>> HandleAsync(CreateChannelMemberRequest request, CancellationToken cancellationToken)
     {
-        var exists = await context.ChannelMembers.AnyAsync(cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId, cancellationToken);
 
-        if (exists)
+        if (!await  context.Channels.AnyAsync(ch => ch.Id == request.ChannelId, cancellationToken))
+        {
+            return new NotFoundApiResult("The channel do not exist");
+        }
+
+        if ( await context.ChannelMembers.AnyAsync(
+                cm => cm.UserId == request.CurrentUserId &&
+                      cm.ChannelId == request.ChannelId, cancellationToken))
         {
             return new ConflictApiResult("You already belong to this channel");
+
         }
+        
+      
+        
         
         ChannelMember creation = ChannelMember.Create(request);
         EntityEntry<ChannelMember> response = await context.ChannelMembers.AddAsync(creation, cancellationToken);

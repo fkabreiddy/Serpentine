@@ -18,7 +18,7 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [MaxLength(100),
      MinLength(3),
      RegularExpression(@"^[a-zA-Z0-9._]+$"), 
-     Required, JsonPropertyName("name"), FromBody]
+     Required, JsonPropertyName("name"), FromBody, DataType(DataType.Text)]
     public string Name { get; set; } = null!;
 
     [MaxLength(500), 

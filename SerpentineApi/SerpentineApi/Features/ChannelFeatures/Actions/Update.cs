@@ -60,6 +60,9 @@ public class UpdateChannelRequestValidator : AbstractValidator<UpdateChannelRequ
 
         RuleFor(x => x.AdultContent)
             .NotNull().WithMessage("Adult content flag must be specified.");
+
+        RuleFor(x => x.ChannelId)
+            .Must(x => UlidHelper.IsValid(x)).WithMessage("Channel Id should be an valid Ulid.");
     }
 }
 

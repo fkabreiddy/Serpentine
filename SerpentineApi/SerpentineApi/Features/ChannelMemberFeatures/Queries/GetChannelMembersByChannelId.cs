@@ -39,7 +39,7 @@ public class GetChannelMembersByChannelIdRequestValidator : AbstractValidator<Ge
     public GetChannelMembersByChannelIdRequestValidator()
     {
         RuleFor(x => x.ChannelId)
-            .Must(channelId => Ulid.TryParse(channelId.ToString(), out _)).WithMessage("Channel Id must be an valid ULID");
+            .Must(channelId => UlidHelper.IsValid(channelId)).WithMessage("Channel Id must be an valid ULID");
        
         RuleFor(x => x.Take)
             .InclusiveBetween(1, 5)

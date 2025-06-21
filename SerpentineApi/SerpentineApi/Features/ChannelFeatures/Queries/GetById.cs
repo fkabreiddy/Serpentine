@@ -19,7 +19,7 @@ public class GetChannelByIdRequestValidator : AbstractValidator<GetChannelByIdRe
     public GetChannelByIdRequestValidator()
     {
         RuleFor(x => x.ChannelId)
-            .NotEmpty().WithMessage("The channel Id must be longer than 1 character");
+            .Must(x => UlidHelper.IsValid(x)).WithMessage("The channel Id must be an valid ULID");
     }
 }
 

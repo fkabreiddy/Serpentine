@@ -42,7 +42,6 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         modelBuilder.Entity<ChannelMember>(t =>
         {
             t.HasIndex(u => new{u.ChannelId, u.UserId}).IsUnique();
-            t.HasIndex(u => new { u.Channel.Name, u.UserId }).IsUnique();
             t.Navigation(cm => cm.User).AutoInclude().IsRequired();
             t.HasOne(cm => cm.Channel).WithMany(cm => cm.Members).HasForeignKey(c => c.ChannelId);
             t.HasOne(cm => cm.User).WithMany(cm => cm.MyChannels).HasForeignKey(c => c.UserId);
