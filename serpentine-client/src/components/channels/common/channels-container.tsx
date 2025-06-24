@@ -59,7 +59,7 @@ export default function ChannelsContainer(){
            {layout.sideBarExpanded && 
                 <div className="w-full flex mb-2 px-3 items-center justify-between">
                     <label className="font-normal  text-xs text-nowrap">My Channels /  <span className="text-blue-500">{channels.length}</span></label>
-                    <IconButton onClick={()=>{setShowChannels(!showChannels)}} tootltipText={showChannels ? "Minimize" : "Expand"}>
+                    <IconButton onClick={()=>{setShowChannels(!showChannels)}} tooltipText={showChannels ? "Minimize" : "Expand"}>
                         {showChannels ? 
                         <Minimize className="size-[12px] cursor-pointer"/> :
                         <Expand className="size-[12px] cursor-pointer"/> 

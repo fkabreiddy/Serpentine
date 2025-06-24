@@ -82,7 +82,7 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
 const NotificationsIcon = () =>(
 
-   <IconButton onClick={()=>{}} tootltipText="Notifications">
+   <IconButton onClick={()=>{}} tooltipText="Notifications">
          <motion.div
             key="notifications-icon"
             whileHover={{ rotate: 30 }}

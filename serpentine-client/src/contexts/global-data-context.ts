@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 
 interface GlobalData {
-  currentChannelId: number | null;
-  currentGroupId: number | null;
-  setCurrentGroupId: (groupId: number) => void
-  setCurrentChannelId: (channelId: number) => void
+  currentChannelId: string | null;
+  currentGroupId: string | null;
+  setCurrentGroupId: (groupId: string) => void
+  setCurrentChannelId: (channelId: string) => void
 
   
 }
@@ -13,7 +13,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   currentChannelId: null,
   currentGroupId: null,
   
-  setCurrentGroupId: (groupId : number) =>{
+  setCurrentGroupId: (groupId : string) =>{
     set((state) => ({
       ...state,
       currentGroupId: groupId,
@@ -21,7 +21,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }));
   },
 
-  setCurrentChannelId: (groupId : number) =>{
+  setCurrentChannelId: (groupId : string) =>{
     set((state) => ({
       ...state,
       currentChannelId: groupId,

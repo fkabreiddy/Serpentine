@@ -46,11 +46,11 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   return(
 
-    <ScrollShadow hideScrollBar offset={0} id="side-bar" className={` ${layout.sideBarExpanded ? "!max-w-[250px] !min-w-[250px]" : "!max-w-[80px] !min-w-[80px]"} h-scren   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 p-2 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
+    <ScrollShadow  hideScrollBar offset={0} id="side-bar" className={` ${layout.sideBarExpanded ? "!max-w-[250px] !min-w-[250px]" : "!max-w-[80px] !min-w-[80px]"} h-scren py-10   bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col border-r  border-default-100 px-2 overflow-auto gap-4  scroll-smooth scrollbar-hide `}>
        
           
           
-        <div className="flex flex-col items-center gap-3  ">
+        <div className="flex flex-col items-center gap-4  ">
 
           <SideBarButton onClick={()=> navigate("/home")} text="Serpentine">
                 <HomeIcon className="size-[18px]  cursor-pointer group-hover:text-blue-500 transition-all"/>

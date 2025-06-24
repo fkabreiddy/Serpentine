@@ -6,8 +6,8 @@ export class ChannelResponse extends BaseResponse {
   adultContent: boolean = false;
   myMember: ChannelMemberResponse = new ChannelMemberResponse();
   membersCount: number = 0;
-  channelCoverPicture: string | null = null;
-  channelBannerPicture: string | null = null;
+  coverPicture: string | null = null;
+  bannerPicture: string | null = null;
   readonly userIsOwner: boolean = false;
 
   

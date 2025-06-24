@@ -5,8 +5,8 @@ import IconButton from "@/components/common/icon-button";
 import { X } from "lucide-react";
 export default function DefaultView(){
     const {currentChannelId, currentGroupId } = useGlobalDataStore();
-    const [channelId, setChannelId] = useState<number | null>(null);
-    const [groupId, setGroupId] = useState<number | null>(null)
+    const [channelId, setChannelId] = useState<string | null>(null);
+    const [groupId, setGroupId] = useState<string | null>(null)
 
     useEffect(()=>{
 
@@ -52,8 +52,8 @@ export default function DefaultView(){
 
             {
                 (channelId || groupId) && (
-                    <div className="absolute top-2 right-2">
-                        <IconButton tootltipText="Close" onClick={resetValues}>
+                    <div className="fixed top-2 right-2">
+                        <IconButton tooltipText="Close" onClick={resetValues}>
                             <X className="size-[18px]"/>
                         </IconButton>
                     </div>

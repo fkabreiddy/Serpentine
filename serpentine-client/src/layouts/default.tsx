@@ -37,7 +37,7 @@ export default function DefaultLayout({
         <LeftSideBar />
 
         <div className={`absolute top-[15px] !z-[50] ${layout.sideBarExpanded ? "left-[230px]" : "left-[70px]"}`}>
-                <IconButton onClick={changeSidebarState}  tootltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
+                <IconButton onClick={changeSidebarState}  tooltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
                     {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
                 </IconButton>
             </div>

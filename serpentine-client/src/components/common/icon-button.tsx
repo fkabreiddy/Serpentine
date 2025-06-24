@@ -3,11 +3,11 @@ import React from "react";
 import { playSound } from "react-sounds";
 type IconButtonProps =  {
     children: React.ReactNode;
-    tootltipText: string;
+    tooltipText: string;
     onClick: ()=> void;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>
 
-export default function IconButton({children, onClick, tootltipText, ...rest}: IconButtonProps) {
+export default function IconButton({children, onClick, tooltipText: tootltipText, ...rest}: IconButtonProps) {
 
     const handlePlayClickSound = () => playSound("ui/button_soft");
     return(

@@ -37,7 +37,7 @@ interface LightBulbIconProps {
 const LightbulbIcon = ({theme } : LightBulbIconProps) =>(
 
     
-   <IconButton onClick={()=>{}} tootltipText={theme + " mode"}>
+   <IconButton onClick={()=>{}} tooltipText={theme + " mode"}>
               <motion.div
                   key="setting-icon"
                   whileHover={{ rotate: 30 }}

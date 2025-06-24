@@ -52,12 +52,12 @@ export function useCreateChannel() {
     }, [result]);
 
    
-    const createChannel = async (data: CreateChannelRequest) => {
+    const createChannel = async (data: FormData) => {
        
         setResult(null);
         setCreatingChannel(true);
         setChannel(null);
-        const response = await post({endpoint: "channels/create"}, data );
+        const response = await post({endpoint: "channels/create", contentType: "multipart/form-data"}, data );
         setResult(response);
             
         

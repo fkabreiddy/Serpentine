@@ -199,13 +199,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                 className="hidden"
             />
 
-                <div className="w-full">
-                    
-                    {errors.dayOfBirth && (
-                        <p className="text-red-500 text-sm mt-1">{errors.dayOfBirth.message}</p>
-                    )}
-                    
-                </div>
+                
 
                 
 
@@ -394,13 +388,13 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
     );
 }
 
-interface FileAvatarProps {
+export interface FileAvatarProps {
     file: File | null; 
     onRemove: () => void;
     onAdd: () => void;
 }
 
-const FileAvatar: React.FC<FileAvatarProps> = ({ file, onRemove, onAdd }) => (
+export const FileAvatar: React.FC<FileAvatarProps> = ({ file, onRemove, onAdd }) => (
     <div className="rounded-full bg-default-100">
             <Image
             isBlurred

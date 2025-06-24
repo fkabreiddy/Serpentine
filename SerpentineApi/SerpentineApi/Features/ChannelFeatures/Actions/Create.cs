@@ -18,17 +18,17 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [MaxLength(100),
      MinLength(3),
      RegularExpression(@"^[a-zA-Z0-9._]+$"), 
-     Required, JsonPropertyName("name"), FromBody, DataType(DataType.Text)]
+     Required, JsonPropertyName("name"), FromForm, DataType(DataType.Text)]
     public string Name { get; set; } = null!;
 
     [MaxLength(500), 
      MinLength(10),
      Required, 
      JsonPropertyName("description"), 
-     FromBody]
+     FromForm]
     public string Description { get; set; } = null!;
 
-    [Required, FromBody, JsonPropertyName("adultContent")]
+    [Required, FromForm, JsonPropertyName("adultContent")]
     public bool AdultContent { get; set; } = false;
 
     [BindNever, JsonIgnore]
@@ -76,7 +76,7 @@ internal class CreateChannelEndpoint : IEndpoint
         app.MapPost(
                 _settings.BaseUrl + "/create",
                 async (
-                    [FromBody] CreateChannelRequest command,
+                    [FromForm] CreateChannelRequest command,
                     EndpointExecutor<CreateChannelEndpoint> executor,
                     CancellationToken cancellationToken,
                     ISender sender,
@@ -105,7 +105,7 @@ internal class CreateChannelEndpoint : IEndpoint
             .Stable()
             .WithOpenApi()
             .WithTags(new []{"POST", $"{nameof(Channel)}"})
-            .Accepts<CreateChannelRequest>(false, "application/json")
+            .Accepts<CreateChannelRequest>(false, "multipart/form-data")
             .Produces<SuccessApiResult<ChannelResponse>>(200)
             .Produces<ConflictApiResult>(409, "application/json")
             .Produces<BadRequestApiResult>(400, "application/json")

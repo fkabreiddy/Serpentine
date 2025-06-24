@@ -29,7 +29,7 @@ export default function Modal({onClose, children, ...rest}:ModalProps){
         }} className="fixed inset-0 z-[50] w-screen  h-screen dark:bg-black/60  bg-white/60 flex items-center justify-center">
             <div className="p-3 z-[60] py-4 w-[40vw] flex flex-col items-center animate-appearance-in  border-default-50/50 border rounded-xl bg-neutral-900/40 backdrop-blur-md">
                 <div className="absolute right-0 m-2 top-0">
-                    <IconButton onClick={onClose} tootltipText="close">
+                    <IconButton onClick={onClose} tooltipText="close">
                         <X className="size-[14px]"/>
                     </IconButton>
                 </div>
