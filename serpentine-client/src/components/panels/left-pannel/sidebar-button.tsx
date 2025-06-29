@@ -12,17 +12,31 @@ export default function SideBarButton({ text, children, ...rest}:SideBarButtonPr
     const {layout} = useLayoutStore();
     return(
         <>
-              <button
+
+        {layout.sideBarExpanded ?  <button
              {...rest}
-                className={`$ cursor-pointer group items-center ${layout.sideBarExpanded ? "w-full" : "w-fit"} flex-nowrap  flex gap-2 hover:opacity-100 opacity-70 dark:opacity-90 rounded-lg  hover:dark:bg-default-100/30  hover:bg-neutral-100 dark:!text-white text-black  p-2 transition-colors text-sm font-semibold`}
+                className={`$ cursor-pointer rounded-lg group items-center ${layout.sideBarExpanded ? "w-full" : "w-fit"} flex-nowrap  flex gap-2 hover:opacity-100 opacity-80 dark:opacity-100 my-2  dark:bg-neutral-950  dark:hover:bg-neutral-900/80 bg-neutral-100 hover:bg-neutral-200 dark:!text-white text-black  p-2 transition-colors text-sm font-semibold`}
             >
                 {children}
 
                 {layout.sideBarExpanded &&
-                    <label className='font-normal select-none group-hover:text-blue-600 text-[13px] opacity-100 text-nowrap'>{text}</label>
+                    <label className='font-normal select-none  text-[13px] opacity-100 text-nowrap'>{text}</label>
                 }
                 
-            </button>
+            </button> :
+            <IconButton
+                {...rest}
+                tooltipText={text}
+                placement='right'
+                
+                >
+
+                {children}
+            </IconButton>
+
+            }
+        
+           
            
         </>
     )

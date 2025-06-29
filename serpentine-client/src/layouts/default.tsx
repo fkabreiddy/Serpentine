@@ -26,6 +26,14 @@ export default function DefaultLayout({
   
   const {layout, setLayout} = useLayoutStore();
 
+  useEffect(() => {
+
+    if(!isMobile && !layout.sideBarExpanded)
+       setLayout({sideBarExpanded: true})
+
+    
+  }),[isMobile]
+
   
 
   const changeSidebarState = () =>{
@@ -35,12 +43,13 @@ export default function DefaultLayout({
   return (
     <div className="w-screen h-screen flex">
         <LeftSideBar />
-
-        <div className={`absolute top-[15px] !z-[50] ${layout.sideBarExpanded ? "left-[230px]" : "left-[70px]"}`}>
-                <IconButton onClick={changeSidebarState}  tooltipText={layout.sideBarExpanded ? "Minimize Sidebar" : "Expand Sidebar"}>
+          {isMobile && 
+            <div className={`absolute top-[50%] !z-[99999] ${layout.sideBarExpanded ? "left-[250px]" : "left-[50px]"}`}>
+                <button onClick={changeSidebarState}  className="flex bg-default-100 items-center justify-center px-1 py-2 rounded-r-xl">
                     {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
-                </IconButton>
+                </button>
             </div>
+          }
 
         {isMobile && layout.currentRightPanelView !== RightPanelView.DefaultView ? 
           <></> :
@@ -57,7 +66,7 @@ export default function DefaultLayout({
         }
        
 
-       {isMobile && layout.currentRightPanelView === RightPanelView.DefaultView ? <></> :    <RightSideBar/> }
+       {layout.currentRightPanelView === RightPanelView.DefaultView ? <></> :    <RightSideBar/> }
  
        
     </div>

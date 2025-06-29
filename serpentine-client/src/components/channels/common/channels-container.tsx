@@ -1,4 +1,4 @@
-import { Minimize, Plus } from "lucide-react";
+import { ArchiveIcon, Minimize, Plus, TvIcon } from "lucide-react";
 import React, { useEffect } from "react";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useGetChannelsByUserId } from "@/hooks/channel-hooks";
@@ -12,84 +12,61 @@ import ChannelSkeleton from "../skeletons/channel-skeleton";
 import ChannelCard from "./channel-card";
 
 interface ChannelContainerProps{
+    filter?: string;
+    channels: ChannelResponse[];
+    onChannelSelected?: (channel: ChannelResponse) => void;
 }
 
-export default function ChannelsContainer(){
+export default function ChannelsContainer({filter = "", channels, onChannelSelected}:ChannelContainerProps){
 
     const [showChannels, setShowChannels] = React.useState<boolean>(true);
-    const {user} = useAuthStore();
     const {layout, setLayout, newChannel, setNewChannel } = useLayoutStore();
-    const {getChannelsByUserId, setChannels, channels, hasMore, loadingChannels, isBusy } = useGetChannelsByUserId();
 
+   
     
-    useEffect(()=>{
-
-        if(newChannel)
-        {
-            handleChannelCreated(newChannel)
-            setNewChannel(null);
-
-        }
-    },[newChannel])
-    
-    const hasFetched = React.useRef(false);
-
-    useEffect(() => {
-        if (user && !loadingChannels && !isBusy && !hasFetched.current) {
-        hasFetched.current = true;
-        fetchChannels();
-        }
-    }, [user]);
-
-    const fetchChannels = async () => {
-  
-        await getChannelsByUserId({take: 5, skip: channels.length });
-        
-    };
+   
    
 
-    function handleChannelCreated(channel : ChannelResponse){
-
-        setChannels(prev => [...prev, channel]);
-    }
+   
 
     return(
-        <div className={`${showChannels ? "h-full" : "h-fit"}  ${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col gap-2 `} >
+        <div className={`${showChannels ? "h-full" : "h-fit"}  ${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col gap-2 items-center  `} >
            
-           {layout.sideBarExpanded && 
+           {layout.sideBarExpanded &&
                 <div className="w-full flex mb-2 px-3 items-center justify-between">
                     <label className="font-normal  text-xs text-nowrap">My Channels /  <span className="text-blue-500">{channels.length}</span></label>
-                    <IconButton onClick={()=>{setShowChannels(!showChannels)}} tooltipText={showChannels ? "Minimize" : "Expand"}>
-                        {showChannels ? 
-                        <Minimize className="size-[12px] cursor-pointer"/> :
-                        <Expand className="size-[12px] cursor-pointer"/> 
-                    }
+                    <IconButton tooltipText="Archived channels">
+                        <ArchiveIcon className="size-[14px]" />
                     </IconButton>
                 
                 </div>
+               
             } 
             <SideBarButton  text="Create a channel" onClick={()=> setLayout({currentRightPanelView: RightPanelView.CreateChannelFormView})} >
-                  <Plus className="size-[18px]  cursor-pointer group-hover:text-blue-500 transition-all"/>
-            </SideBarButton>              
+                  <Plus className="size-[18px]  cursor-pointer  transition-all"/>
+            </SideBarButton>  
+            {!layout.sideBarExpanded &&
+                <>
+                <IconButton tooltipText="Archived channels">
+                            <ArchiveIcon className="size-[18px]" />
+                    </IconButton>
+                    <hr className="w-full max-md:w-[80%] border-neutral-100 border rounded-full my-3 dark:border-neutral-900" />
+
+                </>
+               
+            }            
             {(channels && showChannels) &&
                     
-                channels.map((ch, i) => (
+                channels.filter(ch => ch.name.toLowerCase().includes(filter.toLowerCase()) ).map((ch, i) => (
                     
-                    <ChannelCard key={`${i}-${ch.name}`} index={i} channel={ch} />
+                    <ChannelCard onClick={() => onChannelSelected?.(ch)} key={`${i}-${ch.name}`}  channel={ch} />
                 ))
                 
 
                 
             }
-            {loadingChannels &&
-                <>
-                    <ChannelSkeleton/>
-                    <ChannelSkeleton/>
-                    <ChannelSkeleton/>
-
-
-                </>
-            }
+            
+            
 
             
                 

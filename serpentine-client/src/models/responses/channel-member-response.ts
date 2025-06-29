@@ -1,3 +1,5 @@
+import { BaseResponse } from "./base-response";
+
 export class ChannelMemberResponse extends BaseResponse {
     
   channelId: number = 0;

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { ChannelResponse } from "@/models/responses/channel-response";
-import { KeyIcon } from "lucide-react";
+import { KeyIcon, VolumeOffIcon } from "lucide-react";
 import { Image } from "@heroui/image";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { Tooltip } from "@heroui/tooltip";
@@ -8,12 +8,11 @@ import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { RightPanelView } from "@/models/right-panel-view";
 import Avatar from "boring-avatars";
 
-interface ChannelCardProps{
-    index : number,
+type ChannelCardProps ={
     channel: ChannelResponse
-}
+} & React.HTMLAttributes<HTMLDivElement>;
 
-const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
+const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
 
     const {layout, setLayout} = useLayoutStore();
     const {setCurrentChannelId} = useGlobalDataStore();
@@ -30,7 +29,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
     <>
        
 
-        <div  className={`flex justify-between my-1  w-full max-w-full px-2 group  gap-2   transition-all cursor-pointer  `}>
+        <div {...rest} className={`flex  justify-between ${layout.sideBarExpanded ? "rounded-lg py-2 px-1" : "rounded-full p-1 "}    w-full max-w-full  min-w-fit !shrink-0 group   gap-2   transition-all cursor-pointer  `}>
             <div className="flex items-center  max-w-[80%] gap-3  ">
                 <Tooltip content={channel.name} size={"sm"} showArrow={true} placement="right" isDisabled={layout.sideBarExpanded} >
                    
@@ -47,7 +46,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
 
                 </Tooltip>
                
-               {layout.sideBarExpanded && <p onClick={()=> setCurrentChannelIntoGlobalState(channel.id)} className="text-[13px] group-hover:underline group-hover:text-purple-600 opacity-80 hover:opacity-100 transition-all font-normal whitespace-nowrap overflow-hidden text-ellipsis w-auto">#{channel.name}</p>}
+               {layout.sideBarExpanded && <p onClick={()=> setCurrentChannelIntoGlobalState(channel.id)} className="text-[13px] group-hover:underline group-hover:text-blue-500 opacity-80 hover:opacity-100 transition-all font-normal whitespace-nowrap overflow-hidden text-ellipsis w-auto">#{channel.name}</p>}
                 
             </div>
             
@@ -56,7 +55,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
                     {
                         channel.myMember.isOwner &&
                         <Tooltip size="sm" content={"You own this channel"} placement="right" showArrow={true}>
-                            <KeyIcon size={15}/>
+                            <KeyIcon className="opacity-60" size={15}/>
                         </Tooltip> 
                     }
                     {
@@ -82,9 +81,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({index, channel}) =>{
 
 const Mute = () => (
 
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-[17px] opacity-20">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-</svg>
+  <VolumeOffIcon size={15}/>
 
 
 )

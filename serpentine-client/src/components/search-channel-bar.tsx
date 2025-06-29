@@ -1,15 +1,19 @@
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import React, { ReactNode, useState } from "react";
-import {X} from "lucide-react"
+import {SearchIcon, X} from "lucide-react"
+import { InputOtpVariantProps } from "@heroui/theme";
+import IconButton from "./common/icon-button";
 
 
-interface SearchChannelBarProps {
+type SearchBarProps = {
     onSearch: (text: string) => void
     onCancel?: () => void;
-}
+    searchButton?: boolean;
+    width?: string;
+} & InputOtpVariantProps
 
-const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel = () => {}}) => {
+const SearchBar: React.FC<SearchBarProps> = ({onSearch, searchButton, width = "60%",  onCancel = () => {}, ...rest}) => {
     const [searchText, setSearchText] = useState<string>("");
 
     React.useEffect(() => {
@@ -23,13 +27,13 @@ const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel =
 
     return (
             <Input
-                
-                placeholder="Search something...."
+                {...rest}
                value={searchText}
                 labelPlacement="outside"
                 autoComplete="current-password"
-                endContent={ <SearchIcon /> }
-                className="w-[60%] max-md:w-full"
+                
+                endContent={searchButton && <IconButton tooltipText="Search"><SearchIcon className="size-[18px] " /></IconButton>}
+                className={`w-[${width}] max-md:w-full `} 
                 
                 onChange={handleChange}
             />
@@ -39,12 +43,6 @@ const SearchChannelBar: React.FC<SearchChannelBarProps> = ({onSearch, onCancel =
     )
 }
 
-const SearchIcon  = () =>  (
 
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 opacity-65">
-     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-    </svg>
 
-)
-
-export default SearchChannelBar
+export default SearchBar

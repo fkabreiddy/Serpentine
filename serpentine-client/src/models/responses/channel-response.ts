@@ -1,3 +1,4 @@
+import { BaseResponse } from "./base-response";
 import { ChannelMemberResponse } from "./channel-member-response";
 
 export class ChannelResponse extends BaseResponse {

@@ -1,0 +1,15 @@
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\bin\Debug\net9.0\FeatureScaffolder.exe
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\bin\Debug\net9.0\FeatureScaffolder.deps.json
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\bin\Debug\net9.0\FeatureScaffolder.runtimeconfig.json
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\bin\Debug\net9.0\FeatureScaffolder.dll
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\bin\Debug\net9.0\FeatureScaffolder.pdb
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.AssemblyInfoInputs.cache
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.AssemblyInfo.cs
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.csproj.CoreCompileInputs.cache
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.sourcelink.json
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.dll
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\refint\FeatureScaffolder.dll
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.pdb
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.genruntimeconfig.cache
+C:\Proyectos\Serpentine\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\ref\FeatureScaffolder.dll

@@ -24,26 +24,13 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className }) => {
   const isDark = theme === "light";
 
   return (
-    <div className="cursor-pointer" onClick={toggleTheme}>
-      <LightbulbIcon theme={theme}/>
-    </div>
-  );
-};
-
-interface LightBulbIconProps {
-  theme: string
-}
-
-const LightbulbIcon = ({theme } : LightBulbIconProps) =>(
-
-    
-   <IconButton onClick={()=>{}} tooltipText={theme + " mode"}>
+   <IconButton onClick={()=> toggleTheme()} tooltipText={theme + " mode"}>
               <motion.div
                   key="setting-icon"
                   whileHover={{ rotate: 30 }}
                   animate={{ rotate: 0 }}
                   exit={{ rotate: -30}}
-                  className="flex flex-col gap-1 relative"
+                  className=" "
               >
                 {theme === "dark" ? <SunIcon className="size-5"/> : <MoonIcon className="size-5"/>}
 
@@ -51,6 +38,10 @@ const LightbulbIcon = ({theme } : LightBulbIconProps) =>(
           
           
        </IconButton>
-        
+  );
+};
 
-)
+interface LightBulbIconProps {
+  theme: string
+}
+

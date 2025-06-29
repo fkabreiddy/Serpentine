@@ -7,6 +7,7 @@ import { set } from "date-fns";
 import { useSound } from 'react-sounds';
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
 import { CreateChannelRequest } from "@/models/requests/channels/create-channel-request";
+import { GetManyByNameOrIdRequest } from "@/models/requests/channels/get-many-by-name-or-id";
 
 
 const initialApiState = <T>(): ApiResult<T> => ({
@@ -111,7 +112,6 @@ export function useGetChannelsByUserId() {
         setIsBusy(true);
         setResult(null);
         setChannels([]);
-        console.log(channels)
         setHasMore(true);
         setLoadingChannels(true);
         do{
@@ -130,4 +130,56 @@ export function useGetChannelsByUserId() {
     };
 
     return { getChannelsByUserId, channels, loadingChannels, setChannels, result, hasMore, isBusy};
+}
+
+export function useGetManyChannelsByNameOrId() {
+
+    
+    const [channels, setChannels] = useState<ChannelResponse[]>([]);
+    const [loadingChannels, setLoadingChannels] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<ChannelResponse[]> | null>(null);
+    const { get } = useFetch<ChannelResponse[]>();
+
+   
+    useEffect(() => {
+       
+
+        if(!result)
+        {
+            return;
+        }
+
+        
+
+        if (result.data && result.statusCode === 200) {
+           setChannels(prev => [...prev, ...(result.data || [])]);
+           console.log("Channels fetched: ", result.data);
+
+        } 
+        else {
+            
+            handleApiErrors(result);
+        }
+
+        setLoadingChannels(false);
+        setResult(null);
+
+
+    }, [result]);
+
+   
+    const getManyChannelsByNameOrId = async (data: GetManyByNameOrIdRequest) => {
+        
+        setResult(null);
+        setChannels([]);
+        setLoadingChannels(true);
+    
+        const response = await get({endpoint: "channels/by-id-or-name?" }, data );
+        
+        setResult(response);
+
+       
+    };
+
+    return { getManyChannelsByNameOrId, channels, loadingChannels, setChannels, result};
 }

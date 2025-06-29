@@ -14,6 +14,7 @@ import { DateInput } from "@heroui/date-input";
 import { createAccountSchema, CreateUserRequest } from "@/models/requests/user/create-user-request";
 import { parseDate, today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { CakeIcon } from "lucide-react";
+import CustomButton from "@/components/common/custom-button";
 
 const minAge = () => {
     const currentDate = today(getLocalTimeZone());
@@ -356,7 +357,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                 />
                                 
 
-                            <Button
+                            <CustomButton
                             isDisabled={!isValid || isCreatingUser || !ageIsValid()}
                             type="submit"
                             isLoading={isCreatingUser}
@@ -366,7 +367,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                             >
                                 <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
                                 Create Account
-                            </Button>
+                            </CustomButton>
                         </>
                         
                     )

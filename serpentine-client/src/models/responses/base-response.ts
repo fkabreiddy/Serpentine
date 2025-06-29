@@ -1,4 +1,4 @@
-abstract class BaseResponse {
+export abstract class BaseResponse {
     id: string = "";
     createdAt: Date = new Date();
     updatedAt: Date = new Date();

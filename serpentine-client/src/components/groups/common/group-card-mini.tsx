@@ -3,11 +3,11 @@ import { Image } from "@heroui/image";
 import { motion } from "motion/react";
 interface GroupCardMiniProps{
 
-    cover? : string | null, 
+    name? : string | null, 
     index: number
 }
 
-const GroupCardMini:React.FC<GroupCardMiniProps> = ({cover = null, index}) =>{
+const GroupCardMini:React.FC<GroupCardMiniProps> = ({name = null, index}) =>{
 
     return(
         <motion.div
@@ -18,8 +18,8 @@ const GroupCardMini:React.FC<GroupCardMiniProps> = ({cover = null, index}) =>{
             transition={{delay: index / 3}}
             className="flex flex-col gap-1 relative"
         >
-             <div className="rounded-full bg-default-50 w-5 h-5 flex items-center hover:bg-blue-600 z-[0]  hover:text-white cursor-pointer transition-all justify-center">
-                {cover === "" || cover === null ? <HashIcon/> : <Image   className="h-5 w-5 rounded-full z-[0]" src={cover}/>}
+             <div className="rounded-full bg-default-50 size-[30px] flex items-center hover:bg-blue-600 z-[0]  hover:text-white cursor-pointer transition-all justify-center">
+                {name === "" || name === null ? <HashIcon/> : <p className="text-lg">{name[0].toUpperCase()}</p>}
             </div>
         </motion.div>
        
