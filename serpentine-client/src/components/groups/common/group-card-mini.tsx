@@ -19,7 +19,7 @@ const GroupCardMini:React.FC<GroupCardMiniProps> = ({name = null, index}) =>{
             className="flex flex-col gap-1 relative"
         >
              <div className="rounded-full bg-default-50 size-[30px] flex items-center hover:bg-blue-600 z-[0]  hover:text-white cursor-pointer transition-all justify-center">
-                {name === "" || name === null ? <HashIcon/> : <p className="text-lg">{name[0].toUpperCase()}</p>}
+                {name === "" || name === null ? <HashIcon/> : <p className="text-sm font-semibold">{name[0].toUpperCase()}</p>}
             </div>
         </motion.div>
        

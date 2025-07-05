@@ -21,7 +21,7 @@ export default function GroupsContainer({channel, onClose}:GroupsContainerProps)
 
     const {layout} = useLayoutStore()
     return (
-        <div className={`${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col gap-2 items-center  `} >
+        <div className={`${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col gap-2 items-center   `} >
             {!layout.sideBarExpanded &&
                 <ChannelCard  channel={channel ?? new ChannelResponse()}/>
             }
@@ -43,13 +43,13 @@ export default function GroupsContainer({channel, onClose}:GroupsContainerProps)
             </SideBarButton>     
             {!layout.sideBarExpanded &&             <hr className={` w-[80%] border-neutral-100 border rounded-full my-3 dark:border-neutral-900`} /> }
 
-            <div className="flex-grow h-full w-full flex-col flex items-center gap-3 justify-center">
+            <ul className="flex-grow h-full w-full flex-col flex items-center gap-3 p-1 justify-center">
                 {Array.from({ length: 4 }).map((_, idx) => (
                     <>
-                        {layout.sideBarExpanded ? <GroupCard key={idx} /> : <GroupCardMini key={idx} index={idx} /> }
+                        {layout.sideBarExpanded ? <GroupCard key={idx} /> : <GroupCardMini name={idx.toString()} key={idx} index={idx} /> }
                     </>
                 ))}
-            </div>
+            </ul>
             
 
         </div>

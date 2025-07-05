@@ -24,7 +24,6 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
     const {userPofilePicture, user, username, setUser, isAuthenticated } = useAuthStore();
    
     const {closeSession} = useCloseSession();
-    const {layout} = useLayoutStore();
     const isMobile = useIsMobile();
    
     

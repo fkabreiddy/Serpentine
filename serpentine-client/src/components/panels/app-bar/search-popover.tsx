@@ -46,17 +46,7 @@ export default function SearchPopover() {
       <PopoverContent className="backdrop-blur-sm border-neutral-100 dark:bg-neutral-900/30  max-w-[400px] w-full  ">
         <div className="px-1 py-2 flex flex-col gap-3">
           <GeneralSearcher onSearching={(value) => setIsSearching(value)} onChannelsSearched={(value) => setChannels(value)} onFilterChanged={(value) => {setFilter(value)}} />
-          <hr className="w-full border-t border-neutral-100 dark:border-neutral-900"/>
-            <div className="flex flex-col gap-2">
-              {filter &&
-                <p className="text-[13px] text-neutral-500">Search results for: {filter}</p>
-              }
-              { isSearching ? <Spinner size="sm" variant="spinner" /> : 
-              <>
-                <ChannelsSection channels={channels} />
-
-              </>}
-            </div>
+          
         </div>
       </PopoverContent>
     </Popover>

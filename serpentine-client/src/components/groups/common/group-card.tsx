@@ -4,20 +4,24 @@ import { useLayoutStore } from "@/contexts/layout-context";
 
 interface GroupCardProps{
  cover? : string | null, 
+ 
 }
 
 const GroupCard : React.FC<GroupCardProps> = ({cover = null}) =>{
 
     return(
 
-        <li className="flex transition-all hover:bg-default-50/20 border-t border-neutral-900/20 flex-col items-end w-full">
+        <div className="relative mb-5 last:mb-0">
+            <div className="absolute left-0 top-3 w-4 h-[10px] border-b-2 border-l-2  dark:border-neutral-800 border-neutral-200 rounded-bl-2xl" />
+           
+          <div className="flex transition-all   flex-col items-end w-full">
 
-            <div className="w-full flex items-center justify-between gap-1">
-                 <div className="  w-full gap-3 flex items-center   ">
+            <div style={{width:"calc(100% - 24px)"}} className=" flex items-center justify-between gap-1">
+                <div className="w-full gap-3 flex items-center   ">
                    
                     <div className="flex text-ellipsis overflow-hidden   w-full flex-col gap-0">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold opacity-80 hover:text-blue-500 hover:underline">Group name</span>
+                            <span className="text-xs font-semibold opacity-80 hover:text-blue-600  dark:hover:text-blue-500  cursor-pointer hover:underline">Group name</span>
                         </div>
                         <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">fka.breiddy: hola</span>
                     </div>
@@ -27,7 +31,9 @@ const GroupCard : React.FC<GroupCardProps> = ({cover = null}) =>{
             </div>
            
 
-        </li>
+        </div>
+        </div>
+        
        
     )
 }
