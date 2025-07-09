@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { motion } from 'motion/react';
 import { useAuthStore } from "@/contexts/authentication-context";
 import { Spinner } from "@heroui/spinner";
@@ -9,11 +9,19 @@ import { useCloseSession } from "@/hooks/user-hooks";
 import IconButton from "@/components/common/icon-button";
 import SearchBar from "@/components/search-channel-bar";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { SendIcon } from "lucide-react";
+import { PlugIcon, SendIcon } from "lucide-react";
 import SearchPopover from "./search-popover";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GeneralSearcher from "@/components/common/general-searcher";
-
+import { useActiveUser } from "@/helpers/active-user-hub";
+import { HubResult } from "@/models/hub-result";
+import { Skeleton } from "@heroui/skeleton";
+import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
+import { HubConnectionState } from "@microsoft/signalr";
+import { Tooltip } from "@heroui/tooltip";
+import {Badge} from "@heroui/badge";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/dropdown";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 
 interface ProfilePanelProps{
 
@@ -22,12 +30,27 @@ interface ProfilePanelProps{
 const AppBar: React.FC<ProfilePanelProps> = () =>{
 
     const {userPofilePicture, user, username, setUser, isAuthenticated } = useAuthStore();
+    const [imActive, setImActive] = useState<boolean>(false);
+   const {connection, connectionStatus} = useActiveUserHubStore();
+   const alreadyMounted = useRef<boolean>(false);
+   const {currentGroupId} = useGlobalDataStore();
+
+    useEffect(()=>{
+
+        setImActive(connectionStatus === HubConnectionState.Connected)
+    },[connectionStatus])
    
+
+    const { connectToApp, disconnect } = useActiveUser({
+
+        onUserConnected:()=>{},
+        onUserDisconnected:()=>{}
+    }); 
     const {closeSession} = useCloseSession();
     const isMobile = useIsMobile();
    
     
-  
+    
     
     useEffect(()=>{
 
@@ -37,18 +60,36 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
     useEffect(()=>{
 
+        const disconnectApp = async () =>{
+            await disconnect();
+        }
         if(!isAuthenticated)
         {
+            disconnectApp();
             closeSession();
         }
+
+        const connect = async () =>{
+            await connectToApp();
+        } 
+
+        if(!alreadyMounted.current)
+        {
+            connect();
+
+        }
+        alreadyMounted.current = true;
+
+        
 
     }, [isAuthenticated, user])
 
     return(
 
         <nav id="app-bar" className=" z-[10]  bg-white dark:bg-black   sticky top-0 w-full    border-b border-default-100 flex items-center px-3 py-2 max-md:justify-end justify-between gap-3 h-fit transition-all">
+           
+                <div className="doodle-pattern -z-[10]"/>
             
-            <div className="doodle-pattern "/>
             <div/>
 
             {
@@ -61,24 +102,29 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
            
             <div className=" flex  items-center justify-end gap-4 ">
 
-                <DmsIcon/>
                 <ThemeSwitch/>
                 
                 <NotificationsIcon/>
                
-                {!isAuthenticated ? 
-                    <Spinner variant="spinner"/> : 
-                
-                    <div className="cursor-pointer flex items-center justify-center rounded-full   transition-all text-sm font-semibold">
-                        {userPofilePicture ? 
-                                <Image isBlurred src="userProfilePicture" width={28} height={28} className="shrink-0 min-w-[28px] min-h-[28px] max-md:!w-[28px] max-md:!h-[28px] rounded-full"/> 
+                {!isAuthenticated || !connection || connectionStatus !== HubConnectionState.Connected ? 
+                    <Skeleton className="size-[28px] shrink-0 rounded-full" /> : 
+                    <Tooltip content={connectionStatus.toString()} placement="bottom" size="sm" showArrow={true} >
+                        <Badge color={connectionStatus === HubConnectionState.Connected ? "success" : "danger"} content="" isDot={true} placement="bottom-left">
+                            <div className="cursor-pointer flex items-center justify-center rounded-full   transition-all text-sm font-semibold">
+                                {userPofilePicture ? 
+                                        <Image isBlurred src="userProfilePicture" width={28} height={28} className="shrink-0 min-w-[28px] min-h-[28px] max-md:!w-[28px] max-md:!h-[28px] rounded-full"/> 
 
-                            :
-                                <Avatar size={28} variant="beam" name={username ?? "adam"}/>
+                                    :
+                                        <Avatar size={28} variant="beam" name={username ?? "adam"}/>
 
 
-                        }
-                    </div>
+                                }
+                            </div>
+                            
+                        </Badge>
+                       
+                    </Tooltip>
+                   
                         
                 }
                 
@@ -114,24 +160,42 @@ const NotificationsIcon = () =>(
 
 )
 
-const DmsIcon = () => (
 
-<IconButton onClick={()=>{}} tooltipText="My direct messages">
-         <motion.div
-            key="mydms-icon"
-            whileHover={{ rotate: -80 }}
-            animate={{ rotate: 0 }}
-            exit={{ rotate: 80}}
-            className="flex  relative"
-        >
-            <SendIcon className="size-[16px] m-[2px]"/>
+interface AvatarDropdownProps{
+    children: ReactNode;
+    status: HubConnectionState ;
+    onLogout: ()=> void;
+}
 
-        </motion.div>
-       
-       
-    </IconButton>
+const AvatarDropdown : React.FC<AvatarDropdownProps> = ({children, status = HubConnectionState.Disconnected, onLogout}) => (
+    <Dropdown>
+      <DropdownTrigger>
+        <button>{children}</button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label="Static Actions">
+        <DropdownItem key="conectionInfo" isReadOnly={true}>
+            <div className="w-full flex gap-3 items-center">
+                {(() => {
+                    switch (status) {
+                        case HubConnectionState.Connected:
+                            return <div className="bg-green-600 size-[6px] rounded-full text-xs font-semibold"/>
+                        case HubConnectionState.Disconnected:
+                            return <div className="bg-red-600 size-[6px] rounded-full font-semibold"/>;
+                        case HubConnectionState.Reconnecting:
+                            return <Spinner size="sm" variant="spinner" />;
+                        default:
+                            return <div className="text-gray-500 text-xs">Unknown</div>;
+                    }
+                })()}
+                <label className="text-xs">{status.toString()}</label>
+
+            </div>
+        </DropdownItem>
+        <DropdownItem key="logout" onClick={onLogout} endContent={<PlugIcon className="size-4 shrink-0"/>}>Logout</DropdownItem>
+        
+      </DropdownMenu>
+    </Dropdown>
 )
-
 
 
 

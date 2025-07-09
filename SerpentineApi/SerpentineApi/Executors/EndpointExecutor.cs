@@ -17,7 +17,7 @@ public class EndpointExecutor<T>
     {
         try
         {
-            _logger.LogInformation($"Calling: {typeof(T)}");
+            _logger.LogInformation($"Calling endpoint: {typeof(T).Name}");
 
             return await func();
         }

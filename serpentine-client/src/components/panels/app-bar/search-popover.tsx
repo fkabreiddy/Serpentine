@@ -36,11 +36,12 @@ export default function SearchPopover() {
   return (
     <Popover placement="bottom" radius="lg" backdrop="opaque" isOpen={open} onOpenChange={setOpen} showArrow={true} >
       <PopoverTrigger>
-        <button>
+        <div>
           <IconButton tooltipText="Search" onClick={() => setOpen(!open)} >
               <SearchIcon className="size-5"/>
           </IconButton>
-        </button>
+        </div>
+       
         
       </PopoverTrigger>
       <PopoverContent className="backdrop-blur-sm border-neutral-100 dark:bg-neutral-900/30  max-w-[400px] w-full  ">

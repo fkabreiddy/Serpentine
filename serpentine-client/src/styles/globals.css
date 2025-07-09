@@ -13,7 +13,12 @@
 }
 
 
-    
+
+    input, select, textarea{
+        min-height: 2lh ;
+        max-height: 6lh;
+        scrollbar-width: none;
+    }
 
 body, html {
    
@@ -25,6 +30,10 @@ body, html {
         @apply border  border-default-foreground/5 !bg-default-50 !bg-opacity-50 !backdrop-blur-3xl ;
         
     }
+
+    interpolate-size: allow-keywords;
+
+    
 
     font-family: 'Inter',  !important;
     input, textarea {
@@ -111,7 +120,16 @@ input{
 }
 
 
+.doodle-pattern-relative {
+    
+    background: white black url('../../public/doodle3.svg') repeat 0 0;
+    
+   
+ 
 
+
+
+}
 .doodle-pattern {
    position: absolute;
     width: 100%;
@@ -122,7 +140,7 @@ input{
     left: 0;
     right: 0;
     opacity:0.2;
-    z-index: -10;
+    
     visibility: visible;
  
 
@@ -149,7 +167,7 @@ input{
     width:100%;
     height:100%;
     background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
-   z-index: -10;
+    
     opacity: 0.2;
     visibility: visible;
     

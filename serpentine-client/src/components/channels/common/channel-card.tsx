@@ -45,7 +45,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
 
     <div className="relative w-full ">
       {/* Main Node */}
-      <div className="flex items-center gap-3 " onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}}>
+      <div className="flex items-center gap-3 " onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}} >
         <div
           {...rest}
           className={`flex  justify-between ${layout.sideBarExpanded ? "rounded-lg py-2 px-1 " : "rounded-full p-1 "}    w-full max-w-full  min-w-fit !shrink-0 group   gap-2   transition-all cursor-pointer  `}

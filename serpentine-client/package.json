@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fluentui/svg-icons": "^1.1.305",
     "@heroicons/react": "^2.2.0",
     "@heroui/accordion": "^2.2.16",
     "@heroui/alert": "^2.2.19",
@@ -62,6 +63,7 @@
     "@heroui/user": "^2.2.15",
     "@hookform/resolvers": "^5.0.1",
     "@internationalized/date": "^3.8.0",
+    "@microsoft/signalr": "^8.0.7",
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-aspect-ratio": "^1.1.6",

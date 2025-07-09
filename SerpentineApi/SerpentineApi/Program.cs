@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Models;
 using SerpentineApi;
 using Scalar.AspNetCore;
 using SerpentineApi.Dependencies;
 using SerpentineApi.Helpers;
+using SerpentineApi.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,10 +16,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "default", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5000").AllowAnyMethod().AllowAnyHeader();
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
 });
+builder.Services.AddCacheServices();
 
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
+builder.Services.AddSignalRServices();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApiServices();
@@ -78,7 +84,13 @@ app.UseRouting();
 app.UseCors("default");
 
 app.UseAuthorization();
+app.MapHub<ActiveUsersHub>("hub/active-users", options =>
+{
+    options.AllowStatefulReconnects = true;
+    options.CloseOnAuthenticationExpiration = true;
 
+    
+});
 app.MapEndpoints();
 app.Run();
 
