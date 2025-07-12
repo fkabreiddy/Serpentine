@@ -43,14 +43,12 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
 
     <>
 
-    <div className="relative w-full ">
       {/* Main Node */}
-      <div className="flex items-center gap-3 " onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}} >
+      <div className="flex items-center gap-3 flex-col w-[50px] " onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}} >
         <div
           {...rest}
-          className={`flex  justify-between ${layout.sideBarExpanded ? "rounded-lg py-2 px-1 " : "rounded-full p-1 "}    w-full max-w-full  min-w-fit !shrink-0 group   gap-2   transition-all cursor-pointer  `}
+          className={`flex items-center flex-col  w-full max-w-full  min-w-fit !shrink-0 group   gap-2   transition-all cursor-pointer  `}
         >
-          <div className="flex items-center  max-w-[80%] gap-3  ">
             <Tooltip
               content={channel.name}
               size={"sm"}
@@ -58,16 +56,18 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
               placement="right"
               isDisabled={layout.sideBarExpanded}
             >
+
+              
               <div>
                 {channel.coverPicture ? (
                   <Image
                     src={channel.coverPicture || "/placeholder.svg"}
-                    className="shrink-0 min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] "
+                    className={`shrink-0 ${layout.sideBarExpanded ? "size-[40px]" : "size-[28px]"}  rounded-full `}
                   />
                 ) : (
                   <Avatar
-                    size={24}
-                    className="max-md:!w-[24px] max-md:!h-[24px]"
+                    size={layout.sideBarExpanded ? 40 : 28}
+                    className={`shrink-0 ${layout.sideBarExpanded ? "size-[40px]" : "size-[28px]"}`}
                     variant="marble"
                     name={channel.name}
                   />
@@ -77,44 +77,16 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
             {layout.sideBarExpanded && (
               <p
                 
-                className="text-[13px] group-hover:underline group-hover:text-blue-500 opacity-80 hover:opacity-100 transition-all font-normal whitespace-nowrap overflow-hidden text-ellipsis w-auto"
+                className="text-[11px] max-w-[50px] group-hover:underline group-hover:text-blue-500 opacity-80 hover:opacity-100 transition-all font-normal whitespace-nowrap overflow-hidden text-ellipsis w-auto"
               >
-                #{channel.name}
+                {channel.name}
               </p>
             )}
-          </div>
-          {layout.sideBarExpanded && (
-            <div className="flex items-center gap-3">
-              {channel.myMember.isOwner && (
-                <Tooltip size="sm" content={"You own this channel"} placement="right" showArrow={true}>
-                  <KeyIcon className="opacity-60" size={15} />
-                </Tooltip>
-              )}
-              {channel.myMember.isSilenced && <Mute />}
-            </div>
-          )}
+         
         </div>
       </div>
 
-      {isExpanded && (
-
-        <>
-
-             
-        
-            <div className="relative ml-4 ">
-              <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
-              
-              
-              {Array.from({ length: groups }).map((group, idx) => (
-                <GroupCard key={idx} />
-              ))}                
-            </div>
-        
-        </>
-       
-      )}
-    </div>
+     
       
 
        

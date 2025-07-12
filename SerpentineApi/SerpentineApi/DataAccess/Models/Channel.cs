@@ -23,6 +23,8 @@ public class Channel : BaseEntity
 
     public string? BannerPicture {get; set;}
 
+    public List<Group> Groups { get; set; } = new();
+
     [NotMapped]
     public int MembersCount { get; set; } = 0;
 

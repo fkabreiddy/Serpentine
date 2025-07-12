@@ -13,6 +13,8 @@ import ChannelCard from "./channel-card";
 import { Skeleton } from "@heroui/skeleton";
 import { Spinner } from "@heroui/spinner";
 import { Tooltip } from "@heroui/tooltip";
+import { Button } from "@heroui/button";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 
 interface ChannelContainerProps{
     filter?: string;
@@ -34,31 +36,12 @@ export default function ChannelsContainer({filter = "", channels, isLoading = tr
    
 
     return(
-        <div className={`${showChannels ? "h-full" : "h-fit"}  ${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col gap-2 items-center  `} >
+        <ScrollShadow orientation="horizontal"  className={`${showChannels ? "h-full" : "h-fit"}  ${layout.sideBarExpanded ? "w-full flex-row items-start" : "w-fit flex-col items-center"} flex  gap-4  overflow-auto scrollbar-hide  `} >
            
-           {layout.sideBarExpanded &&
-                <div className="w-full flex  px-1 items-center justify-between">
-                
-                    {
-                        isLoading ? 
-                        <Tooltip content={"Loading channels"} placement="right" showArrow={true} size="sm">
-                        <Spinner size="sm" variant="dots"/> 
-
-                        </Tooltip>
-                        :
-                        <label className="font-normal  text-xs text-nowrap">My Channels /  <span className="text-blue-500">{channels.length}</span></label>
-                    }
-                    <IconButton tooltipText="Archived channels">
-                        <ArchiveIcon className="size-[14px]" />
-                    </IconButton>
-                   
-                
-                </div>
-               
-            } 
-            <SideBarButton  text="Create a channel" onClick={()=> setLayout({currentRightPanelView: RightPanelView.CreateChannelFormView})} >
+           
+            <button className={` shrink-0 ${layout.sideBarExpanded ? "size-[40px]" : "size-[28px]"} shrink-0 rounded-full bg-neutral-100 dark:bg-neutral-900 items-center justify-center flex`}  onClick={()=> setLayout({currentRightPanelView: RightPanelView.CreateChannelFormView})} >
                 <Plus className="size-[18px]  cursor-pointer  transition-all"/>
-            </SideBarButton>  
+            </button>  
            
             {!layout.sideBarExpanded &&
                 <>
@@ -92,6 +75,6 @@ export default function ChannelsContainer({filter = "", channels, isLoading = tr
             
           
           
-        </div>
+        </ScrollShadow>
     );
 }

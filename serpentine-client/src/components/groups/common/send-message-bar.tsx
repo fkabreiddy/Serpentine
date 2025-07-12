@@ -27,7 +27,8 @@ export default function SendMessageBar()
     return(
         <div className="  w-full  pb-4 py-2 px-3  absolute left-0 bottom-0 flex flex-col items-center">
             
-            <div className="w-[70%] shadow-inner shadow-white dark:shadow-black backdrop-blur-sm  h-fit max-h-[400px]   p-3 max-md:w-[90%] rounded-3xl border border-default-50 ">
+            <div className="w-[70%] shadow-inner dark:shadow-neutral-900/70 shadow-neutral-100/70 backdrop-blur-xl backdrop-opacity-70  h-fit max-h-[400px] dark:bg-neutral-950/20 bg-neutral-50/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900/70 border-neutral-100/70 ">
+
                 <textarea
                     ref={textArea}
                     className=" w-full p-3 border-0 !outline-none !bg-transparent resize-none"

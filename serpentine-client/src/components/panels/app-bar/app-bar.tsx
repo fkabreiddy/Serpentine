@@ -87,7 +87,8 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
     return(
 
         <nav id="app-bar" className=" z-[10]  bg-white dark:bg-black   sticky top-0 w-full    border-b border-default-100 flex items-center px-3 py-2 max-md:justify-end justify-between gap-3 h-fit transition-all">
-           
+                <div className="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-opacity-70   z-[-1]"/>
+
                 <div className="doodle-pattern -z-[10]"/>
             
             <div/>

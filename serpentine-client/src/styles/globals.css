@@ -15,7 +15,7 @@
 
 
     input, select, textarea{
-        min-height: 2lh ;
+        min-height: 1lh ;
         max-height: 6lh;
         scrollbar-width: none;
     }

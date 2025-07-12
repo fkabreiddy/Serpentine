@@ -19,6 +19,8 @@ public class User : BaseEntity
     public DateTime DayOfBirth { get; set; } = DateTime.Now;
 
     public List<ChannelMember> MyChannels { get; set; } = new List<ChannelMember>();
+    public List<GroupAccess> MyAccesses { get; set; } = new List<GroupAccess>();
+    public List<Message> MyMessages { get; set; } = new List<Message>();
 
     private int GetAge(DateTime dateOfBirth)
     {
