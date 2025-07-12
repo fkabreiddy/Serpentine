@@ -91,6 +91,13 @@ app.MapHub<ActiveUsersHub>("hub/active-users", options =>
 
     
 });
+app.MapHub<ActiveChannelsHub>("hub/active-channels", options =>
+{
+    options.AllowStatefulReconnects = true;
+    options.CloseOnAuthenticationExpiration = true;
+
+    
+});
 app.MapEndpoints();
 app.Run();
 

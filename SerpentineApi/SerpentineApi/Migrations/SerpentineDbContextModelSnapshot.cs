@@ -101,6 +101,106 @@ namespace SerpentineApi.Migrations
                     b.ToTable("ChannelMembers");
                 });
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Group", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ChannelId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Group");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.GroupAccess", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("LastAccess")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("GroupId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("GroupAccess");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Message", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ParentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -159,14 +259,87 @@ namespace SerpentineApi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Group", b =>
+                {
+                    b.HasOne("SerpentineApi.DataAccess.Models.Channel", "Channel")
+                        .WithMany("Groups")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.GroupAccess", b =>
+                {
+                    b.HasOne("SerpentineApi.DataAccess.Models.Group", "Group")
+                        .WithMany("Accesses")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SerpentineApi.DataAccess.Models.User", "User")
+                        .WithMany("MyAccesses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Message", b =>
+                {
+                    b.HasOne("SerpentineApi.DataAccess.Models.Group", "Group")
+                        .WithMany("Messages")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SerpentineApi.DataAccess.Models.Message", "Parent")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SerpentineApi.DataAccess.Models.User", "Sender")
+                        .WithMany("MyMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.Channel", b =>
                 {
+                    b.Navigation("Groups");
+
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Group", b =>
+                {
+                    b.Navigation("Accesses");
+
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Message", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
                 {
+                    b.Navigation("MyAccesses");
+
                     b.Navigation("MyChannels");
+
+                    b.Navigation("MyMessages");
                 });
 #pragma warning restore 612, 618
         }
