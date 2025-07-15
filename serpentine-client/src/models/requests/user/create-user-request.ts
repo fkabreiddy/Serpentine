@@ -1,5 +1,6 @@
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import z from "zod";
+const MAX_FILE_SIZE = parseInt(import.meta.env.VITE_MAX_FILE_SIZE) * 1024 * 1024 || 5 * 1024 * 1024; // Default to 5MB if not set
 
 export const createAccountSchema = z.object({
     fullName: z.string()
@@ -22,7 +23,16 @@ export const createAccountSchema = z.object({
            
     confirmPassword: z.string().default(""),
 
-    imageFile: z.instanceof(File).nullable().default(null),
+    imageFile: z
+        .union([z.instanceof(File), z.null()])
+        .optional()
+        .refine(
+          file => file === null || file === undefined || file.size <= MAX_FILE_SIZE,
+          {
+            message: `The profile picture must be less than ${MAX_FILE_SIZE / (1024 * 1024)} MB`,
+          }
+        )
+        .default(null),
     dayOfBirth: z.instanceof(CalendarDate).default(today(getLocalTimeZone()))
 
 }).refine((data) => data.password === data.confirmPassword, {

@@ -1,43 +1,47 @@
 import IconButton from "@/components/common/icon-button";
+import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useActiveChannels } from "@/helpers/active-channels-hub";
 import { useActiveUser } from "@/helpers/active-user-hub";
+import { ChannelResponse } from "@/models/responses/channel-response";
 import { Spinner } from "@heroui/spinner";
 import { HubConnectionState } from "@microsoft/signalr";
 import { PlugIcon, Unplug } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 interface StatusBarProps{
 
-    loadingChannels: boolean;
-    channelsLength: number;
+  channels: ChannelResponse[]
 }
 
-export default function StatusBar({loadingChannels, channelsLength}:StatusBarProps){
+export default function StatusBar({channels}:StatusBarProps){
 
-    const {connection, connectionStatus} = useActiveUserHubStore();
-    const {layout, newChannel, setNewChannel } = useLayoutStore();
+    const {activeChannels, activeChannelsHub, activeChannelsHubsState} = useActiveChannelsHubStore();
+    const alreadyRendered = useRef<boolean>(false);
+    const {layout } = useLayoutStore();
     const {user, username} = useAuthStore();
-    const {connectToApp, disconnect} = useActiveUser(
-    
-        {
-    
-          onUserConnected: () =>{},
-          onUserDisconnected: ()=>{}
-        }
-      );
-    const switchConnection = async () =>{
+    const {registeringToChannels, listenToChannels} = useActiveChannels({
 
-        if(connection && connectionStatus === HubConnectionState.Connected)
-        {
-        await disconnect();
-        }
-        else
-        {
-        await connectToApp();
-        }
-    }
+      onReconnected: async () => await listenToChannels(channels)
+    });
+    
  
+    useEffect(()=>{
+
+
+      if(!activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected) return;
+      const listen = async()=>{
+        await listenToChannels(channels);
+      }
+
+      if(!alreadyRendered.current)
+      {
+        listen();
+        alreadyRendered.current = true;
+      }
+    },[activeChannelsHubsState])
       
     
     return(<>
@@ -57,7 +61,7 @@ export default function StatusBar({loadingChannels, channelsLength}:StatusBarPro
 
           
             {(() => {
-                switch (connectionStatus) {
+                switch (activeChannelsHubsState) {
                     case HubConnectionState.Connected:
                       return <div className="bg-green-600 animate-pulse size-[6px] shrink-0 rounded-full text-xs font-semibold"/>
                     case HubConnectionState.Disconnected:
@@ -72,21 +76,28 @@ export default function StatusBar({loadingChannels, channelsLength}:StatusBarPro
             
 
         
-            <>
-              <div className="w-full flex flex-col">
-                <p className="text-xs">{connectionStatus.toString() } {connectionStatus === HubConnectionState.Connected && "as @" + username}</p>
+          <>
+            <div className="w-full flex flex-col">
+              <p className="text-xs">{activeChannelsHubsState.toString() } {activeChannelsHubsState === HubConnectionState.Connected && "as @" + username}</p>
+             
+              {
+                activeChannels.length !== channels.length && !registeringToChannels ?
                 <label className="text-xs">
-                  {loadingChannels
+                  We couldn't connect to some of your channels. Reload this page.
+                </label>:
+                <label className="text-xs">
+                  {registeringToChannels
                     ? "Connecting to channels..."
-                    : `Connected to ${channelsLength} channels`}
+                    : `Connected to ${activeChannels.length} channels`
+                  }
                 </label>
-              </div>
-              <div></div>
-            </>
-
-          <IconButton tooltipText={connectionStatus === HubConnectionState.Connected ? "Disconnect" : "Connect"} onClick={switchConnection}>
-                    {connectionStatus === HubConnectionState.Disconnected ? <PlugIcon className="size-[18px]"/> : <Unplug className="size-[18px]"/>}
-          </IconButton>
+              }
+            
+            </div>
+            <div></div>
+          </>
+          
+      
           
         </div>
       )}

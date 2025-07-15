@@ -1,6 +1,5 @@
 import { addToast } from "@heroui/toast";
 import { cn } from "@heroui/theme";
-import { useSound } from 'react-sounds';
 
 interface ToastConfig {
   title: string;

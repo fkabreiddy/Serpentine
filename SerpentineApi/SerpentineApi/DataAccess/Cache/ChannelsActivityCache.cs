@@ -41,7 +41,7 @@ public class ChannelsActivityCache
     public bool RemoveUser(string channelId, string userId)
     {
 
-        if (ActiveChannels.TryGetValue(userId, out var usersSet))
+        if (ActiveChannels.TryGetValue(channelId, out var usersSet))
         {
             lock (usersSet)
             {
@@ -63,10 +63,8 @@ public class ChannelsActivityCache
             lock (channelsSet)
             {
 
-                if (!channelsSet.Remove(channelId))
-                {
-                    return false;
-                }
+                channelsSet.Remove(channelId);
+              
                 
             }
             
@@ -104,7 +102,22 @@ public class ChannelsActivityCache
             {
                 foreach (var channel in channelsSet)
                 {
-                    channelsSet.Remove(userId);
+                    if (ActiveChannels.TryGetValue(channel, out var usersSet))
+                    {
+                        var removed = usersSet.RemoveWhere(x => x == userId);
+
+                        if (usersSet.Count == 0)
+                        {
+                            ActiveChannels.TryRemove(channel, out _);
+                        }
+
+
+
+                    }
+                    else
+                    {
+                        return false;
+                    }
 
                 }
             }

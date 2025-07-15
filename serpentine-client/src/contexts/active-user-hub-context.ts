@@ -1,29 +1,32 @@
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
 import { create } from "zustand";
 
-interface ActiveUserHub{
-
-    hub: HubConnection;
-}
 
 interface ActiveUserHubContext{
 
-    connection : ActiveUserHub | null;
-    connectionStatus: HubConnectionState | HubConnectionState.Disconnected;
-    setConnection: (updates: Partial<ActiveUserHub>) => void;
+    activeUserHubConnectionState: HubConnectionState
+    activeUsersHub: HubConnection | null
+    setConnection: (hub: HubConnection | null) => void;
     quitConnection:()=> void;
+    setConnectionState:(connectionState: HubConnectionState) => void;
+
 }
 
 export const useActiveUserHubStore = create<ActiveUserHubContext>((set)=>({
 
-    connection: null,
-    connectionStatus: HubConnectionState.Disconnected,
-    setConnection: (updates: Partial<ActiveUserHub>) => {
+    activeUsersHub: null,
+    activeUserHubConnectionState: HubConnectionState.Disconnected,
+    setConnection: (hubUpdate: HubConnection | null) => {
         set((state)=>({
-            connection: state.connection
-            ? { ...state.connection, ...updates }
-            : { ...updates } as ActiveUserHub,
-            connectionStatus: state.connection  ? state.connection.hub.state : HubConnectionState.Disconnected
+          ...state,
+          activeUsersHub: hubUpdate
+        }))
+    },
+
+    setConnectionState: (connectionState: HubConnectionState)=> {
+         set((state)=>({
+          ...state,
+          activeUserHubConnectionState: connectionState
         }))
     },
 
@@ -32,8 +35,8 @@ export const useActiveUserHubStore = create<ActiveUserHubContext>((set)=>({
     quitConnection:() =>{
         set((state)=>({
             ...state,
-            connection: null,
-            connectionStatus: HubConnectionState.Disconnected
+            activeUsersHub: null,
+
             
         }))
     }

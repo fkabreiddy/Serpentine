@@ -16,11 +16,10 @@ import Avatar from "boring-avatars";
 interface GroupsContainerProps {
 
     channel: ChannelResponse | null;
-    onClose: () => void;
     
 }
 
-export default function GroupsContainer({channel, onClose}:GroupsContainerProps) {
+export default function GroupsContainer({channel}:GroupsContainerProps) {
 
     const {layout} = useLayoutStore()
     return (
@@ -31,13 +30,14 @@ export default function GroupsContainer({channel, onClose}:GroupsContainerProps)
                     <CoverAvatar pictureUrl={channel.coverPicture} channelName={channel.name}/>                    
                 </div>
             }
+            
             <div className="flex items-center gap-3 w-full justify-between">
                
                 <div className="flex items-center gap-3">
-                    <IconButton placement="right"  onClick={onClose} tooltipText="Add a group" >
+                    <IconButton placement="right"  tooltipText="Add a group" >
                         <PlusIcon className="size-[18px]"  />
                     </IconButton>
-                    <IconButton placement="right"  onClick={onClose} tooltipText="Manage" >
+                    <IconButton placement="right"   tooltipText="Manage" >
                         <Settings className="size-[18px]"  />
                     </IconButton>
                 </div>
@@ -52,9 +52,9 @@ export default function GroupsContainer({channel, onClose}:GroupsContainerProps)
                               <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
 
                 {Array.from({ length: 4 }).map((_, idx) => (
-                    <>
-                        {layout.sideBarExpanded ? <GroupCard key={idx} /> : <GroupCardMini name={idx.toString()} key={idx} index={idx} /> }
-                    </>
+                
+                    <GroupCard key={idx.toString() + channel?.name} />  
+                    
                 ))}
             </div>
             

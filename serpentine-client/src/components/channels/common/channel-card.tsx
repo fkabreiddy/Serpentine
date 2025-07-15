@@ -62,12 +62,12 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
                 {channel.coverPicture ? (
                   <Image
                     src={channel.coverPicture || "/placeholder.svg"}
-                    className={`shrink-0 ${layout.sideBarExpanded ? "size-[40px]" : "size-[28px]"}  rounded-full `}
+                    className={`shrink-0 ${layout.sideBarExpanded ? "!size-[40px] min-w-[40px] min-h-[40px] max-w-[40px] min-h-[40px]" : "!size-[28px] min-w-[28px] min-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
                   />
                 ) : (
                   <Avatar
                     size={layout.sideBarExpanded ? 40 : 28}
-                    className={`shrink-0 ${layout.sideBarExpanded ? "size-[40px]" : "size-[28px]"}`}
+                    className={`shrink-0 ${layout.sideBarExpanded ? "!size-[40px] min-w-[40px] min-h-[40px] max-w-[40px] min-h-[40px]" : "!size-[28px] min-w-[28px] min-h-[28px] max-w-[28px] min-h-[28px]"}`}
                     variant="marble"
                     name={channel.name}
                   />

@@ -10,7 +10,7 @@ interface Layout {
 interface LayoutState {
     layout: Layout;
     setLayout: (updates: Partial<Layout>) => void;
-    setNewChannel: (channel: ChannelResponse | null) => void;
+    setNewChannel: (channel: ChannelResponse | null) => void | Promise<void>;
     newChannel: ChannelResponse | null
     
 }

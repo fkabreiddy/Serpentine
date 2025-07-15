@@ -13,7 +13,8 @@ import Avatar from "boring-avatars";
 import { Image } from "@heroui/image";
 import IconButton from "@/components/common/icon-button";
 import { AppWindowMacIcon, ImageIcon } from "lucide-react";
-
+import Noise from "@/components/common/noise-ext";
+import { error } from "console";
 interface CreateChannelFormProps {
 
     onCreate: (channel: ChannelResponse) => void;
@@ -36,18 +37,30 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
         setValue,
         formState: { errors, isValid },
     } = useForm({
-        
         resolver: zodResolver(createChannelSchema),
         mode: "onChange",
-        
         defaultValues: {
-            adultContent:false,
+            adultContent: false,
             description: "",
-            name:""
+            name: "",
+            bannerPictureFile: null,
+            coverPictureFile: null
         }
-        
-
     });
+
+    // To display all form errors (for debugging or UI display)
+    // Example: render a list of error messages above the form
+    const renderFormErrors = () => (
+        <div>
+            {Object.entries(errors).map(([field, error]) =>
+                error?.message ? (
+                    <div key={field} className="text-red-500 text-xs mb-1">
+                        {error.message as string}
+                    </div>
+                ) : null
+            )}
+        </div>
+    );
 
     const handleCoverInputClicked = () => {
         coverInput.current?.click();
@@ -170,8 +183,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                 <h2 className="text-md font-semibold max-md:text-center">Creating a Channel</h2>
                 <p className="text-xs opacity-45 max-md:text-center">Creating a channel makes you the owner of it. Be sure that your channel name is unique when creating it. You can change any information previously</p>
             </div>
-
-             
+           
               <form onSubmit={handleSubmit(data => submit(data))}  className="w-full relative  flex flex-col gap-3 mt-4">
                 
                 <div className="flex flex-col w-full gap-2 relative mt-2 mb-2">
@@ -180,13 +192,13 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                     
                 </div>
                <div className="flex items-center gap-2 mb-4">
-                        <IconButton onClick={() => watch("coverPictureFile") ? handleFileRemoved("coverPictureFile") : handleCoverInputClicked} tooltipText={"Change cover picture"} className="bg-default-100/80 hover:bg-default-100/90 dark:bg-neutral-950/80 dark:hover:bg-neutral-950/90" >
+                        <IconButton type="button"  onClick={() => watch("coverPictureFile") ? handleFileRemoved("coverPictureFile") : handleCoverInputClicked} tooltipText={"Change cover picture"} className="bg-default-100/80 hover:bg-default-100/90 dark:bg-neutral-950/80 dark:hover:bg-neutral-950/90" >
                             <ImageIcon
                                 className= {`size-[18px] ${watch("coverPictureFile") ? "text-red-500" : ""}`}
                                 onClick={handleCoverInputClicked}
                                 />
                         </IconButton>
-                        <IconButton onClick={() => watch("bannerPictureFile") ? handleFileRemoved("bannerPictureFile") : handleBannerInputClicked} tooltipText={"Change banner picture"} className="bg-default-100/80 hover:bg-default-100/90 dark:bg-neutral-950/80 dark:hover:bg-neutral-950/90" >
+                        <IconButton type="button" onClick={() => watch("bannerPictureFile") ? handleFileRemoved("bannerPictureFile") : handleBannerInputClicked} tooltipText={"Change banner picture"} className="bg-default-100/80 hover:bg-default-100/90 dark:bg-neutral-950/80 dark:hover:bg-neutral-950/90" >
                             <AppWindowMacIcon
                                 className= {`size-[18px] ${watch("bannerPictureFile") ? "text-red-500" : ""}`}
                                 onClick={handleBannerInputClicked}
@@ -197,7 +209,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
               <Input
                     label="Channel name"
                     type="text"
-                    placeholder="my.awesome.channel"
+                    placeholder="my_awesome_channel"
                     minLength={3}
                     maxLength={100}
                     value={watch("name")}
@@ -240,9 +252,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                     isDisabled={!isValid || creatingChannel}
                     type="submit"
                     isLoading={creatingChannel}
-                    className={`w-full backdrop-blur-xl bg-default-100/80 ${
-                        !isValid ? "opacity-50" : ""
-                    } max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
+                    className={`w-full backdrop-blur-xl bg-default-100/80  max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
                 >
                     <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
                     Create Channel
@@ -279,15 +289,26 @@ interface BannerProps {
 }
 
 const Banner: React.FC<BannerProps> = ({ file }) => (
-    <div className="w-full rounded-sm dark:bg-neutral-950 bg-neutral-100  h-[100px] ">
-        {file && 
+    <div className="w-full rounded-md dark:bg-neutral-950 bg-neutral-100  h-[100px] ">
+        {file ?
             <img
     
     
             className="rounded-sm w-full h-full    object-cover flex-shrink-0 "
             src={file instanceof File ? window.URL.createObjectURL(file) : ""}            
     
-         /> 
+         />  :
+         <Noise
+         
+         
+            patternSize={250}
+            patternScaleX={0}
+            patternScaleY={0}
+            patternRefreshInterval={2}
+            patternAlpha={10}
+            height="100%"
+            width="100%"
+        />
         }
          
     </div>

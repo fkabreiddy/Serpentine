@@ -6,11 +6,16 @@ import LoginLayout from "./layouts/login-layout";
 import DefaultLayout from "./layouts/default";
 import { AuthorizeView } from "./components/common/authorize-view";
 import ChatroomPage from "./pages/chatroom-page";
+import ClickSpark from "./components/common/spark-click";
+import { useEffect, useState } from "react";
 
 
 function App() {
+
+  
   return (
-    <Routes>
+   
+       <Routes>
       <Route 
         element={
           <LoginLayout>
@@ -45,6 +50,7 @@ function App() {
       </Route>
 
     </Routes>
+   
   );
 }
 

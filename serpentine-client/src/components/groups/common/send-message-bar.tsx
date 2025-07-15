@@ -1,17 +1,10 @@
 import IconButton from "@/components/common/icon-button";
+import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
-import { useAuthStore } from "@/contexts/authentication-context";
-import { DocumentPlusIcon } from "@heroicons/react/24/solid";
-import { Textarea } from "@heroui/input"
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { Skeleton } from "@heroui/skeleton";
-import { Spinner } from "@heroui/spinner";
 import { HubConnectionState } from "@microsoft/signalr";
-import Avatar from "boring-avatars";
-import { ArrowRight, Badge, FilePlusIcon, ImagePlus, Send, SendIcon } from "lucide-react";
+import { ArrowRight, FilePlusIcon, ImagePlus } from "lucide-react";
 import { motion } from "motion/react";
-import React, { useRef, useState } from "react"
-import { Tooltip } from "recharts";
+import { useRef } from "react"
 
 export default function SendMessageBar()
 {
@@ -23,11 +16,11 @@ export default function SendMessageBar()
             element.style.height = (element.scrollHeight) + "px"
     }
      
-    const {connection, connectionStatus} = useActiveUserHubStore();
+    const {activeChannelsHub, activeChannelsHubsState} = useActiveChannelsHubStore();
     return(
         <div className="  w-full  pb-4 py-2 px-3  absolute left-0 bottom-0 flex flex-col items-center">
             
-            <div className="w-[70%] shadow-inner dark:shadow-neutral-900/70 shadow-neutral-100/70 backdrop-blur-xl backdrop-opacity-70  h-fit max-h-[400px] dark:bg-neutral-950/20 bg-neutral-50/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900/70 border-neutral-100/70 ">
+            <div className="w-[70%] shadow-inner dark:shadow-neutral-900/70 shadow-neutral-100/70 backdrop-blur-xl backdrop-opacity-70  h-fit max-h-[400px] dark:bg-neutral-950/20 bg-neutral-200/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900/70 border-neutral-100/70 ">
 
                 <textarea
                     ref={textArea}
@@ -43,7 +36,7 @@ export default function SendMessageBar()
                 <div className=" w-full flex justify-between items-center gap-2 ">
                     <div className="flex items-center gap-3">
                         {(() => {
-                            switch (connectionStatus) {
+                            switch (activeChannelsHubsState) {
                                 case HubConnectionState.Connected:
                                 return <p className="text-green-600 animate-pulse shrink-0  text-xs font-normal">Listening</p>
                                 case HubConnectionState.Disconnected:

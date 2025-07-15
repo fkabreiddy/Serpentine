@@ -27,7 +27,7 @@ body, html {
     [data-slot="input-wrapper"] {
         box-shadow: none !important;
         
-        @apply border  border-default-foreground/5 !bg-default-50 !bg-opacity-50 !backdrop-blur-3xl ;
+        @apply border  border-default-foreground/5 !bg-neutral-200/50 dark:!bg-neutral-900/50  !backdrop-blur-3xl ;
         
     }
 

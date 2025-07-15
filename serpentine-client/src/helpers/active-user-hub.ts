@@ -8,63 +8,58 @@ import { HubConnectionState } from '@microsoft/signalr';
 
 
 
-interface UseActiveUsersHubOptions {
-    onUserConnected?: (result: HubResult<string>) => void;
-    onUserDisconnected?: (result: HubResult<string>) => void;
-}
-export function useActiveUser({ onUserDisconnected, onUserConnected  }: UseActiveUsersHubOptions) {
-    const { setConnection, quitConnection } = useActiveUserHubStore();
-    const [hubStatus, setHubStatus] = useState<signalR.HubConnectionState>(signalR.HubConnectionState.Disconnected);
-    const hubRef = useRef<signalR.HubConnection | null>(null);
 
-    useEffect(() => {
-        return () => {
-            hubRef.current?.stop();
-            hubRef.current = null;
-            quitConnection();
-        };
-    }, []);
+export function useActiveUser() {
+    const { setConnection, quitConnection, setConnectionState, activeUsersHub } = useActiveUserHubStore();
+    const alreadyRendered = useRef<boolean>();
 
-    useEffect(() => {
-        if (hubRef.current) {
-            setConnection({ hub: hubRef.current });
-        } else {
-            quitConnection();
+    useEffect(()=>{
+        if(!alreadyRendered.current)
+        {
+            connectToActiveUsersHub();
+            alreadyRendered.current = true;
         }
-    }, [hubStatus, hubRef]);
+    },[])
+
+    useEffect(()=>{
+
+        if(activeUsersHub)
+        {
+            setConnectionState(activeUsersHub.state);
+        }
+        else{
+            setConnectionState(HubConnectionState.Disconnected);
+        }
+    },[activeUsersHub?.state])
+    
 
     const registerHandlers = () => {
-        const hub = hubRef.current;
-        if (!hub) return;
+        
+        if (!activeUsersHub) return;
 
-        hub.off("SendUserConnected");
-        hub.off("SendUserDisconnected");
-
-        hub.on("SendUserConnected", result => onUserConnected?.(result));
-        hub.on("SendUserDisconnected", result => onUserDisconnected?.(result));
+        activeUsersHub.on("SendUserConnected", result => ()=>{});
+        activeUsersHub.on("SendUserDisconnected", result => ()=>{});
     };
 
     const unregisterHandlers = () =>{
-        const hub = hubRef.current;
-        if (!hub) return;
-
-        hub.off("SendUserConnected");
-        hub.off("SendUserDisconnected");
+        if (!activeUsersHub) return;
+        activeUsersHub.off("SendUserConnected");
+        activeUsersHub.off("SendUserDisconnected");
 
     }
 
-    const disconnect = async () => {
-        if (hubRef.current) {
+    const disconnectFromActiveUsersHub = async () => {
+        if (activeUsersHub) {
             unregisterHandlers();
-            await hubRef.current.stop();
-            hubRef.current = null;
+            await activeUsersHub.stop();
             quitConnection();
+            setConnectionState(HubConnectionState.Disconnected);
             showToast({title: "Disconnected", description: "You were disconnected from serpentine. Try again"})
 
         }
     };
 
-    const connectToApp = async () => {
+    const connectToActiveUsersHub = async () => {
         try{
 
             const token = await getToken();
@@ -76,23 +71,20 @@ export function useActiveUser({ onUserDisconnected, onUserConnected  }: UseActiv
                 .withAutomaticReconnect()
                 .build();
 
-            hub.onreconnecting(() => setHubStatus(signalR.HubConnectionState.Reconnecting));
-            hub.onclose(() => setHubStatus(signalR.HubConnectionState.Disconnected));
+            hub.onreconnecting(() => unregisterHandlers());
+            hub.onclose(() => disconnectFromActiveUsersHub());
             hub.onreconnected(() => {
-                setHubStatus(signalR.HubConnectionState.Connected);
                 registerHandlers();
             });
 
             await hub.start();
 
-            hubRef.current = hub;
             registerHandlers();
-            setConnection({ hub });
-            setHubStatus(signalR.HubConnectionState.Connected);
+            setConnection(hub);
         }
         catch{
 
-            disconnect();
+            disconnectFromActiveUsersHub();
             
         
 
@@ -101,5 +93,5 @@ export function useActiveUser({ onUserDisconnected, onUserConnected  }: UseActiv
         
     };
 
-    return { connectToApp, disconnect };
+    return { disconnectFromActiveUsersHub };
 }

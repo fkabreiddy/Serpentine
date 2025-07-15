@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FeatureScaffolder")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b355ef726393233b8427e3e15bc9f9736e1a469c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7593d1fef1b0dfb46e83d4e77dd7c5dbae4c85dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("FeatureScaffolder")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FeatureScaffolder")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

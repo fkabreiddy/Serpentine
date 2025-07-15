@@ -5,17 +5,16 @@ import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useNavigate } from "react-router-dom";
 
 interface GroupCardProps{
- cover? : string | null, 
+ 
  
 }
 
-const GroupCard : React.FC<GroupCardProps> = ({cover = null}) =>{
+const GroupCard : React.FC<GroupCardProps> = () =>{
 
     const navigate = useNavigate();
-    const {setCurrentGroupId, currentGroupId} = useGlobalDataStore();
     return(
 
-        <div className="relative mb-5 last:mb-0" onClick={()=>{navigate("/group/123")}}>
+        <div  className="relative mb-5 last:mb-0" onClick={()=>{navigate("/group/123")}}>
             <div className="absolute left-0 top-3 w-4 h-[10px] border-b-2 border-l-2  dark:border-neutral-800 border-neutral-200 rounded-bl-2xl" />
            
           <div className="flex transition-all   flex-col items-end w-full">

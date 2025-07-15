@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import { useNavigate } from "react-router-dom";
 import { useLayoutStore } from "@/contexts/layout-context";
@@ -9,7 +9,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useGetChannelsByUserId } from "@/hooks/channel-hooks";
 import { Spinner } from "@heroui/spinner";
-import { CheckIcon, InfoIcon, Layout, Pause, PlayIcon, PlugIcon, Unplug } from "lucide-react";
+import { CheckIcon, InfoIcon, Layout, Pause, PlayIcon, PlugIcon, SearchIcon, Unplug } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import { HubConnectionState } from "@microsoft/signalr";
@@ -19,6 +19,10 @@ import AddIcon from "@fluentui/svg-icons/icons/add_20_filled.svg";
 import { useActiveUser } from "@/helpers/active-user-hub";
 import StatusBar from "./status-bar";
 import GroupsContainer from "@/components/groups/common/groups-container";
+import { useActiveChannels } from "@/helpers/active-channels-hub";
+import { channel } from "diagnostics_channel";
+import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
+import { motion } from "motion/react";
 interface LeftSideBarProps{
 
 }
@@ -36,18 +40,23 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   const [filter, setFilter] = React.useState<string>("");
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [selectedChannel, setSelectedChannel] = useState<ChannelResponse | null>(null);
-  const {getChannelsByUserId, setChannels, channels, loadingChannels, isBusy } = useGetChannelsByUserId();
+  const {getChannelsByUserId, setChannels, channels, loadingChannels, isBusy, hasMore } = useGetChannelsByUserId();
   const {user, username} = useAuthStore();
   const {layout, newChannel, setNewChannel } = useLayoutStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
-  
-  
+  const alreadyMounted = useRef<boolean>(false);
+ 
 
   useEffect(() => {
     if (statusBarRef.current) {
       setStatusBarHeight(statusBarRef.current.offsetHeight);
     }
+
+    alreadyMounted.current = true;
+
+    
+
   }, [isMounted]);
   
   useEffect(()=>{
@@ -63,8 +72,10 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   useEffect(()=>{
 
     setSelectedChannel(channels[0]);
+    
   },[channels])
 
+ 
   function handleChannelCreated(channel : ChannelResponse){
 
     setChannels(prev => [...prev, channel]);
@@ -74,8 +85,8 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
  
     useEffect(() => {
         if (user && !loadingChannels && !isBusy && !hasFetched.current) {
-        hasFetched.current = true;
-        fetchChannels();
+          hasFetched.current = true;
+          fetchChannels();
         }
     }, [user]);
 
@@ -91,6 +102,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   useEffect(() => {
     setIsMounted(true);
+
+   
+
   }, []);
 
  
@@ -136,9 +150,21 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
           />
         )}
         {layout.sideBarExpanded && selectedChannel && <GroupsContainer channel={selectedChannel}/>}
+        {!selectedChannel && layout.sideBarExpanded && !loadingChannels &&
+                    
+            <div className="h-full w-full flex items-center justify-center">
+                <p className="text-xs text-center">Seems you dont hav any channel yet</p>
+            </div>
+        
+        
+        }
+        {!selectedChannel && layout.sideBarExpanded && loadingChannels && <Spinner className="absolute top-1/2 left-1/2" size="sm" variant="spinner"/>}
+
+        
       </ScrollShadow>
+    
+      {!hasMore && !loadingChannels && !isBusy &&   <StatusBar channels={channels} />}
       
-     <StatusBar channelsLength={channels.length} loadingChannels={loadingChannels} />
     </div>
     </>
   )

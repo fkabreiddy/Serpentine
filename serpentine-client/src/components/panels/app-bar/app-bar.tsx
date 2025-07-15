@@ -29,28 +29,31 @@ interface ProfilePanelProps{
 
 const AppBar: React.FC<ProfilePanelProps> = () =>{
 
-    const {userPofilePicture, user, username, setUser, isAuthenticated } = useAuthStore();
-    const [imActive, setImActive] = useState<boolean>(false);
-   const {connection, connectionStatus} = useActiveUserHubStore();
+const {userPofilePicture, user, username, setUser, isAuthenticated } = useAuthStore();
+   const {activeUserHubConnectionState, activeUsersHub} = useActiveUserHubStore();
    const alreadyMounted = useRef<boolean>(false);
    const {currentGroupId} = useGlobalDataStore();
 
-    useEffect(()=>{
-
-        setImActive(connectionStatus === HubConnectionState.Connected)
-    },[connectionStatus])
+    
    
 
-    const { connectToApp, disconnect } = useActiveUser({
-
-        onUserConnected:()=>{},
-        onUserDisconnected:()=>{}
-    }); 
+    const {disconnectFromActiveUsersHub}= useActiveUser();
     const {closeSession} = useCloseSession();
     const isMobile = useIsMobile();
    
     
-    
+    const getConnectionStateText  = () : "success" | "danger" | "warning" | "default" | "primary" | "secondary" =>{
+        switch (activeUserHubConnectionState) {
+            case HubConnectionState.Connected:
+                return "success";
+            case HubConnectionState.Disconnected:
+                return "danger";
+            case HubConnectionState.Reconnecting:
+                return "secondary";
+            default:
+                return "default";
+        }
+    }
     
     useEffect(()=>{
 
@@ -60,25 +63,12 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
     useEffect(()=>{
 
-        const disconnectApp = async () =>{
-            await disconnect();
-        }
+       
         if(!isAuthenticated)
         {
-            disconnectApp();
+            disconnectFromActiveUsersHub();
             closeSession();
         }
-
-        const connect = async () =>{
-            await connectToApp();
-        } 
-
-        if(!alreadyMounted.current)
-        {
-            connect();
-
-        }
-        alreadyMounted.current = true;
 
         
 
@@ -86,7 +76,7 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
 
     return(
 
-        <nav id="app-bar" className=" z-[10]  bg-white dark:bg-black   sticky top-0 w-full    border-b border-default-100 flex items-center px-3 py-2 max-md:justify-end justify-between gap-3 h-fit transition-all">
+        <nav id="app-bar" className=" z-[10]  bg-white dark:bg-neutral-950/50   sticky top-0 w-full    border-b border-default-100 flex items-center px-3 py-2 max-md:justify-end justify-between gap-3 h-fit transition-all">
                 <div className="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-opacity-70   z-[-1]"/>
 
                 <div className="doodle-pattern -z-[10]"/>
@@ -107,10 +97,9 @@ const AppBar: React.FC<ProfilePanelProps> = () =>{
                 
                 <NotificationsIcon/>
                
-                {!isAuthenticated || !connection || connectionStatus !== HubConnectionState.Connected ? 
-                    <Skeleton className="size-[28px] shrink-0 rounded-full" /> : 
-                    <Tooltip content={connectionStatus.toString()} placement="bottom" size="sm" showArrow={true} >
-                        <Badge color={connectionStatus === HubConnectionState.Connected ? "success" : "danger"} content="" isDot={true} placement="bottom-left">
+                {isAuthenticated &&
+                    <Tooltip content={activeUserHubConnectionState.toString()} placement="bottom" size="sm" showArrow={true} >
+                        <Badge color={getConnectionStateText()} content="" isDot={true} placement="bottom-left">
                             <div className="cursor-pointer flex items-center justify-center rounded-full   transition-all text-sm font-semibold">
                                 {userPofilePicture ? 
                                         <Image isBlurred src="userProfilePicture" width={28} height={28} className="shrink-0 min-w-[28px] min-h-[28px] max-md:!w-[28px] max-md:!h-[28px] rounded-full"/> 
@@ -160,6 +149,8 @@ const NotificationsIcon = () =>(
   
 
 )
+
+
 
 
 interface AvatarDropdownProps{
