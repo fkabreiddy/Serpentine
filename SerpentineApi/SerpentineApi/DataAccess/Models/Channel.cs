@@ -30,7 +30,8 @@ public class Channel : BaseEntity
 
     [NotMapped]
     public ChannelMember MyMember { get; set; } = new();
-    
+
+    [NotMapped] public int UnreadMessages { get; set; } = 0;
     
     
     public ChannelResponse ToResponse() => new() 

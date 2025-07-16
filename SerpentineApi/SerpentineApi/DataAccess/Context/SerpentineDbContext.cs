@@ -7,6 +7,12 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
     public DbSet<User> Users { get; set; }
     public DbSet<Channel> Channels { get; set; }
     public DbSet<ChannelMember> ChannelMembers { get; set; }
+    
+    public DbSet<Group> Groups { get; set; }
+    
+    public DbSet<GroupAccess> GroupAccesses { get; set; }
+    
+    public DbSet<Message> Messages { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(t =>
@@ -98,7 +104,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
 
         modelBuilder.Entity<Group>(entity =>
         {
-
+            entity.Navigation(cm => cm.Channel).AutoInclude().IsRequired();
             entity.Property(o => o.Id)
                 .HasConversion(
                     v => v.ToString(),

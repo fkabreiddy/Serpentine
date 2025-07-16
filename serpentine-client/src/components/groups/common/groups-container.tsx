@@ -1,16 +1,10 @@
 import IconButton from "@/components/common/icon-button";
-import SideBarButton from "@/components/panels/left-pannel/sidebar-button";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { ChannelResponse } from "@/models/responses/channel-response";
-import { ArrowLeft, FolderOpenIcon, Plus, PlusIcon, Settings, X } from "lucide-react";
-import React from "react";
-import openBox from "../../../../public/profile-pictures/open-box-white.png"
-import ChannelCard from "@/components/channels/common/channel-card";
+import { PlusIcon, Settings } from "lucide-react";
 import GroupCard from "./group-card";
-import GroupCardMini from "./group-card-mini";
 import { ChannelBanner } from "@/components/channels/common/channel-banner";
-import { CoverAvatar } from "@/components/channels/common/cover";
-import Avatar from "boring-avatars";
+import { ChannelCover } from "@/components/channels/common/channel-cover";
 
 
 interface GroupsContainerProps {
@@ -27,7 +21,7 @@ export default function GroupsContainer({channel}:GroupsContainerProps) {
             {channel && 
                 <div className="flex flex-col w-full gap-2 relative mt-2 mb-4">
                     <ChannelBanner pictureUrl={channel?.bannerPicture}  />
-                    <CoverAvatar pictureUrl={channel.coverPicture} channelName={channel.name}/>                    
+                    <ChannelCover absolute={true} isSmall={false} pictureUrl={channel.coverPicture} channelName={channel.name}/>                    
                 </div>
             }
             

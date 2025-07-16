@@ -126,7 +126,7 @@ namespace SerpentineApi.Migrations
                     b.HasIndex("ChannelId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Group");
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.GroupAccess", b =>
@@ -158,7 +158,7 @@ namespace SerpentineApi.Migrations
                     b.HasIndex("GroupId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("GroupAccess");
+                    b.ToTable("GroupAccesses");
                 });
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.Message", b =>
@@ -198,7 +198,7 @@ namespace SerpentineApi.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>

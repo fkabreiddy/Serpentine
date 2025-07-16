@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using SerpentineApi.Features.GroupFeatures.Actions;
 
 namespace SerpentineApi.DataAccess.Models;
 
@@ -10,10 +11,31 @@ public class Group : BaseEntity
     public List<GroupAccess> Accesses { get; set; } = new();
     public Channel Channel { get; set; } = null!;
     public Ulid ChannelId { get; set; }
-    
-    
-    [NotMapped]
-    public int MessagesCount { get; set; }
-    
-    
+
+    [NotMapped] public int MessagesCount { get; set; } = 0;
+
+    [NotMapped] public GroupAccess? MyAccess { get; set; } = new();
+    [NotMapped] public int UnreadMessages { get; set; } = 0;
+    [NotMapped] public string ChannelName { get; set; } = "";
+
+
+    public GroupResponse ToResponse() => new()
+    {
+        MyAccess = MyAccess ?? new(),
+        Name = Name,
+        ChannelId = ChannelId,
+        UnreadMessages = UnreadMessages,
+        MessagesCount = MessagesCount,
+        ChannelName = ChannelName,
+    };
+
+    public static Group Create(CreateGroupRequest request) => new()
+    {
+        Name = request.Name.Trim().ToLower(),
+        ChannelId = request.ChannelId,
+        Messages = new(){new (){Content = $"{request.Name} group was created!", IsNotification = true}},
+        Accesses = new (){new (){ UserId = request.CurrentUserId, LastAccess = DateTime.Now}}
+    };
+
+
 }

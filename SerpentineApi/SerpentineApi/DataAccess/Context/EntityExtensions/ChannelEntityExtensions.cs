@@ -8,6 +8,7 @@ public static class ChannelEntityExtensions
    {
       var channels = await channelsContext
          .Include(ch => ch.Members.Where(m => m.UserId == userId))
+         .Include(ch => ch.Groups).ThenInclude(g => g.Accesses.Where(a => a.UserId == userId))
          .AsNoTracking()
          .AsSplitQuery()
          .Where(ch => ch.Members.Any(m => m.UserId == userId))
@@ -26,7 +27,15 @@ public static class ChannelEntityExtensions
             BannerPicture = ch.BannerPicture,
             CoverPicture = ch.CoverPicture,
             Members = ch.Members,
-            MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new()
+            MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
+           UnreadMessages = ch.Groups
+              .SelectMany(g => g.Messages)
+              .Count(m => m.CreatedAt > m.Group.Accesses.Where(gla => gla.UserId == userId)
+                 .Select(gla => gla.LastAccess)
+                 .FirstOrDefault() && m.SenderId != userId),
+                 
+         
+               
 
 
          })
@@ -39,7 +48,7 @@ public static class ChannelEntityExtensions
    {
       var channel = await channelsContext
          .Include(ch => ch.Members.Where(m => m.UserId == userId))
-
+         .Include(ch => ch.Groups).ThenInclude(g => g.Accesses.Where(a => a.UserId == userId))
          .AsNoTracking()
          .AsSplitQuery()
          .Where(ch => ch.Members.Any(m => m.UserId == userId) && ch.Id == channelId)
@@ -55,7 +64,12 @@ public static class ChannelEntityExtensions
             BannerPicture = ch.BannerPicture,
             CoverPicture = ch.CoverPicture,
             Members = ch.Members,
-            MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new()
+            MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new(),
+            UnreadMessages = ch.Groups
+               .SelectMany(g => g.Messages)
+               .Count(m => m.CreatedAt > m.Group.Accesses.Where(gla => gla.UserId == userId)
+                  .Select(gla => gla.LastAccess)
+                  .FirstOrDefault() && m.SenderId != userId),
 
 
          })
@@ -99,7 +113,8 @@ public static class ChannelEntityExtensions
             BannerPicture = ch.BannerPicture,
             CoverPicture = ch.CoverPicture,
             Members = ch.Members,
-            MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new()
+            MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new(),
+            
 
 
          })
