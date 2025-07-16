@@ -130,6 +130,14 @@ internal class GetByUserIdEndpointHandler(
         );
 
 
+        var tasks = channels.Select(async channel =>
+        {
+            channel.UnreadMessages =
+                await context.GroupAccesses.GetMessagesCountByChannelId(channel.Id, request.CurrentUserId, cancellationToken);
+        });
+
+        await Task.WhenAll(tasks);
+        
         var response =  channels.Select(ch => ch.ToResponse()).ToList();
         return response;
     }

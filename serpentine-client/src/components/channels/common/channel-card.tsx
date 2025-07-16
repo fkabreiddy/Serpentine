@@ -60,7 +60,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
 
               
               <div>
-                <ChannelCover absolute={false} channelName={channel.name} isSmall={!layout.sideBarExpanded} pictureUrl={channel.coverPicture} />
+                <ChannelCover unreadMessages={channel.unreadMessages} absolute={false} channelName={channel.name} isSmall={!layout.sideBarExpanded} pictureUrl={channel.coverPicture} />
               </div>
             </Tooltip>
             {layout.sideBarExpanded && (

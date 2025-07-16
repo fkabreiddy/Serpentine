@@ -34,7 +34,7 @@ public class Channel : BaseEntity
     [NotMapped] public int UnreadMessages { get; set; } = 0;
     
     
-    public ChannelResponse ToResponse() => new() 
+    public ChannelResponse ToResponse() => new()
     {
         Id = Id,
         CreatedAt = CreatedAt,
@@ -45,7 +45,8 @@ public class Channel : BaseEntity
         MembersCount = MembersCount,
         MyMember = MyMember.ToResponse(),
         BannerPicture = BannerPicture ?? "",
-        CoverPicture = CoverPicture ?? ""
+        CoverPicture = CoverPicture ?? "",
+        UnreadMessages = UnreadMessages
 
     };
     

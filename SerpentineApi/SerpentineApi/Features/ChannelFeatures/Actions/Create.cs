@@ -128,72 +128,81 @@ internal class CreateChannelRequestHandler(
         CancellationToken cancellationToken = default
     )
     {
+        if (request.CurrentUserId.ToString() == "")
+            return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
 
-        
-             if (request.CurrentUserId.ToString() == "")
-                    return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
-                
-             var channel = Channel.Create(request);
-                
-                
-             var exist = await context.Channels.AnyAsync(ch => ch.Name.ToLower() == channel.Name, cancellationToken:cancellationToken);
-              
-             if(exist)
-                 return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
-                
-             var creation = await context.Channels.AddAsync(channel, cancellationToken);
-             
-             if (request.CoverPictureFile is not null)
-             {
-                 if (await cloudinaryService.UploadImage(request.CoverPictureFile,
-                             CloudinaryFolders.ChannelCovers.ToString(), creation.Entity.Id.ToString())
-                         is var coverUploadResponse && coverUploadResponse.IsSuccess)
-                 {
-                     creation.Entity.CoverPicture = coverUploadResponse.Data;
-                 }
-                 else
-                 {
-                     return new BadRequestApiResult(coverUploadResponse.Message, coverUploadResponse.Errors );
-                 }
-             }
-                
-             if (request.BannerPictureFile is not null)
-             {
-                 if (await cloudinaryService.UploadImage(request.BannerPictureFile,
-                             CloudinaryFolders.ChannelBanners.ToString(), creation.Entity.Id.ToString())
-                         is var bannerUploadResponse && bannerUploadResponse.IsSuccess)
-                 {
-                     creation.Entity.BannerPicture = bannerUploadResponse.Data;
-                 }
-                 else
-                 {
-                     return new BadRequestApiResult(bannerUploadResponse.Message, bannerUploadResponse.Errors );
-                 }
-             }
-                
+        var channel = Channel.Create(request);
+
+        var exist = await context.Channels.AnyAsync(ch => ch.Name.ToLower() == channel.Name, cancellationToken: cancellationToken);
+
+        if (exist)
+            return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
+
+        // Start transaction
+        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            var creation = await context.Channels.AddAsync(channel, cancellationToken);
+
+            if (request.CoverPictureFile is not null)
+            {
+                var coverUploadResponse = await cloudinaryService.UploadImage(
+                    request.CoverPictureFile,
+                    CloudinaryFolders.ChannelCovers.ToString(),
+                    creation.Entity.Id.ToString()
+                );
+                if (coverUploadResponse.IsSuccess)
+                {
+                    creation.Entity.CoverPicture = coverUploadResponse.Data;
+                }
+                else
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return new BadRequestApiResult(coverUploadResponse.Message, coverUploadResponse.Errors);
+                }
+            }
+
+            if (request.BannerPictureFile is not null)
+            {
+                var bannerUploadResponse = await cloudinaryService.UploadImage(
+                    request.BannerPictureFile,
+                    CloudinaryFolders.ChannelBanners.ToString(),
+                    creation.Entity.Id.ToString()
+                );
+                if (bannerUploadResponse.IsSuccess)
+                {
+                    creation.Entity.BannerPicture = bannerUploadResponse.Data;
+                }
+                else
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return new BadRequestApiResult(bannerUploadResponse.Message, bannerUploadResponse.Errors);
+                }
+            }
+
             await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
-             context.ChangeTracker.Clear();
+            context.ChangeTracker.Clear();
 
+            Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
+                creation.Entity.Id,
+                request.CurrentUserId,
+                cancellationToken
+            );
 
-             Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
-                 creation.Entity.Id,
-                 request.CurrentUserId,
-                 cancellationToken
-                    
-             );
-
-             if (response is null)
-             {
-                 return new NotFoundApiResult("We could not find the channel you created. Try again.");
-
-             }
-             return response.ToResponse();
-
-        
-
-
-
+            if (response is null)
+            {
+                return new NotFoundApiResult("We could not find the channel you created. Try again.");
+            }
+            return response.ToResponse();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
   

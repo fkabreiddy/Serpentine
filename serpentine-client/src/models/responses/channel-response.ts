@@ -9,6 +9,7 @@ export class ChannelResponse extends BaseResponse {
   membersCount: number = 0;
   coverPicture: string | null = null;
   bannerPicture: string | null = null;
+  unreadMessages: numerb = 0;
   readonly userIsOwner: boolean = false;
 
   

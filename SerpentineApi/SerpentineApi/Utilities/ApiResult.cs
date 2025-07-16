@@ -99,7 +99,7 @@ public class BadRequestApiResult : Failure
 
 public class ConflictApiResult  : Failure
 {
-    public ConflictApiResult(string message = "Bad Request", List<string>? messages = null)
+    public ConflictApiResult(string message = "Conflict", List<string>? messages = null)
     {
         Build(message, 404, new(){message});
     }

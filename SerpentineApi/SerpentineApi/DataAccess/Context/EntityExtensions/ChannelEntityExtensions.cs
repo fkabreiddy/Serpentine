@@ -28,12 +28,7 @@ public static class ChannelEntityExtensions
             CoverPicture = ch.CoverPicture,
             Members = ch.Members,
             MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
-           UnreadMessages = ch.Groups
-              .SelectMany(g => g.Messages)
-              .Count(m => m.CreatedAt > m.Group.Accesses.Where(gla => gla.UserId == userId)
-                 .Select(gla => gla.LastAccess)
-                 .FirstOrDefault() && m.SenderId != userId),
-                 
+           
          
                
 
@@ -65,11 +60,7 @@ public static class ChannelEntityExtensions
             CoverPicture = ch.CoverPicture,
             Members = ch.Members,
             MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new(),
-            UnreadMessages = ch.Groups
-               .SelectMany(g => g.Messages)
-               .Count(m => m.CreatedAt > m.Group.Accesses.Where(gla => gla.UserId == userId)
-                  .Select(gla => gla.LastAccess)
-                  .FirstOrDefault() && m.SenderId != userId),
+            
 
 
          })

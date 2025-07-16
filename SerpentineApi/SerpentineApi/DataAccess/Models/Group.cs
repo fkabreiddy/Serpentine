@@ -21,12 +21,17 @@ public class Group : BaseEntity
 
     public GroupResponse ToResponse() => new()
     {
-        MyAccess = MyAccess ?? new(),
+        Id = Id,
+        CreatedAt = CreatedAt,
+        UpdatedAt = UpdatedAt,
+        MyAccessId = MyAccess?.Id ?? Ulid.Empty,
+        MyLasAccess = MyAccess?.LastAccess ?? DateTime.Now,
         Name = Name,
         ChannelId = ChannelId,
         UnreadMessages = UnreadMessages,
         MessagesCount = MessagesCount,
         ChannelName = ChannelName,
+        
     };
 
     public static Group Create(CreateGroupRequest request) => new()
