@@ -4,15 +4,14 @@ namespace SerpentineApi.DataAccess.Models;
 
 public class User : BaseEntity
 {
-
     [Required, MaxLength(30), MinLength(3), RegularExpression(@"^[a-zA-Z0-9._]+$")]
     public string Username { get; set; } = null!;
-    
+
     [Required, MinLength(1)]
     public string Password { get; set; } = null!;
-    
+
     public string? ProfilePictureUrl { get; set; }
-    
+
     [Required, MaxLength(30), MinLength(3)]
     public string FullName { get; set; } = null!;
 
@@ -28,7 +27,7 @@ public class User : BaseEntity
         int edad = hoy.Year - dateOfBirth.Year;
 
         // Si aún no ha cumplido años este año, se resta uno
-        if (dateOfBirth.Date > hoy.AddYears(-edad)) 
+        if (dateOfBirth.Date > hoy.AddYears(-edad))
         {
             edad--;
         }
@@ -36,26 +35,24 @@ public class User : BaseEntity
         return edad;
     }
 
-    public UserResponse ToResponse() => new()
-    {
-        Id = Id,
-        FullName = FullName,
-        Username = Username,
-        ProfilePictureUrl = ProfilePictureUrl ?? "",
-        Age = GetAge(DayOfBirth),
-    };
+    public UserResponse ToResponse() =>
+        new()
+        {
+            Id = Id,
+            FullName = FullName,
+            Username = Username,
+            ProfilePictureUrl = ProfilePictureUrl ?? "",
+            Age = GetAge(DayOfBirth),
+        };
 
-    public static User Create(CreateUserRequest request)
-        => new()
+    public static User Create(CreateUserRequest request) =>
+        new()
         {
             FullName = request.FullName.Trim(),
             Username = request.Username.Trim().ToLower(),
             Password = request.Password.Hash(),
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            DayOfBirth = request.DayOfBirth
+            DayOfBirth = request.DayOfBirth,
         };
-
-
-
 }

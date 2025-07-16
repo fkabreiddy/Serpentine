@@ -9,15 +9,15 @@ public class CustomUserIdProvider : IUserIdProvider
     public string GetUserId(HubConnectionContext connection)
     {
         var user = connection.User;
-        var subClaim = user.FindFirst(JwtRegisteredClaimNames.Sub)
-                       ?? user.FindFirst(ClaimTypes.NameIdentifier);
+        var subClaim =
+            user.FindFirst(JwtRegisteredClaimNames.Sub)
+            ?? user.FindFirst(ClaimTypes.NameIdentifier);
 
         if (subClaim != null && Ulid.TryParse(subClaim.Value, out var uid))
         {
-            return uid.ToString();  
+            return uid.ToString();
         }
 
-       
         throw new UnauthorizedAccessException();
     }
 }

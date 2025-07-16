@@ -70,10 +70,22 @@ internal class Program
                         ISender sender,
                         HttpContext context
                     ) => await executor.ExecuteAsync<{responseClassName}>(async () =>
-                    {{
-                        return ResultsBuilder.Match(new NotFoundApiResult());
+                    {{{{
+                        var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
-                    }})
+                        if (result.IsT1)
+                        {{
+                            var t1 = result.AsT1;
+
+                            return ResultsBuilder.Match(t1);
+
+                        }}
+
+                        var t0 = result.AsT0;
+
+                        return ResultsBuilder.Match<{responseClassName}>(new SuccessApiResult<{responseClassName}>(t0));
+
+                    }}}})
                 )
                 .DisableAntiforgery()
                 .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)

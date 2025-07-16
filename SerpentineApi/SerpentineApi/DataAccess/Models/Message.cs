@@ -8,10 +8,9 @@ public class Message : BaseEntity
     public User? Sender { get; set; }
     public Ulid GroupId { get; set; }
     public Group Group { get; set; } = null!;
-    public Message? Parent {get; set;}
+    public Message? Parent { get; set; }
     public Ulid? ParentId { get; set; }
 
-    public bool IsNotification {get; set;} = false;
-    public List<Message> Replies {get; set;} = new();
-
+    public bool IsNotification { get; set; } = false;
+    public List<Message> Replies { get; set; } = new();
 }

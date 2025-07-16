@@ -8,12 +8,10 @@ namespace SerpentineApi.Identity;
 
 public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
 {
-    
     private JwtSettings _jwtSettings = jwtSettings.Value;
 
     public Jwt? GenerateToken(UserResponse user)
     {
-        
         var securityKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
                 _jwtSettings.Key ?? throw new NullReferenceException(nameof(_jwtSettings.Key))
@@ -28,10 +26,7 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
                 [
                     new Claim(JwtRegisteredClaimNames.Nickname, user.Username),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                    new Claim(
-                        JwtRegisteredClaimNames.Picture,
-                        user.ProfilePictureUrl
-                    ),
+                    new Claim(JwtRegisteredClaimNames.Picture, user.ProfilePictureUrl),
                     new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                 ]
             ),
@@ -45,7 +40,7 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
 
         var token = handler.CreateToken(tokenDescriptor);
 
-        if (token is  null)
+        if (token is null)
         {
             return null;
         }
@@ -54,8 +49,7 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
         {
             Expiration = DateTime.Now.AddDays(7),
             Issuer = _jwtSettings.Issuer,
-            Token = token
+            Token = token,
         };
-     
     }
 }

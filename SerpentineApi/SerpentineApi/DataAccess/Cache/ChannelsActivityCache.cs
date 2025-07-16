@@ -2,7 +2,6 @@
 
 namespace SerpentineApi.DataAccess.Cache;
 
-
 public class ChannelsActivityCache
 {
     private static readonly ConcurrentDictionary<string, HashSet<string>> ActiveChannels = new();
@@ -15,17 +14,16 @@ public class ChannelsActivityCache
 
         lock (userSet)
         {
-            if(!userSet.Add(userId))
+            if (!userSet.Add(userId))
             {
-                return false; 
+                return false;
             }
         }
 
         lock (channelSet)
         {
-            if(!channelSet.Add(channelId))
+            if (!channelSet.Add(channelId))
             {
-                
                 lock (userSet)
                 {
                     userSet.Remove(userId);
@@ -37,10 +35,8 @@ public class ChannelsActivityCache
         return true;
     }
 
-
     public bool RemoveUser(string channelId, string userId)
     {
-
         if (ActiveChannels.TryGetValue(channelId, out var usersSet))
         {
             lock (usersSet)
@@ -56,24 +52,16 @@ public class ChannelsActivityCache
                     return false;
             }
         }
-        
-        
+
         if (ActiveUsers.TryGetValue(userId, out var channelsSet))
         {
             lock (channelsSet)
             {
-
                 channelsSet.Remove(channelId);
-              
-                
             }
-            
-            
         }
 
         return true;
-
-
     }
 
     public int GetUsersCountOnAChannel(string channelId)
@@ -82,13 +70,8 @@ public class ChannelsActivityCache
         {
             lock (set)
             {
-                
-
                 return set.Count;
-
             }
-            
-            
         }
 
         return 0;
@@ -110,23 +93,15 @@ public class ChannelsActivityCache
                         {
                             ActiveChannels.TryRemove(channel, out _);
                         }
-
-
-
                     }
                     else
                     {
                         return false;
                     }
-
                 }
             }
-            
-            
         }
-        
-        return ActiveUsers.TryRemove(userId, out _);
-        
-    }
 
+        return ActiveUsers.TryRemove(userId, out _);
+    }
 }

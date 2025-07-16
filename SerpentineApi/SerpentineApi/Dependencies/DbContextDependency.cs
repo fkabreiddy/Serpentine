@@ -5,7 +5,10 @@ namespace SerpentineApi.Dependencies;
 
 public static class DbContextDependency
 {
-    public static IServiceCollection AddDbContextServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDbContextServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddDbContext<SerpentineDbContext>(options =>
         {
@@ -14,9 +17,7 @@ public static class DbContextDependency
                 warning.Ignore(RelationalEventId.PendingModelChangesWarning)
             );
         });
-        
 
         return services;
-
     }
 }

@@ -10,9 +10,9 @@ public static class EndpointsDependecy
     public static IServiceCollection AddEndpointsDependencies(this IServiceCollection services)
     {
         services.AddTransient(typeof(EndpointExecutor<>));
-        
+
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        
+
         var handlerInterfaceType = typeof(IEndpointHandler<,>);
         var handlerType = Assembly
             .GetCallingAssembly()
@@ -30,7 +30,7 @@ public static class EndpointsDependecy
         {
             services.AddScoped(handler.Interface, handler.Implementation);
         }
-        
+
         services.AddTransient<ISender, Sender>();
 
         services.AddTransient(typeof(EndpointExecutor<>));
@@ -48,7 +48,7 @@ public static class EndpointsDependecy
 
         return services;
     }
-    
+
     public static IApplicationBuilder MapEndpoints(this IApplicationBuilder app)
     {
         app.UseEndpoints(endpoints =>
@@ -58,8 +58,7 @@ public static class EndpointsDependecy
                 endpoint.MapEndpoint(endpoints);
             }
         });
-    
+
         return app;
     }
 }
-

@@ -4,15 +4,11 @@ namespace SerpentineApi.Dependencies;
 
 public static class SignalRDependency
 {
-    public static IServiceCollection AddSignalRServices(
-        this IServiceCollection services)
+    public static IServiceCollection AddSignalRServices(this IServiceCollection services)
     {
         services.AddTransient(typeof(HubExecutor<>));
         services.AddSignalR();
-        
-        
+
         return services;
     }
-    
-    
 }

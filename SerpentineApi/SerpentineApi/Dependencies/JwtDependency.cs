@@ -8,7 +8,7 @@ namespace SerpentineApi.Dependencies;
 
 public static class JwtDependency
 {
-     public static IServiceCollection AddJwtServices(
+    public static IServiceCollection AddJwtServices(
         this IServiceCollection services,
         IConfiguration configuration
     )
@@ -59,21 +59,26 @@ public static class JwtDependency
                     OnChallenge = c =>
                     {
                         c.HandleResponse();
-                        
-                        var hasToken = c.Request.Headers.TryGetValue("Authorization", out var authHeader)
-                                       && !string.IsNullOrWhiteSpace(authHeader)
-                                       && authHeader.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase);
+
+                        var hasToken =
+                            c.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                            && !string.IsNullOrWhiteSpace(authHeader)
+                            && authHeader
+                                .ToString()
+                                .StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase);
 
                         if (!hasToken)
                         {
-                           
                             c.Response.OnStarting(async () =>
                             {
                                 c.Response.StatusCode = 401;
                                 c.Response.ContentType = "application/json";
-                                await c.Response.WriteAsJsonAsync(new UnauthorizedApiResult("The token or the Authorization header is missing"));
+                                await c.Response.WriteAsJsonAsync(
+                                    new UnauthorizedApiResult(
+                                        "The token or the Authorization header is missing"
+                                    )
+                                );
                             });
-
                         }
                         return Task.CompletedTask;
                     },
@@ -83,11 +88,13 @@ public static class JwtDependency
                         {
                             context.Response.StatusCode = 401;
                             context.Response.ContentType = "application/json";
-                            await context.Response.WriteAsJsonAsync(new UnauthorizedApiResult("The token or the Authorization header is missing"));
+                            await context.Response.WriteAsJsonAsync(
+                                new UnauthorizedApiResult(
+                                    "The token or the Authorization header is missing"
+                                )
+                            );
                         });
 
-
-                        
                         return Task.CompletedTask;
                     },
                     OnMessageReceived = context =>

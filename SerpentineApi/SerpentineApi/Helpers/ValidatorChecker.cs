@@ -13,6 +13,5 @@ public static class ValidatorChecker
         }
 
         return true;
-
     }
 }

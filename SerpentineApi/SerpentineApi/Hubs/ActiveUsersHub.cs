@@ -5,7 +5,8 @@ using SerpentineApi.DataAccess.Cache;
 
 namespace SerpentineApi.Hubs;
 
-public sealed class ActiveUsersHub(ActiveUsersCache cache, HubExecutor<ActiveUsersHub> executor) : Hub<IActiveUsersHub>
+public sealed class ActiveUsersHub(ActiveUsersCache cache, HubExecutor<ActiveUsersHub> executor)
+    : Hub<IActiveUsersHub>
 {
     [Authorize(JwtBearerDefaults.AuthenticationScheme)]
     public override async Task OnConnectedAsync()
@@ -22,10 +23,7 @@ public sealed class ActiveUsersHub(ActiveUsersCache cache, HubExecutor<ActiveUse
                 cache.RemoveUser(userId);
                 cache.AddUser(userId, Context.ConnectionId);
                 await Clients.All.SendUserConnected(new HubResult<string>(userId));
-                
-                
             }
-            
         });
     }
 
@@ -34,17 +32,14 @@ public sealed class ActiveUsersHub(ActiveUsersCache cache, HubExecutor<ActiveUse
         await executor.InvokeVoidAsync(async () =>
         {
             var userId = Context.UserIdentifier ?? throw new UnauthorizedAccessException();
-            if(cache.RemoveUser(userId))
+            if (cache.RemoveUser(userId))
                 await Clients.All.SendUserDisconnected(new HubResult<string>(userId));
-            
         });
     }
 }
 
 public interface IActiveUsersHub
 {
-    
     Task SendUserConnected(HubResult<string> result);
     Task SendUserDisconnected(HubResult<string> result);
 }
-

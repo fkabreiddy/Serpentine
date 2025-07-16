@@ -4,49 +4,35 @@ using Microsoft.EntityFrameworkCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
 
 namespace SerpentineApi.Features.ChannelFeatures.Queries;
+
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 
-
-
-
 public class GetByUserIdRequest : IRequest<OneOf<List<ChannelResponse>, Failure>>
 {
-
     [BindNever, JsonIgnore]
     public Ulid CurrentUserId { get; private set; }
-    
-    [Required, 
-     FromQuery(Name = "take"),
-     JsonPropertyName("take"),
-     Range(1, 5)]
+
+    [Required, FromQuery(Name = "take"), JsonPropertyName("take"), Range(1, 5)]
     public int Take { get; set; } = 0;
-    
-    [Required, 
-     FromQuery(Name = "skip"),
-     JsonPropertyName("skip"),
-     Range(0, int.MaxValue )]
+
+    [Required, FromQuery(Name = "skip"), JsonPropertyName("skip"), Range(0, int.MaxValue)]
     public int Skip { get; set; } = 0;
 
     public void SetCurentUerId(Ulid userId)
     {
         CurrentUserId = userId;
     }
-
-  
 }
 
 public class GetByUserIdValidator : AbstractValidator<GetByUserIdRequest>
 {
     public GetByUserIdValidator()
     {
-       
-        RuleFor(x => x.Take)
-            .InclusiveBetween(1, 5)
-            .WithMessage("Take should be between 1 and 5");
+        RuleFor(x => x.Take).InclusiveBetween(1, 5).WithMessage("Take should be between 1 and 5");
 
         RuleFor(x => x.Skip)
             .GreaterThanOrEqualTo(0)
@@ -54,11 +40,10 @@ public class GetByUserIdValidator : AbstractValidator<GetByUserIdRequest>
     }
 }
 
-
 internal class GetByUserIdEndpoint : IEndpoint
 {
     private readonly ChannelEndpointSettings _settings = new();
-    
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(
@@ -66,15 +51,16 @@ internal class GetByUserIdEndpoint : IEndpoint
                 async (
                     [AsParameters] GetByUserIdRequest command,
                     EndpointExecutor<GetByUserIdEndpoint> executor,
-                     CancellationToken cancellationToken,
-                     ISender sender,
+                    CancellationToken cancellationToken,
+                    ISender sender,
                     HttpContext context
                 ) =>
                 {
                     return await executor.ExecuteAsync<List<ChannelResponse>>(async () =>
                     {
-
-                        command.SetCurentUerId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
+                        command.SetCurentUerId(
+                            UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
+                        );
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {
@@ -87,31 +73,26 @@ internal class GetByUserIdEndpoint : IEndpoint
                         return Results.Ok(new SuccessApiResult<List<ChannelResponse>>(channels));
                     });
                 }
-        )
-        .DisableAntiforgery()
-        .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
-        .Experimental()
-        .WithOpenApi()
-        .WithTags(new []{"GET", $"{nameof(Channel)}"})
-        .RequireCors()
-        .Accepts<GetByUserIdRequest>(false, "application/json")
-        .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
-        .Produces<BadRequestApiResult>(400, "application/json")
-        .Produces<ServerErrorApiResult>(500, "application/json")
-        .Produces<ValidationApiResult>(422, "application/json")
-        .WithDescription($"Return a list of {nameof(ChannelResponse)} where the user is member of. Requires {nameof(GetByUserIdRequest)}. Returns a list of {nameof(ChannelResponse)}")
-        .WithName(nameof(GetByUserIdEndpoint));
+            )
+            .DisableAntiforgery()
+            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .Experimental()
+            .WithOpenApi()
+            .WithTags(new[] { "GET", $"{nameof(Channel)}" })
+            .RequireCors()
+            .Accepts<GetByUserIdRequest>(false, "application/json")
+            .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
+            .Produces<BadRequestApiResult>(400, "application/json")
+            .Produces<ServerErrorApiResult>(500, "application/json")
+            .Produces<ValidationApiResult>(422, "application/json")
+            .WithDescription(
+                $"Return a list of {nameof(ChannelResponse)} where the user is member of. Requires {nameof(GetByUserIdRequest)}. Returns a list of {nameof(ChannelResponse)}"
+            )
+            .WithName(nameof(GetByUserIdEndpoint));
     }
-
-  
-
-
 }
 
-internal class GetByUserIdEndpointHandler(
-    SerpentineDbContext context
-
-    )
+internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
     : IEndpointHandler<GetByUserIdRequest, OneOf<List<ChannelResponse>, Failure>>
 {
     public async Task<OneOf<List<ChannelResponse>, Failure>> HandleAsync(
@@ -129,18 +110,18 @@ internal class GetByUserIdEndpointHandler(
             request.Take
         );
 
-
         var tasks = channels.Select(async channel =>
         {
-            channel.UnreadMessages =
-                await context.GroupAccesses.GetMessagesCountByChannelId(channel.Id, request.CurrentUserId, cancellationToken);
+            channel.UnreadMessages = await context.GroupAccesses.GetMessagesCountByChannelId(
+                channel.Id,
+                request.CurrentUserId,
+                cancellationToken
+            );
         });
 
         await Task.WhenAll(tasks);
-        
-        var response =  channels.Select(ch => ch.ToResponse()).ToList();
+
+        var response = channels.Select(ch => ch.ToResponse()).ToList();
         return response;
     }
-
-  
 }

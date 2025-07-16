@@ -7,5 +7,4 @@ public class GroupAccess : BaseEntity
     public Ulid UserId { get; set; }
     public User User { get; set; } = null!;
     public DateTime LastAccess { get; set; }
-    
 }

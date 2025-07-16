@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SerpentineApi.Helpers
 {
-    public  class UlidHelper
+    public class UlidHelper
     {
         public static bool IsValid(Ulid ulid)
         {
@@ -19,10 +19,7 @@ namespace SerpentineApi.Helpers
                 return false;
             }
 
-            
-
             return true;
-
         }
     }
 }

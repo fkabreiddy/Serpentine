@@ -3,10 +3,8 @@ using SerpentineApi.Helpers;
 
 namespace SerpentineApi.Features;
 
-public class Sender (IServiceProvider serviceProvider) : ISender
+public class Sender(IServiceProvider serviceProvider) : ISender
 {
-    
-
     public async Task<TResponse> SendAndValidateAsync<TResponse>(
         IRequest<TResponse> command,
         CancellationToken cancellationToken = default

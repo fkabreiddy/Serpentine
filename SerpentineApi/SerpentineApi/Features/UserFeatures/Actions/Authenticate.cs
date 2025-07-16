@@ -10,9 +10,14 @@ namespace SerpentineApi.Features.UserFeatures.Actions;
 
 public class AuthenticateUserRequest : IRequest<OneOf<UserResponse, Failure>>
 {
-
-    [Required, FromBody, JsonPropertyName("userName"), MaxLength(30), MinLength(3),
-     RegularExpression("^[a-zA-Z0-9._]+$")]
+    [
+        Required,
+        FromBody,
+        JsonPropertyName("userName"),
+        MaxLength(30),
+        MinLength(3),
+        RegularExpression("^[a-zA-Z0-9._]+$")
+    ]
     public string Username { get; set; } = null!;
 
     [Required, FromBody, MaxLength(30), JsonPropertyName("password"), MinLength(8)]
@@ -23,7 +28,6 @@ public class AuthenticateUserRequestValidator : AbstractValidator<AuthenticateUs
 {
     public AuthenticateUserRequestValidator()
     {
-    
         RuleFor(x => x.Username)
             .NotEmpty()
             .WithMessage("Username is required")
@@ -31,22 +35,19 @@ public class AuthenticateUserRequestValidator : AbstractValidator<AuthenticateUs
             .WithMessage("Username must be between 3 and 30 characters")
             .Matches(@"^[a-zA-Z0-9._]+$")
             .WithMessage("Username can only contain letters, numbers, dots and underscores");
-        
 
         RuleFor(x => x.Password)
             .NotEmpty()
             .WithMessage("Password is required")
             .Length(8, 30)
             .WithMessage("Password must be between 8 and 30 characters");
-    
     }
 }
-
 
 internal class AuthenticateUserEndpoint : IEndpoint
 {
     private readonly UserEndpointSettings _settings = new();
-    
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(
@@ -54,15 +55,13 @@ internal class AuthenticateUserEndpoint : IEndpoint
                 async (
                     [FromBody] AuthenticateUserRequest command,
                     EndpointExecutor<AuthenticateUserEndpoint> executor,
-                     CancellationToken cancellationToken,
-                     ISender sender,
+                    CancellationToken cancellationToken,
+                    ISender sender,
                     JwtBuilder builder
                 ) =>
                 {
                     return await executor.ExecuteAsync<Jwt>(async () =>
                     {
-                        
-
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {
@@ -77,38 +76,40 @@ internal class AuthenticateUserEndpoint : IEndpoint
 
                         if (token is null)
                         {
-                            return Results.BadRequest(new BadRequestApiResult(){Message = "Error creating token"});
+                            return Results.BadRequest(
+                                new BadRequestApiResult() { Message = "Error creating token" }
+                            );
                         }
-                        
-                        return Results.Ok(new SuccessApiResult<Jwt>(token, "Login Successful. Welcome to Serpentine"));
+
+                        return Results.Ok(
+                            new SuccessApiResult<Jwt>(
+                                token,
+                                "Login Successful. Welcome to Serpentine"
+                            )
+                        );
                     });
                 }
-        )
-        .DisableAntiforgery()
-        .AllowAnonymous()
-        .RequireCors()
-        .WithOpenApi()
-        .WithTags(new []{"POST", $"{nameof(User)}"})
-        .Accepts<AuthenticateUserRequest>(false, "application/json")
-        .Produces<SuccessApiResult<Jwt>>(200, "application/json")
-        .Produces<NotFoundApiResult>(404, "application/json")
-        .Produces<BadRequestApiResult>(400, "application/json")
-        .Produces<ServerErrorApiResult>(500, "application/json")
-        .Produces<ValidationApiResult>(422, "application/json")
-        .Stable()
-        .WithDescription($"Authenticates an user based on the credentials. Requires a {nameof(AuthenticateUserRequest)}. Returns {nameof(Jwt)}")
-        .WithName(nameof(AuthenticateUserEndpoint));
+            )
+            .DisableAntiforgery()
+            .AllowAnonymous()
+            .RequireCors()
+            .WithOpenApi()
+            .WithTags(new[] { "POST", $"{nameof(User)}" })
+            .Accepts<AuthenticateUserRequest>(false, "application/json")
+            .Produces<SuccessApiResult<Jwt>>(200, "application/json")
+            .Produces<NotFoundApiResult>(404, "application/json")
+            .Produces<BadRequestApiResult>(400, "application/json")
+            .Produces<ServerErrorApiResult>(500, "application/json")
+            .Produces<ValidationApiResult>(422, "application/json")
+            .Stable()
+            .WithDescription(
+                $"Authenticates an user based on the credentials. Requires a {nameof(AuthenticateUserRequest)}. Returns {nameof(Jwt)}"
+            )
+            .WithName(nameof(AuthenticateUserEndpoint));
     }
-
-  
-
-
 }
 
-internal class AuthenticateUserRequestHandler(
-    SerpentineDbContext context
-
-    )
+internal class AuthenticateUserRequestHandler(SerpentineDbContext context)
     : IEndpointHandler<AuthenticateUserRequest, OneOf<UserResponse, Failure>>
 {
     public async Task<OneOf<UserResponse, Failure>> HandleAsync(
@@ -116,17 +117,19 @@ internal class AuthenticateUserRequestHandler(
         CancellationToken cancellationToken = default
     )
     {
-
         var hashedPassword = request.Password.Hash();
-        var user = await context.Users.AsNoTracking().FirstOrDefaultAsync(
-            u => u.Username.Trim().ToLower() == request.Username.ToLower().Trim() && u.Password == hashedPassword,
-            cancellationToken: cancellationToken);
-        
+        var user = await context
+            .Users.AsNoTracking()
+            .FirstOrDefaultAsync(
+                u =>
+                    u.Username.Trim().ToLower() == request.Username.ToLower().Trim()
+                    && u.Password == hashedPassword,
+                cancellationToken: cancellationToken
+            );
+
         if (user is null)
             return new NotFoundApiResult("Invalid credentials");
 
         return user.ToResponse();
     }
-
-  
 }

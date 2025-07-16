@@ -3,7 +3,6 @@ using System.Text;
 
 namespace SerpentineApi.Utilities;
 
-
 public static class Hasher
 {
     public static string Hash(this string password)
@@ -15,4 +14,3 @@ public static class Hasher
         return BitConverter.ToString(data).Replace("-", string.Empty).ToLower();
     }
 }
-

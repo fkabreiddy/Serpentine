@@ -9,5 +9,5 @@ public enum CloudinaryFolders
 {
     ProfilePictures,
     ChannelBanners,
-    ChannelCovers
+    ChannelCovers,
 }

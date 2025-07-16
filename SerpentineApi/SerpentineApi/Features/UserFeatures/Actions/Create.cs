@@ -10,28 +10,54 @@ using SerpentineApi.Services.CloudinaryStorage;
 
 namespace SerpentineApi.Features.UserFeatures.Actions;
 
-
 public class CreateUserRequest : IRequest<OneOf<UserResponse, Failure>>
 {
-    
-    [Required, MaxLength(30), JsonPropertyName("username"), MinLength(3), RegularExpression(@"^[a-zA-Z0-9._]+$"), FromForm]
+    [
+        Required,
+        MaxLength(30),
+        JsonPropertyName("username"),
+        MinLength(3),
+        RegularExpression(@"^[a-zA-Z0-9._]+$"),
+        FromForm
+    ]
     public string Username { get; set; } = null!;
-    
-    [Required, MaxLength(30), RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$"), JsonPropertyName("password"), MinLength(8), FromForm]
+
+    [
+        Required,
+        MaxLength(30),
+        RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$"),
+        JsonPropertyName("password"),
+        MinLength(8),
+        FromForm
+    ]
     public string Password { get; set; } = null!;
-    
-    [Required, MaxLength(30), JsonPropertyName("confirmPassword"), MinLength(8), Compare(nameof(Password)), FromForm]
+
+    [
+        Required,
+        MaxLength(30),
+        JsonPropertyName("confirmPassword"),
+        MinLength(8),
+        Compare(nameof(Password)),
+        FromForm
+    ]
     public string ConfirmPassword { get; set; } = null!;
-    
-    
-    [Required, JsonPropertyName("fullName"), MaxLength(30), MinLength(10), RegularExpression(@"^[\p{L}\p{M}0-9\s]+$"), FromForm]
+
+    [
+        Required,
+        JsonPropertyName("fullName"),
+        MaxLength(30),
+        MinLength(10),
+        RegularExpression(@"^[\p{L}\p{M}0-9\s]+$"),
+        FromForm
+    ]
     public string FullName { get; set; } = null!;
-    
-    [JsonPropertyName("imageFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
+
+    [JsonPropertyName("imageFile"), FileExtensions(Extensions = "jpg, png, webp, img, jpge")]
     public IFormFile? ImageFile { get; set; }
 
-    [BindNever, JsonIgnore] public int Age => GetAge(this.DayOfBirth);
-        
+    [BindNever, JsonIgnore]
+    public int Age => GetAge(this.DayOfBirth);
+
     [JsonPropertyName("dayOfBirth"), FromForm, Required]
     public DateTime DayOfBirth { get; set; }
 
@@ -41,14 +67,13 @@ public class CreateUserRequest : IRequest<OneOf<UserResponse, Failure>>
         int edad = hoy.Year - dateOfBirth.Year;
 
         // Si aún no ha cumplido años este año, se resta uno
-        if (dateOfBirth.Date > hoy.AddYears(-edad)) 
+        if (dateOfBirth.Date > hoy.AddYears(-edad))
         {
             edad--;
         }
 
         return edad;
     }
-
 }
 
 public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
@@ -56,34 +81,48 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
     public CreateUserRequestValidator()
     {
         RuleFor(x => x.Username)
-            .NotEmpty().WithMessage("Username is required.")
-            .MinimumLength(3).WithMessage("Username must be at least 3 characters.")
-            .MaximumLength(30).WithMessage("Username must not exceed 30 characters.")
-            .Matches(@"^[a-zA-Z0-9._]+$").WithMessage("Username can only contain letters, numbers, dots, and underscores.");
+            .NotEmpty()
+            .WithMessage("Username is required.")
+            .MinimumLength(3)
+            .WithMessage("Username must be at least 3 characters.")
+            .MaximumLength(30)
+            .WithMessage("Username must not exceed 30 characters.")
+            .Matches(@"^[a-zA-Z0-9._]+$")
+            .WithMessage("Username can only contain letters, numbers, dots, and underscores.");
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters.")
-            .MaximumLength(30).WithMessage("Password must not exceed 30 characters.")
-            .Matches(@"[A-Z]+").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches(@"\d+").WithMessage("Password must contain at least one number.")
-            .Matches(@"[\W_]+").WithMessage("Password must contain at least one special character.");
+            .NotEmpty()
+            .WithMessage("Password is required.")
+            .MinimumLength(8)
+            .WithMessage("Password must be at least 8 characters.")
+            .MaximumLength(30)
+            .WithMessage("Password must not exceed 30 characters.")
+            .Matches(@"[A-Z]+")
+            .WithMessage("Password must contain at least one uppercase letter.")
+            .Matches(@"\d+")
+            .WithMessage("Password must contain at least one number.")
+            .Matches(@"[\W_]+")
+            .WithMessage("Password must contain at least one special character.");
 
         RuleFor(x => x.ConfirmPassword)
-            .NotEmpty().WithMessage("Confirm Password is required.")
-            .Equal(x => x.Password).WithMessage("Passwords do not match.");
-        
+            .NotEmpty()
+            .WithMessage("Confirm Password is required.")
+            .Equal(x => x.Password)
+            .WithMessage("Passwords do not match.");
+
         RuleFor(x => x.Age)
             .InclusiveBetween(16, 100)
             .WithMessage("Age must be between 16 and 100.");
-           
-        RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Full name is required.")
-            .MinimumLength(10).WithMessage("Full name must be at least 10 characters.")
-            .MaximumLength(30).WithMessage("Full name must not exceed 30 characters.")
-            .Matches(@"^[\p{L}\p{M}0-9\s]+$").WithMessage("Only letters, numbers, and spaces are allowed.");
 
-         
+        RuleFor(x => x.FullName)
+            .NotEmpty()
+            .WithMessage("Full name is required.")
+            .MinimumLength(10)
+            .WithMessage("Full name must be at least 10 characters.")
+            .MaximumLength(30)
+            .WithMessage("Full name must not exceed 30 characters.")
+            .Matches(@"^[\p{L}\p{M}0-9\s]+$")
+            .WithMessage("Only letters, numbers, and spaces are allowed.");
 
         RuleFor(x => x.ImageFile)
             .Must(file => file == null || file.Length <= 5 * 1024 * 1024) // 5 MB
@@ -96,7 +135,7 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
 public class CreateUserEndpoint : IEndpoint
 {
     private readonly UserEndpointSettings _settings = new();
-    
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(
@@ -110,8 +149,6 @@ public class CreateUserEndpoint : IEndpoint
                 {
                     return await executor.ExecuteAsync<UserResponse>(async () =>
                     {
-
-
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
                         if (result.IsT1)
@@ -122,7 +159,12 @@ public class CreateUserEndpoint : IEndpoint
 
                         var user = result.AsT0;
 
-                        return Results.Ok(new SuccessApiResult<UserResponse>(user, "Account created successfully. Try logging in with it."));
+                        return Results.Ok(
+                            new SuccessApiResult<UserResponse>(
+                                user,
+                                "Account created successfully. Try logging in with it."
+                            )
+                        );
                     });
                 }
             )
@@ -130,8 +172,10 @@ public class CreateUserEndpoint : IEndpoint
             .AllowAnonymous()
             .RequireCors()
             .WithOpenApi()
-            .WithTags(new []{"POST", $"{nameof(User)}"})
-            .WithDescription($"Creates an user. Not requires authorization. Accepts an {nameof(CreateUserRequest)}. Returns a ApiResult with an {nameof(UserResponse)}")
+            .WithTags(new[] { "POST", $"{nameof(User)}" })
+            .WithDescription(
+                $"Creates an user. Not requires authorization. Accepts an {nameof(CreateUserRequest)}. Returns a ApiResult with an {nameof(UserResponse)}"
+            )
             .Accepts<AuthenticateUserRequest>(false, "multipart/form-data")
             .Produces<SuccessApiResult<UserResponse>>(200, "application/json")
             .Produces<ConflictApiResult>(409, "application/json")
@@ -139,51 +183,53 @@ public class CreateUserEndpoint : IEndpoint
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")
             .WithName(nameof(CreateUserEndpoint))
-            .Stable()
-            ;
+            .Stable();
     }
 }
 
 internal class CreateUserRequestHandler(
-    SerpentineDbContext  context,
+    SerpentineDbContext context,
     CloudinaryService cloudinaryService
-    )
-    : IEndpointHandler<CreateUserRequest, OneOf<UserResponse, Failure>>
+) : IEndpointHandler<CreateUserRequest, OneOf<UserResponse, Failure>>
 {
     public async Task<OneOf<UserResponse, Failure>> HandleAsync(
         CreateUserRequest request,
         CancellationToken cancellationToken = default
-        )
+    )
     {
-
-        if (await context.Users.AnyAsync(
-            u => u.Username.Trim().ToLower() == request.Username.Trim().ToLower(),
-            cancellationToken: cancellationToken
-        ))
+        if (
+            await context.Users.AnyAsync(
+                u => u.Username.Trim().ToLower() == request.Username.Trim().ToLower(),
+                cancellationToken: cancellationToken
+            )
+        )
         {
             return new ConflictApiResult("An user with the same username already exist");
         }
-        
 
         User creation = User.Create(request);
         var result = await context.Users.AddAsync(creation, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        
+
         if (request.ImageFile is not null)
         {
-             if(await cloudinaryService.UploadImage(request.ImageFile, CloudinaryFolders.ProfilePictures.ToString(), result.Entity.Id.ToString()) is var imageUpload 
-                && imageUpload.TaskSucceded())
-             {
-
+            if (
+                await cloudinaryService.UploadImage(
+                    request.ImageFile,
+                    CloudinaryFolders.ProfilePictures.ToString(),
+                    result.Entity.Id.ToString()
+                )
+                    is var imageUpload
+                && imageUpload.TaskSucceded()
+            )
+            {
                 result.Entity.ProfilePictureUrl = imageUpload.Data;
-
-             }
+            }
             else
             {
                 return new BadRequestApiResult(imageUpload.Message, imageUpload.Errors);
             }
         }
-       
 
         await context.SaveChangesAsync(cancellationToken);
         context.ChangeTracker.Clear();

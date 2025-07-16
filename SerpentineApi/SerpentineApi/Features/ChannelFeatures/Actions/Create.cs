@@ -15,17 +15,18 @@ namespace SerpentineApi.Features.ChannelFeatures.Actions;
 
 public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
 {
-    [MaxLength(100),
-     MinLength(3),
-     RegularExpression(@"^[a-zA-Z0-9._]+$"), 
-     Required, JsonPropertyName("name"), FromForm, DataType(DataType.Text)]
+    [
+        MaxLength(100),
+        MinLength(3),
+        RegularExpression(@"^[a-zA-Z0-9._]+$"),
+        Required,
+        JsonPropertyName("name"),
+        FromForm,
+        DataType(DataType.Text)
+    ]
     public string Name { get; set; } = null!;
 
-    [MaxLength(500), 
-     MinLength(10),
-     Required, 
-     JsonPropertyName("description"), 
-     FromForm]
+    [MaxLength(500), MinLength(10), Required, JsonPropertyName("description"), FromForm]
     public string Description { get; set; } = null!;
 
     [Required, FromForm, JsonPropertyName("adultContent")]
@@ -34,17 +35,24 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [BindNever, JsonIgnore]
     public Ulid CurrentUserId { get; private set; }
 
-    [FromForm, JsonPropertyName("bannerPictureFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
-    public IFormFile? BannerPictureFile {get; set;}
+    [
+        FromForm,
+        JsonPropertyName("bannerPictureFile"),
+        FileExtensions(Extensions = "jpg, png, webp, img, jpge")
+    ]
+    public IFormFile? BannerPictureFile { get; set; }
 
-    [FromForm, JsonPropertyName("coverPictureFile"), FileExtensions(Extensions ="jpg, png, webp, img, jpge")]
-    public IFormFile? CoverPictureFile {get; set;}
+    [
+        FromForm,
+        JsonPropertyName("coverPictureFile"),
+        FileExtensions(Extensions = "jpg, png, webp, img, jpge")
+    ]
+    public IFormFile? CoverPictureFile { get; set; }
 
     public void SetCurrentUserId(Ulid userId)
     {
         CurrentUserId = userId;
     }
-
 }
 
 public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequest>
@@ -52,25 +60,31 @@ public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequ
     public CreateChannelRequestValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required.")
-            .MinimumLength(3).WithMessage("Name must be at least 3 characters long.")
-            .MaximumLength(100).WithMessage("Name cannot exceed 100 characters.")
-            .Matches(@"^[a-zA-Z0-9._]+$").WithMessage("Name can only contain letters, numbers, dots, and underscores.");
+            .NotEmpty()
+            .WithMessage("Name is required.")
+            .MinimumLength(3)
+            .WithMessage("Name must be at least 3 characters long.")
+            .MaximumLength(100)
+            .WithMessage("Name cannot exceed 100 characters.")
+            .Matches(@"^[a-zA-Z0-9._]+$")
+            .WithMessage("Name can only contain letters, numbers, dots, and underscores.");
 
         RuleFor(x => x.Description)
-            .NotEmpty().WithMessage("Description is required.")
-            .MinimumLength(10).WithMessage("Description must be at least 10 characters long.")
-            .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.");
+            .NotEmpty()
+            .WithMessage("Description is required.")
+            .MinimumLength(10)
+            .WithMessage("Description must be at least 10 characters long.")
+            .MaximumLength(500)
+            .WithMessage("Description cannot exceed 500 characters.");
 
-        RuleFor(x => x.AdultContent)
-            .NotNull().WithMessage("Adult content flag must be specified.");
+        RuleFor(x => x.AdultContent).NotNull().WithMessage("Adult content flag must be specified.");
     }
 }
 
 internal class CreateChannelEndpoint : IEndpoint
 {
     private readonly ChannelEndpointSettings _settings = new();
-    
+
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(
@@ -85,8 +99,9 @@ internal class CreateChannelEndpoint : IEndpoint
                 {
                     return await executor.ExecuteAsync<ChannelResponse>(async () =>
                     {
-                        
-                        command.SetCurrentUserId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
+                        command.SetCurrentUserId(
+                            UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
+                        );
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {
@@ -104,12 +119,14 @@ internal class CreateChannelEndpoint : IEndpoint
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .WithTags(new []{"POST", $"{nameof(Channel)}"})
+            .WithTags(new[] { "POST", $"{nameof(Channel)}" })
             .Accepts<CreateChannelRequest>(false, "multipart/form-data")
             .Produces<SuccessApiResult<ChannelResponse>>(200)
             .Produces<ConflictApiResult>(409, "application/json")
             .Produces<BadRequestApiResult>(400, "application/json")
-            .WithDescription($"Creates a channel in the database. Requires a {nameof(CreateChannelRequest)}. Return {nameof(ChannelResponse)}")
+            .WithDescription(
+                $"Creates a channel in the database. Requires a {nameof(CreateChannelRequest)}. Return {nameof(ChannelResponse)}"
+            )
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")
             .WithName(nameof(CreateChannelEndpoint));
@@ -117,11 +134,9 @@ internal class CreateChannelEndpoint : IEndpoint
 }
 
 internal class CreateChannelRequestHandler(
-   SerpentineDbContext context,
-   CloudinaryService cloudinaryService
-
-)
-    : IEndpointHandler<CreateChannelRequest, OneOf<ChannelResponse, Failure>>
+    SerpentineDbContext context,
+    CloudinaryService cloudinaryService
+) : IEndpointHandler<CreateChannelRequest, OneOf<ChannelResponse, Failure>>
 {
     public async Task<OneOf<ChannelResponse, Failure>> HandleAsync(
         CreateChannelRequest request,
@@ -129,17 +144,26 @@ internal class CreateChannelRequestHandler(
     )
     {
         if (request.CurrentUserId.ToString() == "")
-            return new UnauthorizedApiResult("You are trying to create a channel without being logged in");
+            return new UnauthorizedApiResult(
+                "You are trying to create a channel without being logged in"
+            );
 
         var channel = Channel.Create(request);
 
-        var exist = await context.Channels.AnyAsync(ch => ch.Name.ToLower() == channel.Name, cancellationToken: cancellationToken);
+        var exist = await context.Channels.AnyAsync(
+            ch => ch.Name.ToLower() == channel.Name,
+            cancellationToken: cancellationToken
+        );
 
         if (exist)
-            return new ConflictApiResult($"Another channel with the same name {channel.Name} already exists");
+            return new ConflictApiResult(
+                $"Another channel with the same name {channel.Name} already exists"
+            );
 
         // Start transaction
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await context.Database.BeginTransactionAsync(
+            cancellationToken
+        );
 
         try
         {
@@ -159,7 +183,10 @@ internal class CreateChannelRequestHandler(
                 else
                 {
                     await transaction.RollbackAsync(cancellationToken);
-                    return new BadRequestApiResult(coverUploadResponse.Message, coverUploadResponse.Errors);
+                    return new BadRequestApiResult(
+                        coverUploadResponse.Message,
+                        coverUploadResponse.Errors
+                    );
                 }
             }
 
@@ -177,7 +204,10 @@ internal class CreateChannelRequestHandler(
                 else
                 {
                     await transaction.RollbackAsync(cancellationToken);
-                    return new BadRequestApiResult(bannerUploadResponse.Message, bannerUploadResponse.Errors);
+                    return new BadRequestApiResult(
+                        bannerUploadResponse.Message,
+                        bannerUploadResponse.Errors
+                    );
                 }
             }
 
@@ -194,7 +224,9 @@ internal class CreateChannelRequestHandler(
 
             if (response is null)
             {
-                return new NotFoundApiResult("We could not find the channel you created. Try again.");
+                return new NotFoundApiResult(
+                    "We could not find the channel you created. Try again."
+                );
             }
             return response.ToResponse();
         }
@@ -204,6 +236,4 @@ internal class CreateChannelRequestHandler(
             throw;
         }
     }
-
-  
 }

@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.OpenApi.Models;
-using SerpentineApi;
 using Scalar.AspNetCore;
+using SerpentineApi;
 using SerpentineApi.Dependencies;
 using SerpentineApi.Helpers;
 using SerpentineApi.Hubs;
-
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
@@ -14,20 +13,27 @@ builder.Configuration.AddUserSecrets<Program>();
 builder.Services.AddApiServices(builder);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "default", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-    });
+    options.AddPolicy(
+        name: "default",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:3000", "http://localhost:5000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+    );
 });
 builder.Services.AddCacheServices();
 
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 builder.Services.AddSignalRServices();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApiServices();
-
 
 var app = builder.Build();
 
@@ -38,24 +44,16 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(options =>
     {
         // Fluent API
-        options
-            .WithTitle("Serpentine API")
-            .WithSidebar(true);
+        options.WithTitle("Serpentine API").WithSidebar(true);
         // Bearer
-        options.Authentication = 
-            new ScalarAuthenticationOptions
-            {
-                PreferredSecuritySchemes = [ApiConstants.AuthenticationScheme]
-            }; // Security scheme name from the OpenAPI document
-
-
+        options.Authentication = new ScalarAuthenticationOptions
+        {
+            PreferredSecuritySchemes = [ApiConstants.AuthenticationScheme],
+        }; // Security scheme name from the OpenAPI document
     });
-
-
 }
 
 app.UseHttpsRedirection();
-
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.UseExceptionHandler(appError =>
@@ -69,35 +67,34 @@ app.UseExceptionHandler(appError =>
         if (contextFeature is not null)
         {
             logger.LogError($"Server error: {contextFeature.Error.Message}");
-           
-            await context.Response.WriteAsJsonAsync(new ServerErrorApiResult()
-            {
-                Errors = [contextFeature.Error.Message]
-            });
+
+            await context.Response.WriteAsJsonAsync(
+                new ServerErrorApiResult() { Errors = [contextFeature.Error.Message] }
+            );
         }
     });
 });
-
 
 app.UseAuthentication();
 app.UseRouting();
 app.UseCors("default");
 
 app.UseAuthorization();
-app.MapHub<ActiveUsersHub>("hub/active-users", options =>
-{
-    options.AllowStatefulReconnects = true;
-    options.CloseOnAuthenticationExpiration = true;
-
-    
-});
-app.MapHub<ActiveChannelsHub>("hub/active-channels", options =>
-{
-    options.AllowStatefulReconnects = true;
-    options.CloseOnAuthenticationExpiration = true;
-
-    
-});
+app.MapHub<ActiveUsersHub>(
+    "hub/active-users",
+    options =>
+    {
+        options.AllowStatefulReconnects = true;
+        options.CloseOnAuthenticationExpiration = true;
+    }
+);
+app.MapHub<ActiveChannelsHub>(
+    "hub/active-channels",
+    options =>
+    {
+        options.AllowStatefulReconnects = true;
+        options.CloseOnAuthenticationExpiration = true;
+    }
+);
 app.MapEndpoints();
 app.Run();
-

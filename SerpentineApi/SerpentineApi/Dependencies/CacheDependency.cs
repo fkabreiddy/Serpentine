@@ -4,7 +4,7 @@ namespace SerpentineApi.Dependencies;
 
 public static class CacheDependency
 {
-    public static  IServiceCollection AddCacheServices(this IServiceCollection services)
+    public static IServiceCollection AddCacheServices(this IServiceCollection services)
     {
         services.AddSingleton<ActiveUsersCache>();
         services.AddSingleton<ChannelsActivityCache>();

@@ -2,7 +2,6 @@
 
 public class ChannelResponse : BaseResponse
 {
-
     public string Name { get; set; } = null!;
 
     public string Description { get; set; } = null!;
@@ -18,12 +17,4 @@ public class ChannelResponse : BaseResponse
     public string BannerPicture { get; set; } = "";
 
     public int UnreadMessages { get; set; } = 0;
-
-
-   
-    
-    
-
-
-
 }

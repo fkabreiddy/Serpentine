@@ -7,7 +7,7 @@ public class HubResult<T>
         Message = message;
         IsSuccess = succeeded;
     }
-    
+
     public HubResult(T data, string message = "Success")
     {
         Data = data;

@@ -10,4 +10,4 @@ public class GroupResponse : BaseResponse
     public Ulid MyAccessId { get; set; } = new();
 
     public DateTime MyLasAccess { get; set; } = DateTime.Now;
- }
+}
