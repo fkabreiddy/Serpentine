@@ -21,6 +21,18 @@ public class CreateGroupRequest : IRequest<OneOf<GroupResponse, Failure>>
         FromBody
     ]
     public string Name { get; set; } = null!;
+    
+    [
+        Required,
+        MaxLength(1000),
+        MinLength(3),
+        JsonPropertyName("rules"),
+        FromBody
+    ]
+    public string Rules { get; set; } = null!;
+    
+    [JsonPropertyName("public"), Required, FromBody]
+    public bool Public { get; set; } = true;
 
     [Required, JsonPropertyName("channelId"), FromBody]
     public Ulid ChannelId { get; set; }

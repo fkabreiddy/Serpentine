@@ -7,10 +7,15 @@ public class Group : BaseEntity
 {
     [MaxLength(100), MinLength(3), RegularExpression(@"^[a-zA-Z0-9_]+$")]
     public string Name { get; set; } = null!;
+    
+    [MaxLength(1000), MinLength(3)]
+    public string Rules { get; set; } = null!;
     public List<Message> Messages { get; set; } = new();
     public List<GroupAccess> Accesses { get; set; } = new();
     public Channel Channel { get; set; } = null!;
     public Ulid ChannelId { get; set; }
+
+    public bool Public { get; set; } = true;
     
 
     [NotMapped]
@@ -36,6 +41,8 @@ public class Group : BaseEntity
             ChannelId = ChannelId,
             UnreadMessages = UnreadMessages,
             ChannelName = ChannelName,
+            Rules = Rules,
+            Public = Public,
             LastMessage = LastMessage?.ToResponse() ?? new()
         };
 
@@ -44,6 +51,8 @@ public class Group : BaseEntity
         {
             Name = request.Name.Trim().ToLower(),
             ChannelId = request.ChannelId,
+            Rules = request.Rules,
+            Public = request.Public,
             Messages = new()
             {
                 new() { Content = $"{request.Name} group was created!", IsNotification = true },

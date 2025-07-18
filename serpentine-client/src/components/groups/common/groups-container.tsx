@@ -68,17 +68,19 @@ export default function GroupsContainer({channel}:GroupsContainerProps) {
                  
 
             <div className="relative  w-full ml-[10px] pt-[25px]" style={{width: `calc(100% - 18px)`}}>
-                              <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
 
+                {groups.length >= 1 &&
+                    <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
+                }
                 {groups.map((group, idx) => (
                 
                     <GroupCard group={group} key={idx.toString() + channel?.name} />  
                     
                 ))}
-                {loadingGroups && <Spinner size={"sm"} variant={"dots"} className={"absolute bottom-[40px]"}/>}
-                {!loadingGroups && groups.length <= 0 && <span className={"text-xs opacity-50"}>No groups found on this channel (T_T)</span>}
+               
             </div>
-            
+            {loadingGroups && <Spinner size={"sm"} variant={"dots"} className={" "}/>}
+            {!loadingGroups && groups.length <= 0 && <span className={"text-xs mt-[40px] opacity-50"}>No groups found on this channel (T_T)</span>}
 
         </div>
     );

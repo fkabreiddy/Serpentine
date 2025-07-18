@@ -21,6 +21,8 @@ export function useGetGroupsByChannelId() {
 
         if(!result)
         {
+            setLoadingGroups(false);
+           
             return;
         }
 
@@ -32,6 +34,7 @@ export function useGetGroupsByChannelId() {
         }
         else {
             setHasMore(false);
+            setLoadingGroups(false);
 
             handleApiErrors(result);
         }

@@ -46,6 +46,7 @@ public static class GroupEntityExtensions
             .Include(x => x.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
                 .ThenInclude(m => m.Parent)
             .Where(g => g.ChannelId == channelId)
+            .OrderBy(x => x.Id)
             .Skip(skip)
             .Take(take)
             .Select(ch => new Group()

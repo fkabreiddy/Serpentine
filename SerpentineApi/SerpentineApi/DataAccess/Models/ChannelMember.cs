@@ -14,6 +14,9 @@ public class ChannelMember : BaseEntity
     public bool IsOwner { get; set; } = false;
     public DateTime LastAccess { get; set; } = DateTime.Now;
 
+    public Ulid RoleId { get; set; }
+    public ChannelMemberRole? Role { get; set; }
+
     public ChannelMemberResponse ToResponse() =>
         new()
         {
@@ -27,6 +30,7 @@ public class ChannelMember : BaseEntity
             IsArchived = IsArchived,
             UserProfilePictureUrl = User.ProfilePictureUrl ?? "",
             UserName = User.FullName,
+            Role = Role?.ToResponse() ?? new(),
             UserUsername = User.Username,
         };
 

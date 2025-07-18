@@ -1,7 +1,4 @@
 import React from "react";
-import { Image } from "@heroui/image";
-import { useLayoutStore } from "@/contexts/layout-context";
-import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useNavigate } from "react-router-dom";
 import {GroupResponse} from "@/models/responses/group-response.ts";
 

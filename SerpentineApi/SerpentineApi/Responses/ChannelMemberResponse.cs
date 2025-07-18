@@ -15,4 +15,6 @@ public class ChannelMemberResponse : BaseResponse
     public string UserUsername { get; set; } = "";
 
     public string UserName { get; set; } = "";
+
+    public ChannelMemberRoleResponse Role { get; set; } = new();
 }

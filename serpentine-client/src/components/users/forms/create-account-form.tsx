@@ -357,7 +357,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                                 />
                                 
 
-                            <CustomButton
+                            <Button
                             isDisabled={!isValid || isCreatingUser || !ageIsValid()}
                             type="submit"
                             isLoading={isCreatingUser}
@@ -367,7 +367,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
                             >
                                 <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
                                 Create Account
-                            </CustomButton>
+                            </Button>
                         </>
                         
                     )

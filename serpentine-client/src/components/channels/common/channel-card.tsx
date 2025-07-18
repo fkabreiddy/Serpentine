@@ -48,7 +48,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, ...rest}) =>{
       <div className="flex items-center gap-3 flex-col w-[50px] " onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}} >
         <div
           {...rest}
-          className={`flex items-center flex-col  w-full max-w-full  min-w-fit !shrink-0 group   gap-2   transition-all cursor-pointer  `}
+          className={`flex items-center flex-col  w-full max-w-full  min-w-fit !shrink-0 group   gap-1   transition-all cursor-pointer  `}
         >
             <Tooltip
               content={channel.name}

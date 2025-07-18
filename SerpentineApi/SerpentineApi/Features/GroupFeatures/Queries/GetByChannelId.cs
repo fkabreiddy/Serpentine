@@ -37,12 +37,12 @@ public class GetByChannelIdRequestValidator : AbstractValidator<GetByChannelIdRe
 {
     public GetByChannelIdRequestValidator()
     {
+        RuleFor(x => x.Take).InclusiveBetween(1, 5).WithMessage("Take should be between 1 and 5");
+
         RuleFor(x => x.Skip)
-            .ExclusiveBetween(0, int.MaxValue)
-            .WithMessage("Skip should not be negative number");
-
-        RuleFor(x => x.Take).ExclusiveBetween(1, 5).WithMessage("Take must be between 1 and 5");
-
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Skip should be greater or equal to 0.");
+        
         RuleFor(x => x.ChannelId)
             .Must(x => UlidHelper.IsValid(x))
             .WithMessage("Channel Id should be an valid Ulid.");

@@ -48,11 +48,21 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
         FileExtensions(Extensions = "jpg, png, webp, img, jpge")
     ]
     public IFormFile? CoverPictureFile { get; set; }
+    
+    [BindNever, JsonIgnore]
+    public Ulid RoleId { get; private set; } 
+    
+    public void SetRoleId(Ulid roleId)
+    {
+        RoleId = roleId;
+    }
 
     public void SetCurrentUserId(Ulid userId)
     {
         CurrentUserId = userId;
     }
+    
+    
 }
 
 public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequest>
@@ -147,7 +157,13 @@ internal class CreateChannelRequestHandler(
             return new UnauthorizedApiResult(
                 "You are trying to create a channel without being logged in"
             );
+        
+        var role = await context.ChannelMemberRoles.FirstOrDefaultAsync(r => r.Name == "admin", cancellationToken);
 
+        if (role is null)
+            return new ServerErrorApiResult("Something went wrong. Try again later");
+
+        request.SetRoleId(role.Id);
         var channel = Channel.Create(request);
 
         var exist = await context.Channels.AnyAsync(
@@ -167,6 +183,8 @@ internal class CreateChannelRequestHandler(
 
         try
         {
+          
+            
             var creation = await context.Channels.AddAsync(channel, cancellationToken);
 
             if (request.CoverPictureFile is not null)

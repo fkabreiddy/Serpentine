@@ -6,7 +6,10 @@ public class GroupResponse : BaseResponse
     public int UnreadMessages { get; set; } = 0;
     public string ChannelName { get; set; } = null!;
     public Ulid ChannelId { get; set; }
-    
+
+    public string Rules { get; set; } = "";
+
+    public bool Public { get; set; } = true;
     public GroupAccessResponse MyAccess { get; set; } = new();
     
     public MessageResponse LastMessage { get; set; } = new();
