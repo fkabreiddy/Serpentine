@@ -5,6 +5,9 @@ import { PlusIcon, Settings } from "lucide-react";
 import GroupCard from "./group-card";
 import { ChannelBanner } from "@/components/channels/common/channel-banner";
 import { ChannelCover } from "@/components/channels/common/channel-cover";
+import {useEffect, useRef} from "react";
+import {useGetGroupsByChannelId} from "@/hooks/group-hooks.ts";
+import {Spinner} from "@heroui/spinner";
 
 
 interface GroupsContainerProps {
@@ -15,6 +18,28 @@ interface GroupsContainerProps {
 
 export default function GroupsContainer({channel}:GroupsContainerProps) {
 
+    const {getGroupsByChannelId, loadingGroups, groups} = useGetGroupsByChannelId();
+    const prevChannelId = useRef("");
+
+    const fetchChannels = async () =>{
+        
+        if(!channel ) return;
+        await getGroupsByChannelId({
+            channelId: channel.id,
+            skip: groups.length,
+            take: 5
+        })
+    }
+    useEffect(() => {
+        if(channel === null) return;
+        
+        if(channel.id !== prevChannelId.current) {
+            
+            prevChannelId.current = channel.id;
+            fetchChannels();
+            
+        }
+    }, [channel?.id]);
     const {layout} = useLayoutStore()
     return (
         <div className={`${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col  items-center   `} >
@@ -45,11 +70,13 @@ export default function GroupsContainer({channel}:GroupsContainerProps) {
             <div className="relative  w-full ml-[10px] pt-[25px]" style={{width: `calc(100% - 18px)`}}>
                               <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
 
-                {Array.from({ length: 4 }).map((_, idx) => (
+                {groups.map((group, idx) => (
                 
-                    <GroupCard key={idx.toString() + channel?.name} />  
+                    <GroupCard group={group} key={idx.toString() + channel?.name} />  
                     
                 ))}
+                {loadingGroups && <Spinner size={"sm"} variant={"dots"} className={"absolute bottom-[40px]"}/>}
+                {!loadingGroups && groups.length <= 0 && <span className={"text-xs opacity-50"}>No groups found on this channel (T_T)</span>}
             </div>
             
 

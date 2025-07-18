@@ -3,13 +3,14 @@ import { Image } from "@heroui/image";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useNavigate } from "react-router-dom";
+import {GroupResponse} from "@/models/responses/group-response.ts";
 
 interface GroupCardProps{
- 
+ group: GroupResponse
  
 }
 
-const GroupCard : React.FC<GroupCardProps> = () =>{
+const GroupCard : React.FC<GroupCardProps> = ({group}) =>{
 
     const navigate = useNavigate();
     return(
@@ -24,13 +25,23 @@ const GroupCard : React.FC<GroupCardProps> = () =>{
                    
                     <div className="flex text-ellipsis overflow-hidden   w-full flex-col gap-0">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold opacity-80 hover:text-blue-600  dark:hover:text-blue-500  cursor-pointer hover:underline">Group name</span>
+                            <span className="text-xs font-semibold opacity-80 hover:text-blue-600  dark:hover:text-blue-500  cursor-pointer hover:underline">{group.name}</span>
                         </div>
-                        <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">fka.breiddy: hola</span>
+                        {
+                            group.lastMessage ?
+                            <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                                <strong>{group.lastMessage.sender !== null && group.lastMessage.sender.username} </strong> 
+                                {group.lastMessage && group.lastMessage.content}
+                            </span> : 
+                            <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                                No messages available.
+                            </span>
+
+                        }
                     </div>
                 </div>
 
-                <div className="w-1 h-1 bg-blue-800 rounded-full mr-4 "/>
+                {group.unreadMessages > 0 && <div className="w-1 h-1 bg-blue-800 rounded-full mr-4 "/>}
             </div>
            
 
