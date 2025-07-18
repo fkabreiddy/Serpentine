@@ -42,7 +42,6 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         {
             t.HasIndex(u => u.Name).IsUnique();
             t.Ignore(u => u.MyMember);
-            t.Ignore(u => u.MembersCount);
 
             t.HasMany(u => u.Members)
                 .WithOne(mc => mc.Channel)
@@ -76,7 +75,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithMany(m => m.Replies)
                 .HasForeignKey(m => m.ParentId)
                 .OnDelete(DeleteBehavior.SetNull);
-
+            entity.Navigation(m => m.Sender).AutoInclude().IsRequired();
             entity.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
 
             entity.HasMany(m => m.Replies).WithOne(m => m.Parent).OnDelete(DeleteBehavior.NoAction);

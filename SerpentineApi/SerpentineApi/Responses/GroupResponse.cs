@@ -6,8 +6,8 @@ public class GroupResponse : BaseResponse
     public int UnreadMessages { get; set; } = 0;
     public string ChannelName { get; set; } = null!;
     public Ulid ChannelId { get; set; }
-    public int MessagesCount { get; set; }
-    public Ulid MyAccessId { get; set; } = new();
-
-    public DateTime MyLasAccess { get; set; } = DateTime.Now;
+    
+    public GroupAccessResponse MyAccess { get; set; } = new();
+    
+    public MessageResponse LastMessage { get; set; } = new();
 }

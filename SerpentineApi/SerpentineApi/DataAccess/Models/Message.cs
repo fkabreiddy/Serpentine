@@ -1,4 +1,6 @@
-﻿namespace SerpentineApi.DataAccess.Models;
+﻿using SerpentineApi.Helpers;
+
+namespace SerpentineApi.DataAccess.Models;
 
 public class Message : BaseEntity
 {
@@ -13,4 +15,20 @@ public class Message : BaseEntity
 
     public bool IsNotification { get; set; } = false;
     public List<Message> Replies { get; set; } = new();
+
+    public MessageResponse ToResponse() => new()
+    {
+        Sender = Sender?.ToResponse() ?? new(),
+        Parent = Parent?.ToResponse() ?? new(),
+        Content = Content,
+        GroupId = GroupId,
+        IsNotification = IsNotification,
+        SenderId = SenderId ?? Ulid.Empty,
+        ParentId = ParentId ?? Ulid.Empty,
+        Id = Id,
+        CreatedAt = CreatedAt,
+        UpdatedAt = UpdatedAt
+
+
+    };
 }

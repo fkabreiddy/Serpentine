@@ -110,16 +110,14 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
             request.Take
         );
 
-        var tasks = channels.Select(async channel =>
-        {
+       foreach(var channel in channels){
             channel.UnreadMessages = await context.GroupAccesses.GetMessagesCountByChannelId(
                 channel.Id,
                 request.CurrentUserId,
                 cancellationToken
             );
-        });
+       }
 
-        await Task.WhenAll(tasks);
 
         var response = channels.Select(ch => ch.ToResponse()).ToList();
         return response;

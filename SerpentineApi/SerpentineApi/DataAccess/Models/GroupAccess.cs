@@ -1,4 +1,6 @@
-﻿namespace SerpentineApi.DataAccess.Models;
+﻿using SerpentineApi.Helpers;
+
+namespace SerpentineApi.DataAccess.Models;
 
 public class GroupAccess : BaseEntity
 {
@@ -7,4 +9,14 @@ public class GroupAccess : BaseEntity
     public Ulid UserId { get; set; }
     public User User { get; set; } = null!;
     public DateTime LastAccess { get; set; }
+
+    public GroupAccessResponse ToResponse() => new()
+    {
+        Id = Id,
+        CreatedAt = CreatedAt,
+        UpdatedAt = UpdatedAt,
+        LastAccess = LastAccess,
+        GroupId = GroupId,
+        UserId = UserId
+    };
 }

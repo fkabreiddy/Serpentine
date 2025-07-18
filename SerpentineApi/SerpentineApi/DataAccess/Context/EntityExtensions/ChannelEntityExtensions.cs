@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SerpentineApi.Helpers;
 
 namespace SerpentineApi.DataAccess.Context.EntityExtensions;
 
@@ -14,8 +15,6 @@ public static class ChannelEntityExtensions
     {
         var channels = await channelsContext
             .Include(ch => ch.Members.Where(m => m.UserId == userId))
-            .Include(ch => ch.Groups)
-            .ThenInclude(g => g.Accesses.Where(a => a.UserId == userId))
             .AsNoTracking()
             .AsSplitQuery()
             .Where(ch => ch.Members.Any(m => m.UserId == userId))
@@ -24,19 +23,9 @@ public static class ChannelEntityExtensions
             .Take(take)
             .Select(ch => new Channel()
             {
-                Name = ch.Name,
-                Id = ch.Id,
-                CreatedAt = ch.CreatedAt,
-                UpdatedAt = ch.UpdatedAt,
-                AdultContent = ch.AdultContent,
-                Description = ch.Description,
-                MembersCount = ch.Members.Count,
-                BannerPicture = ch.BannerPicture,
-                CoverPicture = ch.CoverPicture,
-                Members = ch.Members,
-                MyMember =
-                    ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
-            })
+                
+                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
+            }.Spread(ch, new string[]{nameof(Channel.MyMember)}))
             .ToListAsync(token);
 
         return channels;
@@ -49,27 +38,17 @@ public static class ChannelEntityExtensions
         CancellationToken token = default
     )
     {
-        var channel = await channelsContext
+         var channel = await channelsContext
             .Include(ch => ch.Members.Where(m => m.UserId == userId))
-            .Include(ch => ch.Groups)
-            .ThenInclude(g => g.Accesses.Where(a => a.UserId == userId))
             .AsNoTracking()
             .AsSplitQuery()
-            .Where(ch => ch.Members.Any(m => m.UserId == userId) && ch.Id == channelId)
+            .Where(ch => ch.Members.Any(m => m.UserId == userId))
+            .OrderBy(ch => ch.Id)
             .Select(ch => new Channel()
             {
-                Name = ch.Name,
-                Id = ch.Id,
-                CreatedAt = ch.CreatedAt,
-                UpdatedAt = ch.UpdatedAt,
-                AdultContent = ch.AdultContent,
-                Description = ch.Description,
-                MembersCount = ch.Members.Count,
-                BannerPicture = ch.BannerPicture,
-                CoverPicture = ch.CoverPicture,
-                Members = ch.Members,
-                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new(),
-            })
+                
+                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
+            }.Spread(ch, new string[]{nameof(Channel.MyMember)}))
             .FirstOrDefaultAsync(token);
 
         return channel;
@@ -104,18 +83,9 @@ public static class ChannelEntityExtensions
             .Take(5)
             .Select(ch => new Channel()
             {
-                Name = ch.Name,
-                Id = ch.Id,
-                CreatedAt = ch.CreatedAt,
-                UpdatedAt = ch.UpdatedAt,
-                AdultContent = ch.AdultContent,
-                Description = ch.Description,
-                MembersCount = ch.Members.Count,
-                BannerPicture = ch.BannerPicture,
-                CoverPicture = ch.CoverPicture,
-                Members = ch.Members,
+                
                 MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new(),
-            })
+            }.Spread(ch, new string[]{nameof(Channel.MyMember)}))
             .ToListAsync(token);
 
         return channels;

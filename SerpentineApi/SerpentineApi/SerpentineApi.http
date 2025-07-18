@@ -1,4 +1,4 @@
-@SerpentineApi_HostAddress = http://localhost:5084
+@SerpentineApi_HostAddress = http://localhost:5000
 
 GET {{SerpentineApi_HostAddress}}/weatherforecast/
 Accept: application/json

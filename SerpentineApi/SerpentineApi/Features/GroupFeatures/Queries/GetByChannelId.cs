@@ -110,8 +110,22 @@ internal class GetByChannelIdEndpointHandler(SerpentineDbContext context)
     {
         var groups = await context.Groups.GetGroupWithJustMyAccessByChannelId(
             request.ChannelId,
-            request.CurrentUserId
+            request.CurrentUserId,
+            request.Skip,
+            request.Take,
+            cancellationToken
         );
+
+        foreach (Group group in groups)
+        {
+            group.UnreadMessages = await context.Messages.CountUnreadMessagesFromAGroup(
+                group.Id,
+                request.CurrentUserId,
+                group.MyAccess?.LastAccess ?? DateTime.Now,
+                cancellationToken
+            );
+
+        }
 
         return groups.Select(g => g.ToResponse()).ToList();
     }

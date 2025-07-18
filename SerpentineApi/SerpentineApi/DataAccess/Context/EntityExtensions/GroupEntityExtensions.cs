@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SerpentineApi.Helpers;
 
 namespace SerpentineApi.DataAccess.Context.EntityExtensions;
 
@@ -14,18 +15,16 @@ public static class GroupEntityExtensions
         var groups = await groupSet
             .AsNoTracking()
             .AsSplitQuery()
-            .Include(x => x.Accesses.Where(a => a.UserId == userId))
-            .Include(x => x.Messages)
+            .Include(x => x.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
+                .ThenInclude(m => m.Parent)
             .Where(g => g.Id == groupId)
             .Select(ch => new Group()
             {
-                Id = ch.Id,
-                Name = ch.Name,
-                ChannelId = ch.ChannelId,
+               
                 ChannelName = ch.Channel.Name,
-                MessagesCount = ch.Messages.Count(),
                 MyAccess = ch.Accesses.FirstOrDefault(a => a.UserId == userId),
-            })
+                LastMessage = ch.Messages.OrderByDescending(m => m.CreatedAt).FirstOrDefault()
+            }.Spread(ch, new string[]{nameof(Group.ChannelName), nameof(Group.LastMessage), nameof(Group.MyAccess)}))
             .ToListAsync(token);
 
         return groups.FirstOrDefault();
@@ -35,24 +34,27 @@ public static class GroupEntityExtensions
         this DbSet<Group> groupSet,
         Ulid channelId,
         Ulid userId,
+        int skip = 0,
+        int take = 5,
         CancellationToken token = default
     )
     {
         return await groupSet
+                
             .AsNoTracking()
             .AsSplitQuery()
-            .Include(x => x.Accesses.Where(a => a.UserId == userId))
-            .Include(x => x.Messages)
+            .Include(x => x.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
+                .ThenInclude(m => m.Parent)
             .Where(g => g.ChannelId == channelId)
+            .Skip(skip)
+            .Take(take)
             .Select(ch => new Group()
             {
-                Id = ch.Id,
-                Name = ch.Name,
-                ChannelId = ch.ChannelId,
+               
                 ChannelName = ch.Channel.Name,
-                MessagesCount = ch.Messages.Count(),
                 MyAccess = ch.Accesses.FirstOrDefault(a => a.UserId == userId),
-            })
+                LastMessage = ch.Messages.OrderByDescending(m => m.CreatedAt).FirstOrDefault()
+            }.Spread(ch, new string[]{nameof(Group.ChannelName), nameof(Group.LastMessage), nameof(Group.MyAccess)}))
             .ToListAsync(token);
     }
 }

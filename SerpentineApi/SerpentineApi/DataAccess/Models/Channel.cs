@@ -21,18 +21,16 @@ public class Channel : BaseEntity
     public string? BannerPicture { get; set; }
 
     public List<Group> Groups { get; set; } = new();
+    
 
     [NotMapped]
-    public int MembersCount { get; set; } = 0;
-
-    [NotMapped]
-    public ChannelMember MyMember { get; set; } = new();
+    public ChannelMember? MyMember { get; set; } = new();
 
     [NotMapped]
     public int UnreadMessages { get; set; } = 0;
 
     public ChannelResponse ToResponse() =>
-        new()
+        new ChannelResponse()
         {
             Id = Id,
             CreatedAt = CreatedAt,
@@ -40,8 +38,7 @@ public class Channel : BaseEntity
             Name = Name,
             Description = Description,
             UpdatedAt = UpdatedAt,
-            MembersCount = MembersCount,
-            MyMember = MyMember.ToResponse(),
+            MyMember = MyMember?.ToResponse() ?? new(),
             BannerPicture = BannerPicture ?? "",
             CoverPicture = CoverPicture ?? "",
             UnreadMessages = UnreadMessages,
@@ -55,7 +52,6 @@ public class Channel : BaseEntity
             AdultContent = request.AdultContent,
             UpdatedAt = DateTime.Now,
             CreatedAt = DateTime.Now,
-            MembersCount = 1,
             Members =
             [
                 new()

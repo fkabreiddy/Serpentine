@@ -1,7 +1,6 @@
-import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import React, { ReactNode, useState } from "react";
-import {SearchIcon, X} from "lucide-react"
+import React, { useState } from "react";
+import {SearchIcon} from "lucide-react"
 import { InputOtpVariantProps } from "@heroui/theme";
 import IconButton from "./common/icon-button";
 

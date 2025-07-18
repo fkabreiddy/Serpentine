@@ -11,9 +11,7 @@ public class Group : BaseEntity
     public List<GroupAccess> Accesses { get; set; } = new();
     public Channel Channel { get; set; } = null!;
     public Ulid ChannelId { get; set; }
-
-    [NotMapped]
-    public int MessagesCount { get; set; } = 0;
+    
 
     [NotMapped]
     public GroupAccess? MyAccess { get; set; } = new();
@@ -23,6 +21,9 @@ public class Group : BaseEntity
 
     [NotMapped]
     public string ChannelName { get; set; } = "";
+    
+    [NotMapped]
+    public Message? LastMessage { get; set; } 
 
     public GroupResponse ToResponse() =>
         new()
@@ -30,13 +31,12 @@ public class Group : BaseEntity
             Id = Id,
             CreatedAt = CreatedAt,
             UpdatedAt = UpdatedAt,
-            MyAccessId = MyAccess?.Id ?? Ulid.Empty,
-            MyLasAccess = MyAccess?.LastAccess ?? DateTime.Now,
+            MyAccess = MyAccess?.ToResponse() ?? new(),
             Name = Name,
             ChannelId = ChannelId,
             UnreadMessages = UnreadMessages,
-            MessagesCount = MessagesCount,
             ChannelName = ChannelName,
+            LastMessage = LastMessage?.ToResponse() ?? new()
         };
 
     public static Group Create(CreateGroupRequest request) =>
