@@ -1,10 +1,60 @@
 ﻿import {useEffect, useState} from "react";
 import ApiResult from "@/models/api-result.ts";
 import {useFetch} from "@/helpers/axios-helper.ts";
-import {handleApiErrors} from "@/helpers/api-results-handler-helper.ts";
+import {handleApiErrors, handleApiSuccess} from "@/helpers/api-results-handler-helper.ts";
 import {GroupResponse} from "@/models/responses/group-response.ts";
 import {GetGroupsByChannelIdRequest} from "@/models/requests/groups/get-by-channel-id-request.ts";
+import {CreateGroupRequest} from "@/models/requests/groups/create-group-request.ts";
 
+
+
+export function useCreateGroup() {
+
+    const [group, setGroup] = useState<GroupResponse | null>(null);
+    const [creatingGroup, setCreatingGroup] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<GroupResponse> | null>(null);
+    const { post } = useFetch<GroupResponse>();
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            setCreatingGroup(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+            setGroup(result.data);
+            handleApiSuccess(result);
+
+        }
+        else {
+
+            handleApiErrors(result);
+        }
+
+        setCreatingGroup(false);
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const createGroup = async (data: CreateGroupRequest) => {
+
+        setResult(null);
+        setCreatingGroup(true);
+        setGroup(null);
+        const response = await post({endpoint: "groups/create", contentType: "application/json"}, data );
+        setResult(response);
+
+
+
+    };
+
+    return { createGroup, group, creatingGroup};
+}
 export function useGetGroupsByChannelId() {
 
 
@@ -21,8 +71,7 @@ export function useGetGroupsByChannelId() {
 
         if(!result)
         {
-            setLoadingGroups(false);
-           
+
             return;
         }
 
@@ -34,8 +83,6 @@ export function useGetGroupsByChannelId() {
         }
         else {
             setHasMore(false);
-            setLoadingGroups(false);
-
             handleApiErrors(result);
         }
 
@@ -54,6 +101,7 @@ export function useGetGroupsByChannelId() {
         setGroups([]);
         setHasMore(true);
         setLoadingGroups(true);
+
         do{
 
 
@@ -69,5 +117,5 @@ export function useGetGroupsByChannelId() {
 
     };
 
-    return { getGroupsByChannelId, groups, loadingGroups, setGroups, result, hasMore, isBusy};
+    return { getGroupsByChannelId, groups, setGroups, result, hasMore, isBusy};
 }

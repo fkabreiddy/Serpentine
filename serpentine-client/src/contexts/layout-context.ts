@@ -10,8 +10,8 @@ interface Layout {
 interface LayoutState {
     layout: Layout;
     setLayout: (updates: Partial<Layout>) => void;
-    setNewChannel: (channel: ChannelResponse | null) => void | Promise<void>;
-    newChannel: ChannelResponse | null
+  
+
     
 }
 
@@ -21,17 +21,6 @@ export const useLayoutStore = create<LayoutState>((set) => ({
         currentRightPanelView: RightPanelView.DefaultView
 
     },
-    newChannel: null,
-    
-    setNewChannel: (channel : ChannelResponse | null) => {
-
-        set((state)=>({
-            ...state,
-            newChannel: channel
-            }
-        ))
-    },
-    
    
     
     setLayout: (updates: Partial<Layout>) => {

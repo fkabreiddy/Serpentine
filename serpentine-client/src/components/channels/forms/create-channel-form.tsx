@@ -1,20 +1,16 @@
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { Input, Textarea } from "@heroui/input";
 import React, { useEffect, useState, useRef } from "react";
-import {z} from "zod"
 import { useForm} from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
 import {Checkbox} from "@heroui/checkbox"
 import { useCreateChannel } from "@/hooks/channel-hooks";
 import { CreateChannelRequest, createChannelSchema } from "@/models/requests/channels/create-channel-request";
-import { set } from "date-fns";
 import Avatar from "boring-avatars";
-import { Image } from "@heroui/image";
 import IconButton from "@/components/common/icon-button";
 import { AppWindowMacIcon, ImageIcon } from "lucide-react";
 import Noise from "@/components/common/noise-ext";
-import { error } from "console";
 interface CreateChannelFormProps {
 
     onCreate: (channel: ChannelResponse) => void;
@@ -48,19 +44,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
         }
     });
 
-    // To display all form errors (for debugging or UI display)
-    // Example: render a list of error messages above the form
-    const renderFormErrors = () => (
-        <div>
-            {Object.entries(errors).map(([field, error]) =>
-                error?.message ? (
-                    <div key={field} className="text-red-500 text-xs mb-1">
-                        {error.message as string}
-                    </div>
-                ) : null
-            )}
-        </div>
-    );
+   
 
     const handleCoverInputClicked = () => {
         coverInput.current?.click();
@@ -165,7 +149,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                 accept="image/png, image/jpeg, image/webp, image/jpg"
                 multiple={false}
                 max={1}
-
+                
                 className="hidden"
             />
 
@@ -214,9 +198,9 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                     maxLength={100}
                     value={watch("name")}
                     labelPlacement="outside"
-                    
+                    id={"channelName-input"}
                     isRequired={true}
-                    autoComplete="username"
+                    autoComplete="channelName"
                     description="Must be just letters, numbers, underscores and dots."
                     {...register("name")}
                     errorMessage={errors.name?.message}
@@ -233,8 +217,10 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                     maxRows={4}
                     labelPlacement="outside"
                     isRequired={true}
-                    isClearable={true}
-                    autoComplete="username"
+                    isClearable={true}                    
+                    id={"channelDescription-input"}
+
+                    autoComplete="channelDescription"
                     description="Be as clear as possible about you channel and the rules."
                     {...register("description")}
                     errorMessage={errors.description?.message}
@@ -242,7 +228,12 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                 />
 
 
-                <Checkbox isSelected={watch("adultContent")} {...register("adultContent")} size="sm">
+                <Checkbox 
+                    isSelected={watch("adultContent")} 
+                    {...register("adultContent")} 
+                    size="sm"
+                    id={"hasAdultContent-checkBox"}
+                >
                     Has adult content
                 </Checkbox>
                 <p className="text-xs opacity-45">Adult content channels must not be visible for some users.</p>
@@ -258,6 +249,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                     Create Channel
                 </Button>
             
+                 
             </form>
 
             

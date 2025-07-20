@@ -8,7 +8,7 @@ public class ChannelResponse : BaseResponse
 
     public bool AdultContent { get; set; } = false;
 
-    public ChannelMemberResponse MyMember { get; set; } = new();
+    public ChannelMemberResponse? MyMember { get; set; } 
 
     public int MembersCount { get; set; } = 0;
 

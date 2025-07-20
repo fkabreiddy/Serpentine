@@ -14,7 +14,7 @@ public class CreateGroupRequest : IRequest<OneOf<GroupResponse, Failure>>
 {
     [
         Required,
-        MaxLength(100),
+        MaxLength(30),
         MinLength(3),
         RegularExpression(@"^[a-zA-Z0-9_]+$"),
         JsonPropertyName("name"),

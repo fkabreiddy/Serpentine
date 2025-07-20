@@ -1,30 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import {ScrollShadow} from "@heroui/scroll-shadow";
-import { X } from "lucide-react";
-import {  useLayoutStore } from "@/contexts/layout-context";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { RightPanelView } from "@/models/right-panel-view";
+import {X} from "lucide-react";
+import {useLayoutStore} from "@/contexts/layout-context";
+import {useIsMobile} from "@/hooks/use-mobile";
+import {RightPanelView} from "@/models/right-panel-view";
 import CreateChannelForm from "@/components/channels/forms/create-channel-form";
 import IconButton from "@/components/common/icon-button";
 import DefaultView from "./default-view";
-
+import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
+import CreateGroupForm from "@/components/groups/forms/create-group-form.tsx";
 
 
 interface RightSideBarProps{
 
 }
 
-interface JoinChannelDrawerProps{
-
-    open : boolean 
-    openChanged : (change : boolean) => void
-}
 
 
 const RightSideBar: React.FC<RightSideBarProps> = () =>{
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
-   const {layout, setLayout, setNewChannel} = useLayoutStore();
+   const {layout, setLayout} = useLayoutStore();
+   const {setCreatedChannel} = useGlobalDataStore();
    const isMobile = useIsMobile();
 
   
@@ -36,6 +33,9 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
     setIsMounted(true);
   }, []);
 
+  const close = ()=>{
+      setLayout({currentRightPanelView: RightPanelView.DefaultView})
+  }
  
 
   if (!isMounted) {
@@ -47,13 +47,13 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
     <ScrollShadow hideScrollBar offset={0}  className={`h-scren ${isMobile ? "w-[100%] ml-[50px]": "!min-w-[300px] !max-w-[300px]"}  bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col items-center border-l  border-default-100 p-3 overflow-auto gap-2  scroll-smooth scrollbar-hide `}>
         {layout.currentRightPanelView !== RightPanelView.DefaultView && 
           <div className="absolute top-2 right-2">
-            <IconButton tooltipText="Close" onClick={()=>setLayout({currentRightPanelView: RightPanelView.DefaultView})}>
+            <IconButton tooltipText="Close" onClick={()=> close()}>
               <X className="size-[18px]"/>
             </IconButton>
           </div>
         }
         <div className="mt-4"/>
-        {layout.currentRightPanelView === RightPanelView.CreateChannelFormView && <CreateChannelForm  onCreate={setNewChannel}/>}
+        {layout.currentRightPanelView === RightPanelView.CreateChannelFormView && <CreateChannelForm  onCreate={(ch)=> {setCreatedChannel(ch); close();}}/>}
         {layout.currentRightPanelView === RightPanelView.DefaultView && 
           <div className=" h-full w-full flex items-center justify-center">
               
@@ -61,6 +61,7 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
 
           </div> 
         }
+        {layout.currentRightPanelView === RightPanelView.CreateGroupFormView && <CreateGroupForm onCreate={()=> close()}/>}
 
         
     </ScrollShadow>

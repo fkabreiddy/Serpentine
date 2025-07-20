@@ -1,48 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import {ScrollShadow} from "@heroui/scroll-shadow";
-import { useNavigate } from "react-router-dom";
 import { useLayoutStore } from "@/contexts/layout-context";
-import { useCloseSession } from "@/hooks/user-hooks";
 import ChannelsContainer from "@/components/channels/common/channels-container";
 import SearchBar from "@/components/search-channel-bar";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useGetChannelsByUserId } from "@/hooks/channel-hooks";
 import { Spinner } from "@heroui/spinner";
-import { CheckIcon, InfoIcon, Layout, Pause, PlayIcon, PlugIcon, SearchIcon, Unplug } from "lucide-react";
-import { Tooltip } from "@heroui/tooltip";
-import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
-import { HubConnectionState } from "@microsoft/signalr";
-import IconButton from "@/components/common/icon-button";
-import { disconnect } from "process";
-import AddIcon from "@fluentui/svg-icons/icons/add_20_filled.svg";
-import { useActiveUser } from "@/helpers/active-user-hub";
+
 import StatusBar from "./status-bar";
 import GroupsContainer from "@/components/groups/common/groups-container";
-import { useActiveChannels } from "@/helpers/active-channels-hub";
-import { channel } from "diagnostics_channel";
-import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
-import { motion } from "motion/react";
+
+import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 interface LeftSideBarProps{
 
 }
 
-interface JoinChannelDrawerProps{
-
-    open : boolean 
-    openChanged : (change : boolean) => void
-}
 
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
-  
-  const [filter, setFilter] = React.useState<string>("");
+  const [filter, setFilter] = useState("");
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [selectedChannel, setSelectedChannel] = useState<ChannelResponse | null>(null);
   const {getChannelsByUserId, setChannels, channels, loadingChannels, isBusy, hasMore } = useGetChannelsByUserId();
-  const {user, username} = useAuthStore();
-  const {layout, newChannel, setNewChannel } = useLayoutStore();
+  const {user} = useAuthStore();
+  const {layout } = useLayoutStore();
+  const {createdChannel, setCreatedChannel} = useGlobalDataStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
@@ -61,13 +45,14 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   
   useEffect(()=>{
 
-    if(newChannel)
+    if(createdChannel)
     {
-        handleChannelCreated(newChannel)
-        setNewChannel(null);
-
+        setChannels((prev)=>([...prev, createdChannel]));
+        setCreatedChannel(null);
+        
     }
-  },[newChannel])
+    
+  },[createdChannel])
 
   useEffect(()=>{
 
@@ -76,10 +61,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   },[channels])
 
  
-  function handleChannelCreated(channel : ChannelResponse){
 
-    setChannels(prev => [...prev, channel]);
-  }
    
   const hasFetched = React.useRef(false);
  
@@ -127,9 +109,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
         } h-full  py-4 max-md:z-[9999] max-md:h-full bg-white dark:bg-black/40 backdrop-blur-lg animate-all flex flex-col border-r max-md:absolute border-default-100 px-2 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
         style={{ paddingBottom: statusBarHeight }}
       >
-        
 
-        
+
+          
 
         <div className="flex flex-col w-full items-center gap-3">
           <ChannelsContainer

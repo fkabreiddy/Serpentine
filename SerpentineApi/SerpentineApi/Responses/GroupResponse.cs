@@ -10,7 +10,7 @@ public class GroupResponse : BaseResponse
     public string Rules { get; set; } = "";
 
     public bool Public { get; set; } = true;
-    public GroupAccessResponse MyAccess { get; set; } = new();
+    public GroupAccessResponse? MyAccess { get; set; } 
     
-    public MessageResponse LastMessage { get; set; } = new();
+    public MessageResponse? LastMessage { get; set; } 
 }

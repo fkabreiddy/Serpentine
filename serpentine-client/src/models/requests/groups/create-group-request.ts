@@ -9,7 +9,7 @@ export const createGroupSchema = z.object({
 
     rules: z.string()
         .min(3, "rules must be at least 3 characters")
-        .max(100, "rules must be less than 100 characters")
+        .max(1000, "rules must be less than 100 characters")
         .default(""),
     
     public: z.boolean().default(true),
@@ -21,4 +21,4 @@ export const createGroupSchema = z.object({
 
 });
 
-export type createGroupSchema = z.output<typeof createAccountSchema>;
+export type CreateGroupRequest = z.output<typeof createAccountSchema>;

@@ -5,18 +5,18 @@ export class ChannelResponse extends BaseResponse {
   name: string = '';
   description: string = '';
   adultContent: boolean = false;
-  myMember: ChannelMemberResponse = new ChannelMemberResponse();
+  myMember: ChannelMemberResponse | null = null;
   membersCount: number = 0;
   coverPicture: string | null = null;
   bannerPicture: string | null = null;
-  unreadMessages: numerb = 0;
+  unreadMessages: number = 0;
   readonly userIsOwner: boolean = false;
 
   
  constructor(init?: Partial<ChannelResponse>) {
     super(init); 
     Object.assign(this, init);
-    this.userIsOwner = this.myMember.isOwner;
+    this.userIsOwner = this.myMember?.isOwner ?? false;
   }
 
 

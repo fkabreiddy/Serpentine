@@ -62,8 +62,8 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         {
             t.HasIndex(u => new { u.ChannelId, u.UserId }).IsUnique();
             t.Navigation(cm => cm.User).AutoInclude().IsRequired();
-            t.HasOne(cm => cm.Role).WithMany(r => r.Members).HasForeignKey(cm => cm.RoleId);
-            t.Navigation(cm => cm.Role).AutoInclude().IsRequired();
+            t.HasOne(cm => cm.Role).WithMany(r => r.Members).HasForeignKey(cm => cm.RoleId).IsRequired(false);
+            t.Navigation(cm => cm.Role).AutoInclude();
             t.HasOne(cm => cm.Channel).WithMany(cm => cm.Members).HasForeignKey(c => c.ChannelId);
             t.HasOne(cm => cm.User).WithMany(cm => cm.MyChannels).HasForeignKey(c => c.UserId);
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
@@ -79,7 +79,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithMany(m => m.Replies)
                 .HasForeignKey(m => m.ParentId)
                 .OnDelete(DeleteBehavior.SetNull);
-            entity.Navigation(m => m.Sender).AutoInclude().IsRequired();
+            entity.Navigation(m => m.Sender).AutoInclude();
             entity.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
 
             entity.HasMany(m => m.Replies).WithOne(m => m.Parent).OnDelete(DeleteBehavior.NoAction);
@@ -118,7 +118,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         modelBuilder.Entity<ChannelMemberRole>(t => 
         {
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
-            t.HasMany(mr => mr.Members).WithOne(mc => mc.Role).HasForeignKey(mc => mc.RoleId).OnDelete(DeleteBehavior.SetNull);
+            t.HasMany(mr => mr.Members).WithOne(mc => mc.Role).HasForeignKey(mc => mc.RoleId).IsRequired(false).OnDelete(DeleteBehavior.SetNull);
             t.HasData(new ChannelMemberRole[]
             {
                 new(){Name = "admin"},

@@ -13,8 +13,7 @@ public class ChannelMember : BaseEntity
     public bool IsArchived { get; set; } = false;
     public bool IsOwner { get; set; } = false;
     public DateTime LastAccess { get; set; } = DateTime.Now;
-
-    public Ulid RoleId { get; set; }
+    public Ulid? RoleId { get; set; }
     public ChannelMemberRole? Role { get; set; }
 
     public ChannelMemberResponse ToResponse() =>

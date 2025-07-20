@@ -32,7 +32,11 @@ export function useLoginUser() {
     useEffect(() => {
 
         if(!result)
+        {
+            setIsLoggingIn(false);
             return;
+
+        }
 
         if (result.data && result.statusCode === 200) {
 
@@ -47,6 +51,8 @@ export function useLoginUser() {
         }
 
         setIsLoggingIn(false);
+        setResult(null);
+
 
     }, [result]);
 
@@ -69,7 +75,11 @@ export function useCreateUser() {
     useEffect(() => {
 
         if(!result)
+        {
+            setIsCreatingUser(false);
             return;
+
+        }
 
         if (result.data && result.isSuccess) {
             handleApiSuccess(result);
@@ -78,6 +88,8 @@ export function useCreateUser() {
             handleApiErrors(result);
         }
         setIsCreatingUser(false);
+        setResult(null);
+
 
     }, [result]);
 
@@ -100,8 +112,12 @@ export function useGetByUsername() {
 
     useEffect(() => {
 
-        if (!result) 
+        if (!result)
+        {
+            setIsGettingByUsername(false);
             return;
+
+        }
 
         if (result.data && result.isSuccess) {
             handleApiErrors({data: null, message: "Another user with this username is already in use", resultTitle: "Conflict",  statusCode: 409, isSuccess: false, errors: ["This username is already in use"]});
@@ -117,6 +133,8 @@ export function useGetByUsername() {
         }
 
         setIsGettingByUsername(false);
+        setResult(null);
+
 
     }, [result]);
 

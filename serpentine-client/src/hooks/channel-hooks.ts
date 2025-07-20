@@ -33,6 +33,7 @@ export function useCreateChannel() {
 
         if(!result)
         {
+            setCreatingChannel(false);
             return;
         }
 
@@ -84,6 +85,7 @@ export function useGetChannelsByUserId() {
 
         if(!result)
         {
+            setLoadingChannels(false);
             return;
         }
 
@@ -95,7 +97,6 @@ export function useGetChannelsByUserId() {
         } 
         else {
             setHasMore(false);
-            
             handleApiErrors(result);
         }
 
@@ -104,6 +105,8 @@ export function useGetChannelsByUserId() {
 
 
     }, [result]);
+    
+    
 
    
     const getChannelsByUserId = async (data: GetChannelsByUserIdRequest) => {
@@ -146,6 +149,7 @@ export function useGetManyChannelsByNameOrId() {
 
         if(!result)
         {
+            setLoadingChannels(false);
             return;
         }
 

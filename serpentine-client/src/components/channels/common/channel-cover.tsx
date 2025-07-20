@@ -13,11 +13,11 @@ export interface ChannelCoverProps {
 export const ChannelCover: React.FC<ChannelCoverProps> = ({ pictureUrl, channelName, isSmall = false, absolute = false, unreadMessages=0 }) => (
        
     
-    <Badge isInvisible={unreadMessages <= 0} content={unreadMessages} placement="bottom-right" color="success">
+    <Badge shape={"circle"} isInvisible={unreadMessages <= 0} content={unreadMessages} placement="bottom-right" className={"bg-blue-600 text-white text-[10px]"}>
         {pictureUrl ? 
             <img
             src={pictureUrl}
-            className={`shrink-0 ${absolute && "absolute -bottom-[2px] right-[20px] ring-[5px] dark:ring-black ring-white"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
+            className={`shrink-0  ${absolute && "absolute -bottom-[2px] right-[20px] ring-[5px] dark:ring-black ring-white"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
             />
          : 
             <Avatar

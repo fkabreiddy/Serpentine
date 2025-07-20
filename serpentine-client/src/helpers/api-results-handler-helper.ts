@@ -16,10 +16,7 @@ export const handleApiErrors = (data: ApiResult<any>) => {
 };
 
 export const handleApiSuccess = (data: ApiResult<any>) =>{
-    const playSuccess = () => playSound("notification/success")
 
-    playSuccess();
-  
     showToast({
         title: "Success",
         description: data.message,

@@ -13,7 +13,7 @@ public static class MessageEntityExtensions
     )
     {
         return await messageSet.CountAsync(
-            x => x.GroupId == groupId && x.CreatedAt > date && x.SenderId != currentUserId,
+            x => x.GroupId == groupId && x.CreatedAt <= date && x.SenderId != currentUserId,
             token
         );
     }

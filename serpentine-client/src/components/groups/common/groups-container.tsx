@@ -1,13 +1,15 @@
 import IconButton from "@/components/common/icon-button";
-import { useLayoutStore } from "@/contexts/layout-context";
-import { ChannelResponse } from "@/models/responses/channel-response";
-import { PlusIcon, Settings } from "lucide-react";
+import {useLayoutStore} from "@/contexts/layout-context";
+import {ChannelResponse} from "@/models/responses/channel-response";
+import {Info, PlusIcon, Settings} from "lucide-react";
 import GroupCard from "./group-card";
-import { ChannelBanner } from "@/components/channels/common/channel-banner";
-import { ChannelCover } from "@/components/channels/common/channel-cover";
-import {useEffect, useRef} from "react";
+import {ChannelBanner} from "@/components/channels/common/channel-banner";
+import {ChannelCover} from "@/components/channels/common/channel-cover";
+import {useEffect, useRef, useTransition} from "react";
 import {useGetGroupsByChannelId} from "@/hooks/group-hooks.ts";
 import {Spinner} from "@heroui/spinner";
+import {RightPanelView} from "@/models/right-panel-view.ts";
+import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 
 
 interface GroupsContainerProps {
@@ -18,8 +20,13 @@ interface GroupsContainerProps {
 
 export default function GroupsContainer({channel}:GroupsContainerProps) {
 
-    const {getGroupsByChannelId, loadingGroups, groups} = useGetGroupsByChannelId();
+    const {getGroupsByChannelId, groups, setGroups} = useGetGroupsByChannelId();
     const prevChannelId = useRef("");
+    const {setCurrentChannelId, createdGroup, setCreatedGroup} = useGlobalDataStore();
+    const {layout, setLayout} = useLayoutStore();
+    const [loadingGroups, startLoadingGroups] = useTransition();
+    
+    
 
     const fetchChannels = async () =>{
         
@@ -30,17 +37,31 @@ export default function GroupsContainer({channel}:GroupsContainerProps) {
             take: 5
         })
     }
+
+    useEffect(() => {
+        
+        if(createdGroup && createdGroup.channelId === channel?.id){
+            
+            setGroups((prev)=>([...prev, createdGroup]));
+            setCreatedGroup(null);
+        }
+    }, [createdGroup]);
+    
     useEffect(() => {
         if(channel === null) return;
         
         if(channel.id !== prevChannelId.current) {
             
             prevChannelId.current = channel.id;
-            fetchChannels();
+            
+            startLoadingGroups(async () => {
+                 await fetchChannels();
+
+            })
             
         }
     }, [channel?.id]);
-    const {layout} = useLayoutStore()
+    
     return (
         <div className={`${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col  items-center   `} >
             {channel && 
@@ -53,12 +74,26 @@ export default function GroupsContainer({channel}:GroupsContainerProps) {
             <div className="flex items-center gap-3 w-full justify-between">
                
                 <div className="flex items-center gap-3">
-                    <IconButton placement="right"  tooltipText="Add a group" >
-                        <PlusIcon className="size-[18px]"  />
-                    </IconButton>
-                    <IconButton placement="right"   tooltipText="Manage" >
-                        <Settings className="size-[18px]"  />
-                    </IconButton>
+                    {((channel?.myMember?.role && channel?.myMember.role.name == "admin") || channel?.myMember?.isOwner) ?
+                       <>
+                           <IconButton onClick={()=> {
+                               setLayout({currentRightPanelView: RightPanelView.CreateGroupFormView}); 
+                               setCurrentChannelId(channel?.id);
+                           }} placement="right"  tooltipText="Add a group" >
+                               <PlusIcon className="size-[18px]"  />
+                           </IconButton>
+                           <IconButton placement="right"   tooltipText="Manage" >
+                               <Settings className="size-[18px]"  />
+                           </IconButton>
+                       </>
+                        :
+                        <IconButton placement="right"   tooltipText="About" >
+                            <Info className="size-[18px]"  />
+                        </IconButton>
+                        
+                       
+                    }
+                   
                 </div>
                        
                         <h2  className="text-[13px] font-normal justify-self-end">{channel ? `#${channel.name}` : "Channel"}</h2>

@@ -1,6 +1,6 @@
 import { Tooltip } from "@heroui/tooltip";
 import React from "react";
-import { playSound } from "react-sounds";
+
 type IconButtonProps =  {
     children: React.ReactNode;
     tooltipText: string;
@@ -9,13 +9,11 @@ type IconButtonProps =  {
 
 export default function IconButton({children, onClick, placement = "bottom", tooltipText: tootltipText, ...rest}: IconButtonProps) {
 
-    const handlePlayClickSound = () => playSound("ui/button_soft");
     return(
         <>
             <Tooltip  content={tootltipText} size="sm" placement={placement}>
                 <button
                     onClick={(e) => {
-                        handlePlayClickSound();
                         if (onClick) onClick(e);
                     }}
                     {...rest}

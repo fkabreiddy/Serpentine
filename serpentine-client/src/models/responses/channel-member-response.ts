@@ -9,7 +9,7 @@ export class ChannelMemberResponse extends BaseResponse {
   isArchived: boolean = false;
   isOwner: boolean = false;
   lastAccess: Date = new Date();
-  role: ChannelMemberRoleResponse = new ChannelMemberRoleResponse();
+  role: ChannelMemberRoleResponse  = new ChannelMemberRoleResponse();
 
   constructor(init?: Partial<ChannelMemberResponse>) {
     super(init); 

@@ -23,7 +23,7 @@ namespace SerpentineApi.DataAccess.Context.EntityExtensions
                     GroupId = g.Key,
                     MessagesCount = g.Sum(la =>
                         la.Group.Messages.Count(m =>
-                            m.CreatedAt > la.LastAccess && m.SenderId != userId
+                            m.CreatedAt <= la.LastAccess && m.SenderId != userId
                         )
                     ),
                 })

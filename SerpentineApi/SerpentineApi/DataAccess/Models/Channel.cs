@@ -24,7 +24,7 @@ public class Channel : BaseEntity
     
 
     [NotMapped]
-    public ChannelMember? MyMember { get; set; } = new();
+    public ChannelMember? MyMember { get; set; } 
 
     [NotMapped]
     public int UnreadMessages { get; set; } = 0;
@@ -38,7 +38,7 @@ public class Channel : BaseEntity
             Name = Name,
             Description = Description,
             UpdatedAt = UpdatedAt,
-            MyMember = MyMember?.ToResponse() ?? new(),
+            MyMember = MyMember?.ToResponse(),
             BannerPicture = BannerPicture ?? "",
             CoverPicture = CoverPicture ?? "",
             UnreadMessages = UnreadMessages,

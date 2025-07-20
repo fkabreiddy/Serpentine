@@ -18,13 +18,13 @@ public class Message : BaseEntity
 
     public MessageResponse ToResponse() => new()
     {
-        Sender = Sender?.ToResponse() ?? new(),
-        Parent = Parent?.ToResponse() ?? new(),
+        Sender = Sender?.ToResponse(),
+        Parent = Parent?.ToResponse(),
         Content = Content,
         GroupId = GroupId,
         IsNotification = IsNotification,
-        SenderId = SenderId ?? Ulid.Empty,
-        ParentId = ParentId ?? Ulid.Empty,
+        SenderId = SenderId,
+        ParentId = ParentId,
         Id = Id,
         CreatedAt = CreatedAt,
         UpdatedAt = UpdatedAt

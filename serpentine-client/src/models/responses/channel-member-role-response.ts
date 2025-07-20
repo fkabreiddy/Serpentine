@@ -5,7 +5,7 @@ export class ChannelMemberRoleResponse extends BaseResponse {
     name: string = "default";
     
 
-    constructor(init?: Partial<ChannelResponse>) {
+    constructor(init?: Partial<ChannelMemberRoleResponse>) {
         super(init);
         Object.assign(this, init);
     }
