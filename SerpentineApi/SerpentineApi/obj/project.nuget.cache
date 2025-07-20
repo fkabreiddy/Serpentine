@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bETtUZQDB6U=",
+  "dgSpecHash": "7HHs/yBa0LA=",
   "success": true,
-  "projectFilePath": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\serpentineapi\\SerpentineApi.csproj",
+  "projectFilePath": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\serpentineapi\\SerpentineApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\breid\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\breid\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

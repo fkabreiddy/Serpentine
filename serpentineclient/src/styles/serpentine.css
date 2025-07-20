@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+* {
+    font-family: "Inter" !important;
+}
+
+
+input, select, textarea {
+    min-height: 2em;
+    max-height: 12em;
+    scrollbar-width: none;
+    outline: none !important;
+    
+}
+
+
+input, textarea {
+    font-size: 13px !important;
+}
+
+label {
+    line-height: 20px;
+    font-weight: 500 !important;
+    opacity: 0.7;
+    font-size: 12px; 
+}
+
+:root {
+    @supports (interpolate-size: allow-keywords) {
+        interpolate-size: allow-keywords;
+    }
+    @supports (interpolate-size: allow-sizes) {
+        interpolate-size: allow-sizes;
+    }
+   
+}
+
+input{
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    font-family: "Inter" !important;
+   
+}
+
+
+
+.outlined-text{
+    -webkit-text-fill-color: transparent !important;
+    -webkit-text-stroke-width: 3px !important;
+    -webkit-text-stroke-color: transparent !important;
+}
+
+.group[data-checked="true"] {
+
+    svg {
+        opacity: 100 !important;
+    }
+}
+.rainbow {
+    text-align: center;
+    font-size: 32px;
+    font-family: monospace;
+    letter-spacing: 5px;
+}
+.rainbow_text_animated {
+    -webkit-background-clip: text;
+    background-color: #239C92AC;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%239C92AC' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");   
+     animation: rainbow_animation 20s ease-in-out infinite;
+    background-color: var(--mud-palette-surface);
+    
+    
+}
+
+@keyframes rainbow_animation {
+    0% {
+        background-position: 0 0;
+    }
+
+    50% {
+        background-position: 100% 0;
+    }
+    100%{
+        background-position: 0 0;
+
+    }
+   
+
+}
+
+.animate-border-radius{
+    -webkit-transition:  border-radius 0.2s ease-in-out;
+    transition:  border-radius 0.2s ease-in-out;
+}
+
+
+.doodle-pattern-relative {
+    
+    background: white black url('../../public/doodle3.svg') repeat 0 0;
+    
+   
+ 
+
+
+
+}
+.doodle-pattern {
+   position: absolute;
+    width: 100%;
+    height: 100%;
+    background:  transparent  url('../../public/doodle3.svg')  repeat 0 0;
+    bottom: 0;
+    top:0;
+    left: 0;
+    right: 0;
+    opacity:0.2;
+    
+    visibility: visible;
+ 
+
+
+
+}
+.grain {
+
+    position: absolute;
+    width:100%;
+    height:100%;
+    background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
+   z-index: -10;
+    opacity: 0.4;
+    visibility: visible;
+    
+
+   
+}
+
+.grain-lighter {
+
+    position: absolute;
+    width:100%;
+    height:100%;
+    background: transparent url('http://assets.iceable.com/img/noise-transparent.png') repeat 0 0;
+    
+    opacity: 0.2;
+    visibility: visible;
+    
+
+   
+}
+
+@keyframes bg-animation {
+    0% { opacity: 0.1 }
+    10% { opacity: 0.2  }
+    20% { opacity: 0.3  }
+    30% { opacity: 0.4  }
+    40% { opacity: 0.5 }
+    50% { opacity: 0.6 }
+    60% { opacity: 0.5 }
+    70% { opacity: 0.4  }
+    80% { opacity: 0.3  }
+    90% { opacity: 0.2  }
+    100% { opacity: 0.1  }
+
+
+
+}
+
+
+.pattern-bg {
+
+    background-color: #ffffff00;
+    z-index:-1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23707070' fill-opacity='0.25' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+
+}
+
+.pattern-bg-lighter {
+
+    background-color: #ffffff00;
+    z-index:-1;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23707070' fill-opacity='0.25' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+
+}
+
