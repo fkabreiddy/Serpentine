@@ -31,7 +31,6 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
-  const [isPendingChannels, startPendingChannels] = useTransition();
 
   useEffect(() => {
     if (statusBarRef.current) {
@@ -48,8 +47,8 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
     if(createdChannel)
     {
-        setChannels((prev)=>([...prev, createdChannel]));
-        setCreatedChannel(null);
+      console.log(createdChannel);
+      setChannels((prev)=>([...prev, createdChannel]));
         
     }
     

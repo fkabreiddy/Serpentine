@@ -4,5 +4,6 @@ export enum RightPanelView{
     CreateChannelFormView,
     ChannelInfo,
     CreateGroupFormView,
+    ManageChannelView,
 }
 

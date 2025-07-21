@@ -5,12 +5,12 @@ import { create } from "zustand";
 interface ActiveChannelsStore {
   activeChannelsHub: HubConnection | null;
   activeChannelsHubsState: HubConnectionState;
-  activeChannels: ChannelResponse[];
+  activeChannels: string[];
   setConnection: (hub: HubConnection | null) => void;
   quitConnection: () => void;
   setActiveChannelsHubConnectionState: (connetionState: HubConnectionState) => void;
-  addChannel: (channel: ChannelResponse) => void;
-  removeChannel: (channel: ChannelResponse) => void;
+  addChannel: (channelId: string ) => void;
+  removeChannel: (channelId: string) => void;
   clearChannels: () => void;
 }
 
@@ -57,16 +57,14 @@ export const useActiveChannelsHubStore = create<ActiveChannelsStore>((set) => ({
     set((state) => ({
         ...state,
 
-      activeChannels: state.activeChannels.filter(c => c.id !== channelToRemove.id),
+      activeChannels: state.activeChannels.filter(c => c !== channelToRemove),
     }));
   },
 
   clearChannels: () => {
     
     set((state) => ({ 
-        
         ...state,
-
         activeChannels: [] 
     }));
   },

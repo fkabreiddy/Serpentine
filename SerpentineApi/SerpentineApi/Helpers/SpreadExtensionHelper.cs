@@ -14,8 +14,8 @@ public static class SpreadExtensionHelper
             {
                 if (ignoreProps is not null && ignoreProps.Contains(sourceProp.Name))
                     continue;
-                
-                PropertyInfo targetProp = typeof(TTarget).GetProperty(sourceProp.Name);
+
+                PropertyInfo? targetProp = typeof(TTarget)?.GetProperty(sourceProp.Name) ;
 
                 if (targetProp == null || !targetProp.CanWrite)
                     continue;

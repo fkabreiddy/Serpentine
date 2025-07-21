@@ -12,7 +12,7 @@ public class HubExecutor<THub>(ILogger<THub> logger)
             logger.LogInformation($"Calling hub: {typeof(THub).Name}");
             return await func();
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException )
         {
             logger.LogError($"Unauthorized Access to: {nameof(THub)}");
             return new HubResult<T>(false, "You do not have permission to access this resource.");

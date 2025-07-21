@@ -70,6 +70,7 @@ public class CloudinaryService
             Transformation = new Transformation()
                 .Width(300)
                 .Height(300)
+                .Quality(100)
                 .Crop("thumb")
                 .Gravity("face"),
         };
@@ -93,7 +94,11 @@ public class CloudinaryService
             return new(true, data: uploadResult.SecureUrl.AbsoluteUri);
         }
 
-        return null;
+        return new(
+            false,
+            message: "Error uploading the image",
+            errors: [uploadResult.Error?.Message ?? "Unknown error occurred."]
+        );
     }
 
     public async Task<bool> DeleteImageAsync(string publicId, string folderName)

@@ -42,6 +42,7 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, index, ...rest}) =>{
 
       {/* Main Node */}
       <motion.div 
+      key={channel.id.toString() + "-motion"}
       className="flex items-center gap-3 flex-col w-[50px] " 
       onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}}
       initial={{ opacity: 0, x: -10 }}

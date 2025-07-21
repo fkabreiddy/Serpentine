@@ -24,13 +24,30 @@ public sealed class ActiveChannelsHub(
         });
     }
 
+    
+    [Authorize(JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<HubResult<int>> GetActiveUsersOnAChannelById(string channelId)
+    {
+        return await executor.InvokeAsync<int>(async () =>
+        {
+
+
+            var amount = cache.GetUsersCountOnAChannel(channelId);
+            await Task.CompletedTask;
+            return new HubResult<int>(amount);
+            
+        });
+    }
+
     [Authorize(JwtBearerDefaults.AuthenticationScheme)]
     public async Task<HubResult<bool>> ConnectToChannel(string channelId)
     {
         return await executor.InvokeAsync<bool>(async () =>
         {
             var userId = Context.UserIdentifier ?? throw new UnauthorizedAccessException();
+
             var added = cache.AddChannel(channelId, userId);
+
 
             if (added)
             {

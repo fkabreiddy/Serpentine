@@ -6,9 +6,8 @@ import {useIsMobile} from "@/hooks/use-mobile";
 import {RightPanelView} from "@/models/right-panel-view";
 import CreateChannelForm from "@/components/channels/forms/create-channel-form";
 import IconButton from "@/components/common/icon-button";
-import DefaultView from "./default-view";
-import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 import CreateGroupForm from "@/components/groups/forms/create-group-form.tsx";
+import ManageChannelView from "@/components/channels/common/manage-channel";
 
 
 interface RightSideBarProps{
@@ -21,7 +20,6 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
    const {layout, setLayout} = useLayoutStore();
-   const {setCreatedChannel} = useGlobalDataStore();
    const isMobile = useIsMobile();
 
   
@@ -53,15 +51,9 @@ const RightSideBar: React.FC<RightSideBarProps> = () =>{
           </div>
         }
         <div className="mt-4"/>
-        {layout.currentRightPanelView === RightPanelView.CreateChannelFormView && <CreateChannelForm  onCreate={(ch)=> {setCreatedChannel(ch); close();}}/>}
-        {layout.currentRightPanelView === RightPanelView.DefaultView && 
-          <div className=" h-full w-full flex items-center justify-center">
-              
-             <DefaultView/>
-
-          </div> 
-        }
+        {layout.currentRightPanelView === RightPanelView.CreateChannelFormView && <CreateChannelForm  triggerClose={() => close()}/>}
         {layout.currentRightPanelView === RightPanelView.CreateGroupFormView && <CreateGroupForm onCreate={()=> close()}/>}
+        {layout.currentRightPanelView === RightPanelView.ManageChannelView && <ManageChannelView/>}
 
         
     </ScrollShadow>

@@ -6,11 +6,13 @@ import App from "./App.tsx";
 import { Provider } from "./provider.tsx";
 import "@/styles/globals.css";
 import "@/styles/serpentine.css";
-
+import {ToastProvider} from "@heroui/toast";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <Provider>
+        <ToastProvider />
+
         <App />
       </Provider>
     </BrowserRouter>

@@ -11,20 +11,33 @@ import Avatar from "boring-avatars";
 import IconButton from "@/components/common/icon-button";
 import { AppWindowMacIcon, ImageIcon } from "lucide-react";
 import Noise from "@/components/common/noise-ext";
+import { showToast } from "@/helpers/sonner-helper";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 interface CreateChannelFormProps {
 
-    onCreate: (channel: ChannelResponse) => void;
+    triggerClose: () => void;
 }
 
 type FileType = File;
 
 
 
-const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
+const CreateChannelForm: React.FC<CreateChannelFormProps> = ({triggerClose}) => {
 
     const {channel, createChannel, creatingChannel} = useCreateChannel();
+    const {setCreatedChannel} = useGlobalDataStore();
+
+    
     const coverInput = useRef<HTMLInputElement>(null);
     const bannerInput = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if(channel) {
+            setCreatedChannel(null);
+            setCreatedChannel(channel);
+            triggerClose();
+        }
+    }, [channel]);
 
     const {
         register,
@@ -98,15 +111,24 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
                 const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
 
                 const fileExtension = file.name.split('.').pop()?.toLowerCase();
-        
-                if(file.size > maxSizeInBytes) {
-                    return;
-                }
-
+                
                 if(!fileExtension || !allowedExtensions.includes(fileExtension)) {
+                    showToast({
+                        title: "Invalid file type",
+                        description: "Please select a valid image file (jpg, png, webp).",
+                    });
                     return;
 
                 }
+                if(file.size > maxSizeInBytes) {
+                    showToast({
+                        title: "Image too large",
+                        description: "Please select an image smaller than 5MB.",
+                    });
+                    return;
+                }
+
+              
                 
                 if(field === "coverPictureFile" || field === "bannerPictureFile") {
                     setValue(field, file);
@@ -125,18 +147,6 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({onCreate}) => {
 
   
 
-  
-
-    useEffect(()=>{
-
-        
-        if(channel)
-        {
-            onCreate(channel);
-
-        }
-
-    },[channel])
         
         
 

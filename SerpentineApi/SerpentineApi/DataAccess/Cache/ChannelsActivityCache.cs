@@ -2,7 +2,7 @@
 
 namespace SerpentineApi.DataAccess.Cache;
 
-public class ChannelsActivityCache
+public class ChannelsActivityCache(ILogger<ChannelsActivityCache> logger)
 {
     private static readonly ConcurrentDictionary<string, HashSet<string>> ActiveChannels = new();
     private static readonly ConcurrentDictionary<string, HashSet<string>> ActiveUsers = new();
@@ -41,14 +41,15 @@ public class ChannelsActivityCache
         {
             lock (usersSet)
             {
-                var removed = usersSet.RemoveWhere(x => x == userId);
+                var removed = usersSet.Remove(userId);
 
                 if (usersSet.Count == 0)
                 {
                     ActiveChannels.TryRemove(channelId, out _);
                 }
+                logger.LogInformation($"Removed user {userId} from channel {channelId}. Remaining users: {usersSet.Count}");
 
-                if (removed <= 0)
+                if (!removed)
                     return false;
             }
         }
@@ -58,6 +59,7 @@ public class ChannelsActivityCache
             lock (channelsSet)
             {
                 channelsSet.Remove(channelId);
+                logger.LogInformation($"Removed channel {channelId} from user {userId}. Remaining channels: {channelsSet.Count}");
             }
         }
 

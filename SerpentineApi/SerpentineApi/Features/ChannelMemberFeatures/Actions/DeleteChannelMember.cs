@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Helpers;
-using SerpentineApi.Helpers;
 using SerpentineApi.Identity;
 using SerpentineApi.Services.CloudinaryStorage;
 
@@ -43,6 +42,7 @@ internal class DeleteChannelMemberEndpoint : IEndpoint
                 ) =>
                     await executor.ExecuteAsync<ChannelMemberResponse>(async () =>
                     {
+                        await Task.CompletedTask;
                         return ResultsBuilder.Match(new NotFoundApiResult());
                     })
             )
@@ -68,6 +68,7 @@ internal class DeleteChannelMemberEndpointHandler
         CancellationToken cancellationToken = default
     )
     {
+        await Task.CompletedTask;
         return new NotFoundApiResult();
     }
 }

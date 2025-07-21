@@ -6,42 +6,23 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { HubResult } from "@/models/hub-result";
 import { a } from "motion/react-client";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
+import { HubConnectionState } from "@microsoft/signalr";
+import { clear } from "console";
+import { showToast } from "./sonner-helper";
 
-interface UseActiveChannelsProps{
 
-    
-    onReconnected?: () => void | Promise<void>;
-
-    
-}
-
-export function useActiveChannels({onReconnected = ()=>{}}:UseActiveChannelsProps) {
+export function useActiveChannels() {
   const {
     setConnection,
     quitConnection,
-    addChannel,
     clearChannels,
-    removeChannel,
     setActiveChannelsHubConnectionState,
-    activeChannels,
     activeChannelsHub,
   } = useActiveChannelsHubStore();
 
   const alreadyRendered = useRef<boolean>(false);
-  const [registeringToChannels, setRegisteringToChannels] = useState(false);
-  const {newChannel} = useLayoutStore();
-
-  useEffect(()=>{
-
-    const connect = async (channel: ChannelResponse) =>{
-
-        await listenToChannel(channel);
-    }
-    if(newChannel)
-    {
-        connect(newChannel);
-    }
-  },[newChannel])
+  
 
   useEffect(() => {
    
@@ -55,14 +36,8 @@ export function useActiveChannels({onReconnected = ()=>{}}:UseActiveChannelsProp
     }
   }, []);
 
-  useEffect(() => {
-    
-    if (activeChannelsHub) {
-      setActiveChannelsHubConnectionState(activeChannelsHub.state);
-    } else {
-      setActiveChannelsHubConnectionState(signalR.HubConnectionState.Disconnected);
-    }
-  }, [activeChannelsHub?.state]);
+  
+
 
   const registerHandlers = () => {
     if (!activeChannelsHub) return;
@@ -72,67 +47,27 @@ export function useActiveChannels({onReconnected = ()=>{}}:UseActiveChannelsProp
     if (!activeChannelsHub) return;
   };
 
-  const disconnectFromActiveChannelsHub = async () => {
-    if (activeChannelsHub) {
-      unregisterHandlers();
-      await stopListeningToChannels();
-      clearChannels();
-      await activeChannelsHub.stop();
-      quitConnection();
-    }
-  };
 
-  const listenToChannels = async (channels: ChannelResponse[]) => {
+  const handleDisconnect =  () =>{
 
-    if (!activeChannelsHub) return;
-
-    setRegisteringToChannels(true);
-
-    for (const channel of channels) {
-      try {
-        const result: HubResult<boolean> = await activeChannelsHub.invoke("ConnectToChannel", channel.id);
-        if (result.isSuccess) {
-          addChannel(channel);
-        }
-      } catch (error) {
-        console.error(`Error connecting to channel ${channel.id}`, error);
-      }
-    }
-    setRegisteringToChannels(false);
-  };
-
-  const stopListeningToChannels = async () => {
-    if (!activeChannelsHub) return;
-
-    setRegisteringToChannels(true);
-    for (const channel of activeChannels) {
-      try {
-        const result: HubResult<boolean> = await activeChannelsHub.invoke("DisconnectFromChannel", channel.id);
-        if (result.isSuccess) {
-          removeChannel(channel);
-        }
-      } catch (error) {
-        console.error(`Error disconnecting to channel ${channel.id}`, error);
-      }
-    }
+    setActiveChannelsHubConnectionState(HubConnectionState.Disconnected);
     clearChannels();
-    setRegisteringToChannels(false);
-  };
-
-  const listenToChannel = async (channel: ChannelResponse) =>{
-
-    
-    if (!activeChannelsHub) return;
-
-    try {
-        const result: HubResult<boolean> = await activeChannelsHub.invoke("ConnectToChannel", channel.id);
-        if (result.isSuccess) {
-          addChannel(channel);
-        }
-      } catch (error) {
-        console.error(`Error connecting to channel ${channel.id}`, error);
-      }
+    quitConnection();
   }
+
+  const handleReconnecting = () =>{
+    setActiveChannelsHubConnectionState(HubConnectionState.Reconnecting);
+    clearChannels();
+    unregisterHandlers();
+
+
+  } 
+
+  const handleReconnected = () => {
+    setActiveChannelsHubConnectionState(HubConnectionState.Connected);
+    registerHandlers();
+  }
+
 
   const connectToActiveChannelsHub = async () => {
     try {
@@ -146,32 +81,69 @@ export function useActiveChannels({onReconnected = ()=>{}}:UseActiveChannelsProp
 
       newHub.onreconnecting(async ()=>{
 
-       await stopListeningToChannels();
-        unregisterHandlers();
+        handleReconnecting();
       })
 
       newHub.onclose(async () => {
-
-        await stopListeningToChannels();
+        handleDisconnect();
       });
 
       newHub.onreconnected(async () => {
-        registerHandlers();
-        onReconnected(); //remember to listen to channels again manually outside of this hook
+         handleReconnected(); //remember to listen to channels again manually outside of this hook
       });
 
       await newHub.start();
 
       setConnection(newHub);
+      unregisterHandlers();
       registerHandlers();
+      setActiveChannelsHubConnectionState(newHub.state);
 
     } catch (error) {
-      disconnectFromActiveChannelsHub();
+      activeChannelsHub?.stop();
     }
   };
 
+  
+}
+
+export function useActiveChannelsActions() {
+  
+  const {activeChannelsHub, addChannel, removeChannel} = useActiveChannelsHubStore();
+  const listenToChannel = async (channel: ChannelResponse) =>{
+
+    
+    if (!activeChannelsHub) return;
+
+    try {
+        const result: HubResult<boolean> = await activeChannelsHub.invoke("ConnectToChannel", channel.id);
+        if (result.isSuccess) {
+          addChannel(channel.id);
+          return;
+        }
+      } catch (error) {
+        showToast({title: "Error", description: `Error connecting to channel ${channel.id}`});
+      }
+  }
+
+  const stopListeningToChannel = async (channel: ChannelResponse) =>{
+
+    
+    if (!activeChannelsHub) return;
+
+    try {
+        const result: HubResult<boolean> = await activeChannelsHub.invoke("DisconnectFromChannel", channel.id);
+        if (result.isSuccess) {
+          removeChannel(channel.id);
+          return;
+        }
+      } catch (error) {
+        showToast({title: "Error", description: `Error disconnecting from channel ${channel.id}`});
+      }
+  }
+
   return {
-    listenToChannels,
-    registeringToChannels,
-  };
+    listenToChannel,
+    stopListeningToChannel,
+  }
 }

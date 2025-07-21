@@ -1,13 +1,8 @@
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { useFetch } from '../helpers/axios-helper';
- import ApiResult, { HookState } from "@/models/api-result";
+ import ApiResult from "@/models/api-result";
 import { ChannelResponse } from "@/models/responses/channel-response";
-import { showToast } from '../helpers/sonner-helper';
-import { set } from "date-fns";
-import { useSound } from 'react-sounds';
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
-import { CreateChannelRequest } from "@/models/requests/channels/create-channel-request";
-import { GetManyByNameOrIdRequest } from "@/models/requests/channels/get-many-by-name-or-id";
 
 
 const initialApiState = <T>(): ApiResult<T> => ({
@@ -39,6 +34,8 @@ export function useCreateChannel() {
 
         if (result.data && result.statusCode === 200) {
            setChannel(result.data);
+            console.log(result.data);
+
            handleApiSuccess(result);
 
         } 
@@ -61,6 +58,7 @@ export function useCreateChannel() {
         setChannel(null);
         const response = await post({endpoint: "channels/create", contentType: "multipart/form-data"}, data );
         setResult(response);
+
             
         
        
@@ -172,7 +170,7 @@ export function useGetManyChannelsByNameOrId() {
     }, [result]);
 
    
-    const getManyChannelsByNameOrId = async (data: GetManyByNameOrIdRequest) => {
+    const getManyChannelsByNameOrId = async (data: GetManyChannelsByNameOrIdRequest) => {
         
         setResult(null);
         setChannels([]);
@@ -186,4 +184,48 @@ export function useGetManyChannelsByNameOrId() {
     };
 
     return { getManyChannelsByNameOrId, channels, loadingChannels, setChannels, result};
+}
+
+export function useGetChannelById() {
+
+
+    const [channel, setChannel] = useState<ChannelResponse | null>(null);
+    const [loadingChannel, setLoadingChannel] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
+    const { get } = useFetch<ChannelResponse>();
+
+   
+    useEffect(() => {
+       
+
+        if(!result)
+        {
+            setLoadingChannel(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+           setChannel(result.data);
+        } 
+        else {
+            handleApiErrors(result);
+        }
+
+        setLoadingChannel(false);
+        setResult(null);
+
+    }, [result]);
+
+    const getChannelById = async (data: GetChannelByIdRequest) => {
+
+        setResult(null);
+        setChannel(null);
+        setLoadingChannel(true);
+
+        const response = await get({endpoint: "channels/by-id?" }, data );
+
+        setResult(response);
+    };
+
+    return { getChannelById, channel, loadingChannel, setChannel, result };
 }

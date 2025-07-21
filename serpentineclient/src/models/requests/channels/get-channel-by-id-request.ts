@@ -1,0 +1,4 @@
+interface GetChannelByIdRequest{
+
+    channelId: string;
+}

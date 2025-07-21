@@ -49,7 +49,7 @@ export default function ChannelsContainer({filter = "", channels, isLoading = tr
               
                 channels.filter(ch => ch.name.toLowerCase().includes(filter.toLowerCase()) ).map((ch, i) => (
                     
-                    <ChannelCard index={i} onClick={() => onChannelSelected?.(ch)} key={`${i}-${ch.name}`}  channel={ch} />
+                    <ChannelCard index={i}  onClick={() => onChannelSelected?.(ch)} key={ch.id}  channel={ch} />
                 ))
                
             }

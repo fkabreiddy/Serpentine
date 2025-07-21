@@ -1,4 +1,5 @@
 import Noise from "@/components/common/noise-ext";
+import { Skeleton } from "@heroui/skeleton";
 
 export interface ChannelBannerProps {
     pictureUrl: string | null; 

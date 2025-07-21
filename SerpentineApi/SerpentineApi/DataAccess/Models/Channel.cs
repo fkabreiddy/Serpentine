@@ -29,6 +29,9 @@ public class Channel : BaseEntity
     [NotMapped]
     public int UnreadMessages { get; set; } = 0;
 
+    [NotMapped]
+    public int MembersCount { get; set; } = 0;
+
     public ChannelResponse ToResponse() =>
         new ChannelResponse()
         {
@@ -42,6 +45,7 @@ public class Channel : BaseEntity
             BannerPicture = BannerPicture ?? "",
             CoverPicture = CoverPicture ?? "",
             UnreadMessages = UnreadMessages,
+            MembersCount = MembersCount,
         };
 
     public static Channel Create(CreateChannelRequest request) =>

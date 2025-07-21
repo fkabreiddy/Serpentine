@@ -5,6 +5,7 @@ import { HubResult } from "@/models/hub-result";
 import { useEffect, useRef, useState } from "react";
 import { showToast } from "./sonner-helper";
 import { HubConnectionState } from '@microsoft/signalr';
+import { set } from "zod";
 
 
 
@@ -12,25 +13,19 @@ import { HubConnectionState } from '@microsoft/signalr';
 export function useActiveUser() {
     const { setConnection, quitConnection, setConnectionState, activeUsersHub } = useActiveUserHubStore();
     const alreadyRendered = useRef<boolean>();
+    const activeUsersHubRef = useRef<signalR.HubConnection | null>(null);
+
 
     useEffect(()=>{
         if(!alreadyRendered.current)
         {
             connectToActiveUsersHub();
             alreadyRendered.current = true;
+            
         }
     },[])
 
-    useEffect(()=>{
-
-        if(activeUsersHub)
-        {
-            setConnectionState(activeUsersHub.state);
-        }
-        else{
-            setConnectionState(HubConnectionState.Disconnected);
-        }
-    },[activeUsersHub?.state])
+    
     
 
     const registerHandlers = () => {
@@ -71,16 +66,19 @@ export function useActiveUser() {
                 .withAutomaticReconnect()
                 .build();
 
-            hub.onreconnecting(() => unregisterHandlers());
-            hub.onclose(() => disconnectFromActiveUsersHub());
+            hub.onreconnecting(() => {unregisterHandlers(); setConnectionState(HubConnectionState.Reconnecting)});
+            hub.onclose(() => {disconnectFromActiveUsersHub(); setConnectionState(HubConnectionState.Disconnected)});
             hub.onreconnected(() => {
                 registerHandlers();
+                setConnectionState(HubConnectionState.Connected);
             });
 
             await hub.start();
-
+        
+            
             registerHandlers();
             setConnection(hub);
+            setConnectionState(hub.state);
         }
         catch{
 

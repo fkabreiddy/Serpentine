@@ -89,9 +89,10 @@ internal class GetChannelByIdEndpointHandler(SerpentineDbContext context)
         CancellationToken cancellationToken
     )
     {
+
         Channel? channel = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
             request.ChannelId,
-            request.ChannelId,
+            request.CurrentUserId,
             cancellationToken
         );
 

@@ -83,7 +83,7 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
                            }} placement="right"  tooltipText="Add a group" >
                                <PlusIcon className="size-[18px]"  />
                            </IconButton>
-                           <IconButton placement="right"   tooltipText="Manage" >
+                           <IconButton placement="right" onClick={()=>{setCurrentChannelId(channel?.id); setLayout({currentRightPanelView: RightPanelView.ManageChannelView})}}   tooltipText="Manage" >
                                <Settings className="size-[18px]"  />
                            </IconButton>
                        </>

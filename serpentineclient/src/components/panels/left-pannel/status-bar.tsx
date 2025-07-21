@@ -3,14 +3,15 @@ import SquarePattern from "@/components/common/square-pattern";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import { useAuthStore } from "@/contexts/authentication-context";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
-import { useActiveChannels } from "@/helpers/active-channels-hub";
+import { useActiveChannels, useActiveChannelsActions } from "@/helpers/active-channels-hub";
 import { useActiveUser } from "@/helpers/active-user-hub";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { Spinner } from "@heroui/spinner";
 import { HubConnectionState } from "@microsoft/signalr";
 import { PlugIcon, Square, Unplug } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface StatusBarProps{
 
@@ -20,33 +21,68 @@ interface StatusBarProps{
 export default function StatusBar({channels}:StatusBarProps){
 
     const {activeChannels, activeChannelsHub, activeChannelsHubsState} = useActiveChannelsHubStore();
+    const [listeningToChannel, setListeningToChannel] = useState(false);
     const alreadyRendered = useRef<boolean>(false);
     const {layout } = useLayoutStore();
     const {user, username} = useAuthStore();
-    const {registeringToChannels, listenToChannels} = useActiveChannels({
+    const {createdChannel} = useGlobalDataStore();
+    const {listenToChannel, stopListeningToChannel} = useActiveChannelsActions();
 
-      onReconnected: async () => await listenToChannels(channels)
-    });
+    const activeChannelsConnection = useActiveChannels();
+    
+    useEffect(() => {
+
+       
+      if(!activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected || !createdChannel) return;
+
+      setListeningToChannel(true);
+
+      listenToChannel(createdChannel);
+      
+      setListeningToChannel(false);
+
+
+    }, [createdChannel]);
+
+    useEffect(() => {}, [activeChannelsHub, activeChannelsHubsState]);
+
+
+
+    
+    
+
+    const listenToChannels = async (channels: ChannelResponse[]) => {
+
+      if(!activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected) return;
+
+      setListeningToChannel(true);
+      for(const channel of channels)
+      {
+        await stopListeningToChannel(channel);
+        await listenToChannel(channel);
+      }
+      setListeningToChannel(false);
+
+    }
+
     
  
     useEffect(()=>{
 
 
       if(!activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected) return;
-      const listen = async()=>{
-        await listenToChannels(channels);
-      }
+     
 
-      if(!alreadyRendered.current)
+      if(!alreadyRendered.current || activeChannelsHubsState === HubConnectionState.Connected)
       {
-        listen();
+        listenToChannels(channels);
         alreadyRendered.current = true;
       }
     },[activeChannelsHubsState])
-      
-    
-    return(<>
-    
+
+   
+    return (<>
+
         {layout.sideBarExpanded  && (
 
         <div
@@ -81,12 +117,12 @@ export default function StatusBar({channels}:StatusBarProps){
               <p className="text-xs">{activeChannelsHubsState.toString() } {activeChannelsHubsState === HubConnectionState.Connected && "as @" + username}</p>
              
               {
-                activeChannels.length !== channels.length && !registeringToChannels ?
+                activeChannels.length !== channels.length && activeChannelsHubsState === HubConnectionState.Connected ?
                 <label className="text-xs">
                   We couldn't connect to some of your channels. Reload this page.
                 </label>:
                 <label className="text-xs">
-                  {registeringToChannels
+                  {listeningToChannel
                     ? "Connecting to channels..."
                     : `Connected to ${activeChannels.length} channels`
                   }
@@ -94,11 +130,11 @@ export default function StatusBar({channels}:StatusBarProps){
               }
             
             </div>
-            <div></div>
+
           </>
-          
-      
-          
+
+
+
         </div>
       )}
     </>)
