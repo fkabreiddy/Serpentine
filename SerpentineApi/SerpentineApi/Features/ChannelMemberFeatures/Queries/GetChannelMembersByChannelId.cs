@@ -56,6 +56,7 @@ internal class GetChannelMemberByChannelIdEndpoint : IEndpoint
                 {
                     return await executor.ExecuteAsync<List<ChannelMemberResponse>>(async () =>
                     {
+                        
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {

@@ -1,0 +1,4 @@
+interface GetChannelMemberByChannelAndUserIdRequest{
+
+    channelId: string
+}

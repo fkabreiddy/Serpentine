@@ -107,7 +107,7 @@ internal class CreateGroupEndpoint : IEndpoint
             .DisableAntiforgery()
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .RequireCors()
-            .Experimental()
+            .Stable()
             .WithOpenApi()
             .WithTags(new[] { "Groups", "POST" })
             .WithDescription(

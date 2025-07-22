@@ -13,6 +13,7 @@ import GroupsContainer from "@/components/groups/common/groups-container";
 
 import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 import { start } from "repl";
+import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 interface LeftSideBarProps{
 
 }
@@ -27,10 +28,23 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
   const {getChannelsByUserId, setChannels, channels, loadingChannels, isBusy, hasMore } = useGetChannelsByUserId();
   const {user} = useAuthStore();
   const {layout } = useLayoutStore();
-  const {createdChannel, setCreatedChannel} = useGlobalDataStore();
+  const {createdChannel, setCreatedChannel, deletedChannelId, setDeletedChannelId} = useGlobalDataStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
+
+
+  useEffect(() =>{
+
+    if(deletedChannelId)
+    {
+
+      setChannels(channels.filter(channel => channel.id !== deletedChannelId));
+      
+      setDeletedChannelId(null);
+      
+    }
+  },[deletedChannelId])
 
   useEffect(() => {
     if (statusBarRef.current) {
@@ -56,7 +70,14 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
 
   useEffect(()=>{
 
-    setSelectedChannel(channels[0]);
+    if(channels.length > 0)
+    {
+      setSelectedChannel(channels[0]);
+    }
+    else
+    {
+      setSelectedChannel(null);
+    }
     
   },[channels])
 

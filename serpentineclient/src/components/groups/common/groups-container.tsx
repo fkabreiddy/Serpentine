@@ -25,7 +25,7 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
 
     const {getGroupsByChannelId, groups, setGroups, loadingGroups} = useGetGroupsByChannelId();
     const prevChannelId = useRef("");
-    const {setCreateGroupChannelData, setChannelInfoId, createdGroup, setCreatedGroup} = useGlobalDataStore();
+    const {setCreateGroupChannelData, createChannelGroupData, setChannelInfoId, createdGroup, setCreatedGroup} = useGlobalDataStore();
     const {layout, setLayout} = useLayoutStore();
     
     
@@ -40,6 +40,19 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
         })
     }
 
+    useEffect(() => {
+        
+        if(createChannelGroupData)
+        {
+            setLayout({currentRightPanelView: RightPanelView.CreateGroupFormView}); 
+
+        }
+
+    }, [createChannelGroupData]);
+
+    const setCreateGroupData = (channel: ChannelResponse) =>{
+        setCreateGroupChannelData({channelId: channel.id, channelName: channel.name});
+    }
     useEffect(() => {
         
         if(createdGroup && createdGroup.channelId === channel?.id){
@@ -81,10 +94,7 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
                             {((channel.myMember?.role && channel.myMember?.role?.name == "admin") || channel.myMember?.isOwner) &&
                             
                                 <IconButton 
-                                    onClick={()=> {
-                                        setCreateGroupChannelData({channelId: channel.id, channelName: channel.name});
-                                        setLayout({currentRightPanelView: RightPanelView.CreateGroupFormView}); 
-                                    }} 
+                                    onClick={()=> setCreateGroupData(channel)}
                                 placement="right"  
                                 tooltipText="Add a group" >
                                     <PlusIcon className="size-[18px]"  />

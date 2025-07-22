@@ -107,38 +107,41 @@ export function useActiveChannels() {
   
 }
 
-export function useActiveChannelsActions() {
+export function useActiveChannelsHubActions() {
   
   const {activeChannelsHub, addChannel, removeChannel} = useActiveChannelsHubStore();
-  const listenToChannel = async (channel: ChannelResponse) =>{
+
+  
+
+  const listenToChannel = async (channelId: string, channelName: string  | null = null) =>{
 
     
     if (!activeChannelsHub) return;
 
     try {
-        const result: HubResult<boolean> = await activeChannelsHub.invoke("ConnectToChannel", channel.id);
+        const result: HubResult<boolean> = await activeChannelsHub.invoke("ConnectToChannel", channelId);
         if (result.isSuccess) {
-          addChannel(channel.id);
+          addChannel(channelId);
           return;
         }
       } catch (error) {
-        showToast({title: "Error", description: `Error connecting to channel ${channel.id}`});
+        showToast({title: "Error", description: `Error connecting to channel ${channelName ?? "" }`});
       }
   }
 
-  const stopListeningToChannel = async (channel: ChannelResponse) =>{
+  const stopListeningToChannel = async (channelId: string, channelName: string  | null = null) =>{
 
     
     if (!activeChannelsHub) return;
 
     try {
-        const result: HubResult<boolean> = await activeChannelsHub.invoke("DisconnectFromChannel", channel.id);
+        const result: HubResult<boolean> = await activeChannelsHub.invoke("DisconnectFromChannel", channelId);
         if (result.isSuccess) {
-          removeChannel(channel.id);
+          removeChannel(channelId);
           return;
         }
       } catch (error) {
-        showToast({title: "Error", description: `Error disconnecting from channel ${channel.id}`});
+        showToast({title: "Error", description: `Error disconnecting from channel ${channelName ?? ""}`});
       }
   }
 

@@ -13,6 +13,7 @@ import { AppWindowMacIcon, ImageIcon } from "lucide-react";
 import Noise from "@/components/common/noise-ext";
 import { showToast } from "@/helpers/sonner-helper";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
+import { motion } from "motion/react";
 interface CreateChannelFormProps {
 
     triggerClose: () => void;
@@ -151,7 +152,11 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({triggerClose}) => 
         
 
     return (
-        <div className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
+        <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+         className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
             <input
                 onChange={(e) => handleFileChanged(e, "coverPictureFile")}
                 type="file"
@@ -264,7 +269,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({triggerClose}) => 
 
             
             
-        </div>
+        </motion.div>
     );
 };
 

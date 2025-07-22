@@ -43,7 +43,7 @@ public class GetChannelByIdEndpoint : IEndpoint
                 {
                     return await executor.ExecuteAsync<ChannelResponse>(async () =>
                     {
-                        request.SetUserId(
+                        request.SetCurrentUserId(
                             UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
                         );
                         var result = await sender.SendAndValidateAsync(request, cancellationToken);

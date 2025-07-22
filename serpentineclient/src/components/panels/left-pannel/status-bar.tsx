@@ -5,7 +5,7 @@ import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
-import { useActiveChannels, useActiveChannelsActions } from "@/helpers/active-channels-hub";
+import { useActiveChannels, useActiveChannelsHubActions } from "@/helpers/active-channels-hub";
 import { useActiveUser } from "@/helpers/active-user-hub";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { Spinner } from "@heroui/spinner";
@@ -20,31 +20,20 @@ interface StatusBarProps{
 
 export default function StatusBar({channels}:StatusBarProps){
 
-    const {activeChannels, activeChannelsHub, activeChannelsHubsState} = useActiveChannelsHubStore();
+    const {activeChannels, activeChannelsHub, activeChannelsHubsState, removeChannel} = useActiveChannelsHubStore();
     const [listeningToChannel, setListeningToChannel] = useState(false);
     const alreadyRendered = useRef<boolean>(false);
     const {layout } = useLayoutStore();
     const {user, username} = useAuthStore();
-    const {createdChannel} = useGlobalDataStore();
-    const {listenToChannel, stopListeningToChannel} = useActiveChannelsActions();
+    const {deletedChannelId} = useGlobalDataStore();
+    const {listenToChannel, stopListeningToChannel} = useActiveChannelsHubActions();
 
     const activeChannelsConnection = useActiveChannels();
+
+
     
-    useEffect(() => {
+   
 
-       
-      if(!activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected || !createdChannel) return;
-
-      setListeningToChannel(true);
-
-      listenToChannel(createdChannel);
-      
-      setListeningToChannel(false);
-
-
-    }, [createdChannel]);
-
-    useEffect(() => {}, [activeChannelsHub, activeChannelsHubsState]);
 
 
 
@@ -58,27 +47,36 @@ export default function StatusBar({channels}:StatusBarProps){
       setListeningToChannel(true);
       for(const channel of channels)
       {
-        await stopListeningToChannel(channel);
-        await listenToChannel(channel);
+        
+        await stopListeningToChannel(channel.id, channel.name);
+        await listenToChannel(channel.id, channel.name);
       }
       setListeningToChannel(false);
 
     }
 
-    
+    useEffect(() => {
+
+      if(deletedChannelId)
+      {
+        const desconnect = async () => {
+          await stopListeningToChannel(deletedChannelId);
+        }
+
+        desconnect();
+      }
+    },[deletedChannelId])
  
     useEffect(()=>{
-
-
-      if(!activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected) return;
      
 
-      if(!alreadyRendered.current || activeChannelsHubsState === HubConnectionState.Connected)
+      if(activeChannelsHubsState === HubConnectionState.Connected  )
       {
+        
+        console.log("channels to remove", channels);
         listenToChannels(channels);
-        alreadyRendered.current = true;
       }
-    },[activeChannelsHubsState])
+    },[activeChannelsHubsState, channels])
 
    
     return (<>
@@ -117,7 +115,7 @@ export default function StatusBar({channels}:StatusBarProps){
               <p className="text-xs">{activeChannelsHubsState.toString() } {activeChannelsHubsState === HubConnectionState.Connected && "as @" + username}</p>
              
               {
-                activeChannels.length !== channels.length && activeChannelsHubsState === HubConnectionState.Connected ?
+                activeChannelsHubsState !== HubConnectionState.Connected ?
                 <label className="text-xs">
                   We couldn't connect to some of your channels. Reload this page.
                 </label>:

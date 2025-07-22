@@ -15,7 +15,52 @@ const initialApiState = <T>(): ApiResult<T> => ({
 });
 
 
+export function useDeleteChannel() {
 
+    const [deletingChannel, setDeletingChannel] = useState<boolean>(false);
+    const [channelDeleted, setChannelDeleted] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<boolean> | null>(null);
+    const { delete: deleteCh } = useFetch<boolean>();
+    useEffect(() => {
+       
+        if(!result)
+        {
+            setDeletingChannel(false);
+            setChannelDeleted(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+           handleApiSuccess(result);
+           setChannelDeleted(true);
+
+        } 
+        else {
+            handleApiErrors(result);
+            setChannelDeleted(false);
+        }
+
+        setDeletingChannel(false);
+        setResult(null);
+
+    }, [result]);
+    
+
+
+    const deleteChannel = async (data: DeleteChannelRequest) => {
+
+        setChannelDeleted(false);
+        setResult(null);
+        setDeletingChannel(true);
+        const response = await deleteCh({endpoint: "channels/delete", contentType: "application/json"}, data );
+        setResult(response);
+
+    };
+
+    
+
+    return { deleteChannel, result, deletingChannel, channelDeleted};
+}
 export function useCreateChannel() {
 
     const [channel, setChannel] = useState<ChannelResponse | null>(null);
@@ -119,7 +164,7 @@ export function useGetChannelsByUserId() {
 
             
             data.skip = channelCount;
-            const response = await get({endpoint: "channels/by-userId?" }, data );
+            const response = await get({endpoint: "channels/by-userId" }, data );
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
@@ -176,7 +221,7 @@ export function useGetManyChannelsByNameOrId() {
         setChannels([]);
         setLoadingChannels(true);
     
-        const response = await get({endpoint: "channels/by-id-or-name?" }, data );
+        const response = await get({endpoint: "channels/by-id-or-name" }, data );
         
         setResult(response);
 
@@ -222,7 +267,7 @@ export function useGetChannelById() {
         setChannel(null);
         setLoadingChannel(true);
 
-        const response = await get({endpoint: "channels/by-id?" }, data );
+        const response = await get({endpoint: "channels/by-id" }, data );
 
         setResult(response);
     };

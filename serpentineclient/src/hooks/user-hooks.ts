@@ -143,7 +143,7 @@ export function useGetByUsername() {
         setResult(null);
         setIsGettingByUsername(true);
         setIsAvailable(false);
-        const response = await get({endpoint: "user/by-username?"}, data );
+        const response = await get({endpoint: "user/by-username"}, data );
         setResult(response);
 
        

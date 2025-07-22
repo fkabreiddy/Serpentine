@@ -7,6 +7,7 @@ import {Checkbox} from "@heroui/checkbox";
 import {Button} from "@heroui/button";
 import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 import {useCreateGroup} from "@/hooks/group-hooks.ts";
+import { motion } from 'motion/react';
 
 interface CreateGroupFormProps{
     onCreate: () => void;
@@ -54,7 +55,7 @@ export default function CreateGroupForm({onCreate}:CreateGroupFormProps)
         
         if(createChannelGroupData?.channelId){
             setValue("channelId", createChannelGroupData.channelId);
-
+            setCreateGroupChannelData(createChannelGroupData)
         }
 
     },[createChannelGroupData]);
@@ -63,7 +64,10 @@ export default function CreateGroupForm({onCreate}:CreateGroupFormProps)
             {createChannelGroupData &&
             
             
-            <>
+            < motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}>
             <div className="">
                 <h2 className="text-md font-semibold max-md:text-center">Creating a Group</h2>
                 <p className="text-xs opacity-45 max-md:text-center">You are creating a group for channel : <strong>#{createChannelGroupData?.channelName}</strong>. Be sure that your group name is unique in your channel. You can change any information previously</p>
@@ -128,8 +132,8 @@ export default function CreateGroupForm({onCreate}:CreateGroupFormProps)
 
             </form>
 
-        </>
-            
+        </motion.div>
+
             }
 
         </>

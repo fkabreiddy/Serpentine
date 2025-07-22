@@ -9,6 +9,9 @@ export class ChannelMemberResponse extends BaseResponse {
   isArchived: boolean = false;
   isOwner: boolean = false;
   lastAccess: Date = new Date();
+  userProfilePictureUrl : string = "";
+  userUsername : string = "";
+  userName : string = "";
   role: ChannelMemberRoleResponse  = new ChannelMemberRoleResponse();
 
   constructor(init?: Partial<ChannelMemberResponse>) {

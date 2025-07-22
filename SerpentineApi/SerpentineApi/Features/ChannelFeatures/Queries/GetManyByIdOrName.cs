@@ -63,7 +63,7 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
                     {
                         return await executor.ExecuteAsync<List<ChannelResponse>>(async () =>
                         {
-                            request.SetUserId(
+                            request.SetCurrentUserId(
                                 UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
                             );
                             var result = await sender.SendAndValidateAsync(

@@ -70,21 +70,22 @@ export function useFetch<T>() {
       
 
       let response;
+      const queryString = new URLSearchParams(data).toString();
+
       switch (method) {
         case HttpVerbsEnum.Post:
         response = await api.post<ApiResult<T>>(endpoint, data, config);
           break;
         case HttpVerbsEnum.Get:
-            const queryString = new URLSearchParams(data).toString() 
-            response = await api.get<ApiResult<T>>(`${endpoint}${queryString}`, config);
+            response = await api.get<ApiResult<T>>(`${endpoint}?${queryString}`, config);
           
           break;
         case HttpVerbsEnum.Put:
           response = await api.put<ApiResult<T>>(endpoint, data, config);
           break;
         case HttpVerbsEnum.Delete:
-          response = await api.delete<ApiResult<T>>(endpoint, config);
-          break;
+            response = await api.delete<ApiResult<T>>(`${endpoint}?${queryString}`, config);
+            break;
         default:
           throw new Error(`Unsupported HTTP method: ${method}`);
       }

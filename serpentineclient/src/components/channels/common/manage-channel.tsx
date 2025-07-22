@@ -1,5 +1,5 @@
 import { useGlobalDataStore } from "@/contexts/global-data-context"
-import { useGetChannelById } from "@/hooks/channel-hooks";
+import { useDeleteChannel, useGetChannelById } from "@/hooks/channel-hooks";
 import { useEffect, useState, useRef } from "react";
 import {Spinner} from "@heroui/spinner"
 import { ChannelBanner } from "./channel-banner";
@@ -12,6 +12,8 @@ import IconButton from "@/components/common/icon-button";
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User} from "@heroui/react";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { ChannelMemberRoleResponse } from "@/models/responses/channel-member-role-response";
+import { useLayoutStore } from "@/contexts/layout-context";
+import { RightPanelView } from "@/models/right-panel-view";
 
 
 export default function ManageChannelView(){
@@ -159,6 +161,23 @@ export default function ManageChannelView(){
 
 const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({ channel }) => {
 
+    const {deleteChannel, deletingChannel, channelDeleted} = useDeleteChannel();
+    const {setChannelInfoId, setDeletedChannelId} = useGlobalDataStore();
+
+    const {setLayout} = useLayoutStore();
+
+    const fetchDeleteChannel = async () => {
+
+        await deleteChannel({channelId: channel.id});
+    }
+
+    useEffect(() => {
+        if (channelDeleted) {
+            setChannelInfoId(null);
+            setDeletedChannelId(channel.id);
+            setLayout({currentRightPanelView: RightPanelView.DefaultView});
+        }
+    }, [channelDeleted]);
     return(
 
       <Dropdown placement="bottom-end">
@@ -202,7 +221,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({ channel }) =>
              </DropdownItem>
          {
             channel.myMember?.isOwner ?       
-            <DropdownItem color="danger" key="delete" endContent={<TrashIcon size={16}/>}>
+            <DropdownItem color="danger" key="delete" onClick={() => fetchDeleteChannel()} endContent={deletingChannel ? <Spinner variant="spinner" size="sm" /> : <TrashIcon size={16}/>}>
 
                 <p className="font-normal text-[13px]">Delete this channel</p>
 

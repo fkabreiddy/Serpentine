@@ -11,7 +11,7 @@ public abstract class RequestWithUserCredentials
     [JsonIgnore, BindNever]
     public Ulid CurrentUserId { get; private set; }
 
-    public void SetUserId(Ulid userId)
+    public void SetCurrentUserId(Ulid userId)
     {
         CurrentUserId = userId;
     }

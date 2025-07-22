@@ -1,0 +1,4 @@
+interface GetGroupByIdRequest{
+
+    groupId: string
+}

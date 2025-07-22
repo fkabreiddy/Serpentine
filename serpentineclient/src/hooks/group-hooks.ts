@@ -106,7 +106,7 @@ export function useGetGroupsByChannelId() {
 
 
             data.skip = channelCount;
-            const response = await get({endpoint: "groups/by-channel-id?" }, data );
+            const response = await get({endpoint: "groups/by-channel-id" }, data );
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
@@ -118,4 +118,51 @@ export function useGetGroupsByChannelId() {
     };
 
     return { getGroupsByChannelId, groups, setGroups, loadingGroups, result, hasMore, isBusy};
+}
+
+export function useGetGroupById(){
+
+    const [result, setResult] = useState<ApiResult<GroupResponse>| null>(null);
+    const [searchingGroup, setSearchingGroup] = useState<boolean>(false);
+    const [group, setGroup] = useState<GroupResponse | null>(null);
+    const {get} = useFetch<GroupResponse>();
+
+    useEffect(()=>{
+
+        if(!result)
+        {
+            setSearchingGroup(false);
+            return;
+        }
+
+        if(result.data !== null && result.isSuccess)
+        {
+            setGroup(result.data);
+        }
+        else{
+            handleApiErrors(result);
+        }
+
+        setResult(null);
+
+
+    },[result])
+
+    const getGroupById = async (data: GetGroupByIdRequest) =>{
+
+        setResult(null);
+        setGroup(null);
+        setSearchingGroup(true);
+
+        const response = await get({endpoint: "groups/by-id", contentType: "application/json"}, data)
+
+        setResult(response);
+
+    }
+
+    return{
+        group, 
+        getGroupById,
+        searchingGroup
+    }
 }
