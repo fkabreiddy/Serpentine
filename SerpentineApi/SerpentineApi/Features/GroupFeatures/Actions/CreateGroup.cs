@@ -138,14 +138,30 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
             if (!await dbContext.Channels.AnyAsync(ch => ch.Id == request.ChannelId))
                 return new BadRequestApiResult("Channel do not exist");
 
+            if (await dbContext.ChannelMembers.Include(cm => cm.Role)
+                                .AsNoTracking()
+                                .AsSplitQuery()
+                                .FirstOrDefaultAsync(cm => cm.ChannelId == request.ChannelId && cm.UserId == request.CurrentUserId
+                                , cancellationToken) is var permission && permission is null)
+            {
+                return new BadRequestApiResult("You dont have permissions to create a group in this channel");
+                 
+            }
+
+            if (!permission.IsOwner || permission.Role is null || permission.Role.Name != "admin")
+            {
+                return new BadRequestApiResult("You dont have permissions to create a group in this channel");
+
+            }
+
             if (
-                await dbContext.Groups.AnyAsync(x =>
-                    x.ChannelId == request.ChannelId && x.Name.ToLower() == request.Name.ToLower()
+                    await dbContext.Groups.AnyAsync(x =>
+                        x.ChannelId == request.ChannelId && x.Name.ToLower() == request.Name.ToLower()
+                    )
                 )
-            )
-                return new ConflictApiResult(
-                    "Another group on this channel with the same name already exist"
-                );
+                    return new ConflictApiResult(
+                        "Another group on this channel with the same name already exist"
+                    );
 
             var newGroup = Group.Create(request);
 

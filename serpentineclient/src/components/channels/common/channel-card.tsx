@@ -3,8 +3,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { VolumeOffIcon } from "lucide-react";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { Tooltip } from "@heroui/tooltip";
-import { useGlobalDataStore } from "@/contexts/global-data-context";
-import { RightPanelView } from "@/models/right-panel-view";
+
 import { ChannelCover } from "./channel-cover";
 import { motion } from "motion/react";
 
@@ -15,25 +14,11 @@ type ChannelCardProps ={
 
 const ChannelCard:React.FC<ChannelCardProps> = ({channel, index, ...rest}) =>{
 
-    const {layout, setLayout} = useLayoutStore();
-    const {setCurrentChannelId} = useGlobalDataStore();
-    const [isExpanded, setIsExpanded] = useState<boolean>(false);
-    const [groups, setGroups] = useState<number>(() => Math.floor(Math.random() * 5) + 1)
-    const setCurrentChannelIntoGlobalState = (channelId: string) =>{
-
-        setCurrentChannelId(channelId);
-        setLayout({currentRightPanelView: RightPanelView.DefaultView})
-    }
+    const {layout} = useLayoutStore();
+    
   
 
-    useEffect(()=>{
-
-        if(!layout.sideBarExpanded)
-        {
-            setIsExpanded(false);
-        }
-    },[layout.sideBarExpanded])
-
+   
 
     return(
 
@@ -44,7 +29,6 @@ const ChannelCard:React.FC<ChannelCardProps> = ({channel, index, ...rest}) =>{
       <motion.div 
       key={channel.id.toString() + "-motion"}
       className="flex items-center gap-3 flex-col w-[50px] " 
-      onClick={() => {setCurrentChannelIntoGlobalState(channel.id); setIsExpanded(!isExpanded);}}
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       transition={{ duration: 0.2, delay: index ? index * 0.1 : 0 }}

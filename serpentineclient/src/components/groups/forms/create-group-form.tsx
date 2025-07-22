@@ -14,12 +14,12 @@ interface CreateGroupFormProps{
 
 export default function CreateGroupForm({onCreate}:CreateGroupFormProps)
 {
-    const {currentChannelId, setCreatedGroup} = useGlobalDataStore();
+    const {createChannelGroupData, setCreateGroupChannelData, setCreatedGroup} = useGlobalDataStore();
     const {creatingGroup, group, createGroup} = useCreateGroup();
 
     useEffect(() => {
         setCreatedGroup(group);
-        
+        setCreateGroupChannelData(null);
         if(group)
         {
             onCreate();
@@ -52,18 +52,21 @@ export default function CreateGroupForm({onCreate}:CreateGroupFormProps)
     
     useEffect(() => {
         
-        if(currentChannelId){
-            setValue("channelId", currentChannelId);
+        if(createChannelGroupData?.channelId){
+            setValue("channelId", createChannelGroupData.channelId);
 
         }
-        
-    },[currentChannelId]);
+
+    },[createChannelGroupData]);
     return(
-        
         <>
+            {createChannelGroupData &&
+            
+            
+            <>
             <div className="">
                 <h2 className="text-md font-semibold max-md:text-center">Creating a Group</h2>
-                <p className="text-xs opacity-45 max-md:text-center">You are creating a group for channel with id: <strong>{currentChannelId}</strong>. Creating a group makes you an admin of it. Be sure that your group name is unique in your channel. You can change any information previously</p>
+                <p className="text-xs opacity-45 max-md:text-center">You are creating a group for channel : <strong>#{createChannelGroupData?.channelName}</strong>. Be sure that your group name is unique in your channel. You can change any information previously</p>
             </div>
 
             <form onSubmit={handleSubmit(data => submit(data))}   className="w-full relative  flex flex-col gap-3 mt-4">
@@ -126,5 +129,10 @@ export default function CreateGroupForm({onCreate}:CreateGroupFormProps)
             </form>
 
         </>
+            
+            }
+
+        </>
+        
     )
 }

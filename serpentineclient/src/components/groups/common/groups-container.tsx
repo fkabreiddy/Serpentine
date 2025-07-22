@@ -25,7 +25,7 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
 
     const {getGroupsByChannelId, groups, setGroups, loadingGroups} = useGetGroupsByChannelId();
     const prevChannelId = useRef("");
-    const {setCurrentChannelId, createdGroup, setCreatedGroup} = useGlobalDataStore();
+    const {setCreateGroupChannelData, setChannelInfoId, createdGroup, setCreatedGroup} = useGlobalDataStore();
     const {layout, setLayout} = useLayoutStore();
     
     
@@ -64,71 +64,75 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
     }, [channel?.id]);
     
     return (
-        <div className={`${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col  items-center   `} >
-            {channel && 
-                <div className="flex flex-col w-full gap-2 relative mt-2 mb-4">
-                    <ChannelBanner pictureUrl={channel?.bannerPicture}  />
-                    <ChannelCover absolute={true} isSmall={false} pictureUrl={channel.coverPicture} channelName={channel.name}/>                    
+
+        <>
+            {channel &&
+                 <div className={`${layout.sideBarExpanded ? "w-full" : "w-fit"} flex flex-col  items-center   `} >
+                   
+                        <div className="flex flex-col w-full gap-2 relative mt-2 mb-4">
+                            <ChannelBanner pictureUrl={channel?.bannerPicture}  />
+                            <ChannelCover absolute={true} isSmall={false} pictureUrl={channel.coverPicture} channelName={channel.name}/>                    
+                        </div>
+                    
+                    
+                    <div className="flex items-center gap-3 w-full justify-between">
+                    
+                        <div className="flex items-center gap-3">
+                            {((channel.myMember?.role && channel.myMember?.role?.name == "admin") || channel.myMember?.isOwner) &&
+                            
+                                <IconButton 
+                                    onClick={()=> {
+                                        setCreateGroupChannelData({channelId: channel.id, channelName: channel.name});
+                                        setLayout({currentRightPanelView: RightPanelView.CreateGroupFormView}); 
+                                    }} 
+                                placement="right"  
+                                tooltipText="Add a group" >
+                                    <PlusIcon className="size-[18px]"  />
+                                </IconButton>
+                                
+                            
+                            }
+                            <IconButton placement="right"  onClick={()=>{setChannelInfoId(channel?.id); setLayout({currentRightPanelView: RightPanelView.ManageChannelView})}}  tooltipText="About" >
+                                    <Info className="size-[18px]"  />
+                             </IconButton>
+                        
+                        </div>
+                            
+                        <div className="flex items-center gap-3">
+                            {
+                                channel?.myMember?.role && channel?.myMember.role.name === "admin" && 
+                                <Tooltip placement="bottom" showArrow={true} size="sm" content="Admin">
+                                    <KeyIcon className="size-[15px] opacity-80 cursor-pointer" />
+                                </Tooltip>
+                            }
+                            <h2  className="text-[13px] font-normal justify-self-end">{channel ? `#${channel.name}` : "Channel"}</h2>
+
+                        </div>
+
+                        
+                    </div>
+                        
+
+                    <div className="relative  w-full ml-[10px] pt-[25px]" style={{width: `calc(100% - 18px)`}}>
+
+                        {groups.filter(g => g.name.toLowerCase().includes(filter.toLowerCase())).length >= 1 &&
+                            <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
+                        }
+                        {groups.filter(g => g.name.toLowerCase().includes(filter.toLowerCase())).map((group, idx) => (
+                        
+                            <GroupCard index={idx} group={group} key={idx.toString() + channel?.name} />  
+                            
+                        ))}
+                    
+                    </div>
+                    {loadingGroups && <Spinner size={"sm"} color="default" variant={"dots"} className={" "}/>}
+                    {!loadingGroups && groups.length <= 0 && <span className={"text-xs mt-[40px] opacity-50"}>No groups found on this channel (T_T)</span>}
+
                 </div>
             }
-            
-            <div className="flex items-center gap-3 w-full justify-between">
-               
-                <div className="flex items-center gap-3">
-                    {((channel?.myMember?.role && channel?.myMember.role.name == "admin") || channel?.myMember?.isOwner) ?
-                       <>
-                           <IconButton onClick={()=> {
-                               setLayout({currentRightPanelView: RightPanelView.CreateGroupFormView}); 
-                               setCurrentChannelId(channel?.id);
-                           }} placement="right"  tooltipText="Add a group" >
-                               <PlusIcon className="size-[18px]"  />
-                           </IconButton>
-                           <IconButton placement="right" onClick={()=>{setCurrentChannelId(channel?.id); setLayout({currentRightPanelView: RightPanelView.ManageChannelView})}}   tooltipText="Manage" >
-                               <Settings className="size-[18px]"  />
-                           </IconButton>
-                       </>
-                        :
 
-                        <IconButton placement="right"   tooltipText="About" >
-                            <Info className="size-[18px]"  />
-                        </IconButton>
-                        
-                       
-                    }
-                   
-                </div>
-                       
-                <div className="flex items-center gap-3">
-                    {
-                        channel?.myMember?.role && channel?.myMember.role.name === "admin" && 
-                        <Tooltip placement="bottom" showArrow={true} size="sm" content="Admin">
-                            <KeyIcon className="size-[15px] opacity-80 cursor-pointer" />
-                        </Tooltip>
-                    }
-                    <h2  className="text-[13px] font-normal justify-self-end">{channel ? `#${channel.name}` : "Channel"}</h2>
-
-                </div>
-
-                  
-            </div>
-                 
-
-            <div className="relative  w-full ml-[10px] pt-[25px]" style={{width: `calc(100% - 18px)`}}>
-
-                {groups.filter(g => g.name.toLowerCase().includes(filter.toLowerCase())).length >= 1 &&
-                    <div style={{height:  "calc(100% - 15px)"}} className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full" />
-                }
-                {groups.filter(g => g.name.toLowerCase().includes(filter.toLowerCase())).map((group, idx) => (
-                
-                    <GroupCard index={idx} group={group} key={idx.toString() + channel?.name} />  
-                    
-                ))}
-               
-            </div>
-            {loadingGroups && <Spinner size={"sm"} color="default" variant={"dots"} className={" "}/>}
-            {!loadingGroups && groups.length <= 0 && <span className={"text-xs mt-[40px] opacity-50"}>No groups found on this channel (T_T)</span>}
-
-        </div>
+        </>
+       
     );
 }
 

@@ -3,30 +3,42 @@ import {ChannelResponse} from "@/models/responses/channel-response.ts";
 import {GroupResponse} from "@/models/responses/group-response.ts";
 
 interface GlobalData {
-  currentChannelId: string | null;
-  currentGroupId: string | null;
-  setCreatedChannel: (channel: ChannelResponse | null) => void;
-  setCurrentGroupId: (groupId: string) => void;
-  setCurrentChannelId: (channelId: string)  => void;
+  createChannelGroupData: {channelId: string, channelName: string} | null;
+  setCreateGroupChannelData: (data: {channelId: string, channelName: string} | null) => void;
+  channelInfoId: string | null;
+  setChannelInfoId: (id: string | null) => void;
   createdChannel: ChannelResponse | null;
+  setCreatedChannel: (channel: ChannelResponse | null) => void;
   createdGroup: GroupResponse | null;
-  setCreatedGroup: (group: GroupResponse | null)=>void
+  setCreatedGroup: (group: GroupResponse | null)=> void
 
   
 }
 
 export const useGlobalDataStore = create<GlobalData>((set) => ({
-  currentChannelId: null,
-  currentGroupId: null,
+  createChannelGroupData: null,
   createdChannel: null,
   createdGroup: null,
-  
+  channelInfoId: null,
+  setChannelInfoId: (id: string | null) => {
+    set((state) => ({
+      ...state,
+      channelInfoId: id,
+    }));
+  },
   setCreatedGroup: (group: GroupResponse | null) => {
     set((state)=>({
       
       ...state,
       createdGroup: group,
     }))
+  },
+
+  setCreateGroupChannelData: (data: { channelId : string, channelName : string} | null) => {
+    set((state) => ({
+      ...state,
+      createChannelGroupData: data,
+    }));
   },
   setCreatedChannel: (channel: ChannelResponse | null) => {
     set((state)=> ({
@@ -35,21 +47,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }))
   },
   
-  setCurrentGroupId: (groupId : string) =>{
-    set((state) => ({
-      ...state,
-      currentGroupId: groupId,
-     
-    }));
-  },
-
-  setCurrentChannelId: (groupId : string) =>{
-    set((state) => ({
-      ...state,
-      currentChannelId: groupId,
-     
-    }));
-  },
+ 
 
  
 }));

@@ -136,15 +136,22 @@ internal class UpdateChannelRequestChannel(SerpentineDbContext context)
             );
 
         if (
-            await context.ChannelMembers.AnyAsync(cm =>
+            await context.ChannelMembers.FirstOrDefaultAsync(cm =>
                 cm.UserId == request.CurrentUserId
-                && cm.ChannelId == request.ChannelId
-                && cm.IsOwner
-            ) == false
+                && cm.ChannelId == request.ChannelId,
+                 cancellationToken
+            ) is var permission && permission is null
         )
         {
             return new NotFoundApiResult("Channel not found");
         }
+
+        if (!permission.IsOwner || permission.Role is null || permission.Role.Name != "admin")
+        {
+            return new BadRequestApiResult("You dont have permissions to create a group in this channel");
+
+        }
+
 
         Channel? channel = await context.Channels.FirstOrDefaultAsync(
             ch => ch.Id == request.ChannelId,
