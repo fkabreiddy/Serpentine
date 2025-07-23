@@ -16,17 +16,16 @@ export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl }) => (
             src={pictureUrl}            
     
          /> :
-          <Noise
-                  
-                  
-                     patternSize={250}
-                     patternScaleX={0}
-                     patternScaleY={0}
-                     patternRefreshInterval={2}
-                     patternAlpha={10}
-                     height="100%"
-                     width="100%"
-                 />
+            <Noise
+                    
+                patternSize={250}
+                patternScaleX={0}
+                patternScaleY={0}
+                patternRefreshInterval={2}
+                patternAlpha={10}
+                height="100%"
+                width="100%"
+            />
         }
          
     </div>

@@ -52,6 +52,9 @@ export default defineConfig([
         "plugin:prettier/recommended",
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
       ),
     ),
 
@@ -79,6 +82,7 @@ export default defineConfig([
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
+          sourceType: "module"
         },
       },
     },

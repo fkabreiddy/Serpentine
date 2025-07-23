@@ -6,8 +6,8 @@ interface NoiseProps {
   patternScaleY?: number;
   patternRefreshInterval?: number;
   patternAlpha?: number;
-  height?:string;
-  width?:string
+  height?: string;
+  width?: string;
 }
 
 const Noise: React.FC<NoiseProps> = ({
@@ -17,8 +17,7 @@ const Noise: React.FC<NoiseProps> = ({
   patternRefreshInterval = 2,
   patternAlpha = 15,
   width = "0px",
-  height = "0px"
-  
+  height = "0px",
 }) => {
   const grainRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -33,12 +32,12 @@ const Noise: React.FC<NoiseProps> = ({
     let animationId: number;
 
     const canvasSize = 1024;
-    
+
     const resize = () => {
       if (!canvas) return;
       canvas.width = canvasSize;
       canvas.height = canvasSize;
-      
+
       canvas.style.width = width;
       canvas.style.height = height;
     };
@@ -46,7 +45,7 @@ const Noise: React.FC<NoiseProps> = ({
     const drawGrain = () => {
       const imageData = ctx.createImageData(canvasSize, canvasSize);
       const data = imageData.data;
-      
+
       for (let i = 0; i < data.length; i += 4) {
         const value = Math.random() * 255;
         data[i] = value;
@@ -54,7 +53,7 @@ const Noise: React.FC<NoiseProps> = ({
         data[i + 2] = value;
         data[i + 3] = patternAlpha;
       }
-      
+
       ctx.putImageData(imageData, 0, 0);
     };
 
@@ -74,16 +73,20 @@ const Noise: React.FC<NoiseProps> = ({
       window.removeEventListener("resize", resize);
       window.cancelAnimationFrame(animationId);
     };
-  }, [patternSize, patternScaleX, patternScaleY, patternRefreshInterval, patternAlpha]);
+  }, [
+    patternSize,
+    patternScaleX,
+    patternScaleY,
+    patternRefreshInterval,
+    patternAlpha,
+  ]);
 
   return (
     <canvas
-    
       className="pointer-events-none  "
       ref={grainRef}
       style={{
-        imageRendering: 'pixelated',
-       
+        imageRendering: "pixelated",
       }}
     />
   );

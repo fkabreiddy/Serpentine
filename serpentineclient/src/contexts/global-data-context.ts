@@ -1,20 +1,20 @@
-import { create } from 'zustand';
-import {ChannelResponse} from "@/models/responses/channel-response.ts";
-import {GroupResponse} from "@/models/responses/group-response.ts";
+import { create } from "zustand";
+import { ChannelResponse } from "@/models/responses/channel-response.ts";
+import { GroupResponse } from "@/models/responses/group-response.ts";
 
 interface GlobalData {
-  createChannelGroupData: {channelId: string, channelName: string} | null;
-  setCreateGroupChannelData: (data: {channelId: string, channelName: string} | null) => void;
+  createChannelGroupData: { channelId: string; channelName: string } | null;
+  setCreateGroupChannelData: (
+    data: { channelId: string; channelName: string } | null
+  ) => void;
   channelInfoId: string | null;
   setChannelInfoId: (id: string | null) => void;
   createdChannel: ChannelResponse | null;
   setCreatedChannel: (channel: ChannelResponse | null) => void;
   createdGroup: GroupResponse | null;
-  setCreatedGroup: (group: GroupResponse | null)=> void
+  setCreatedGroup: (group: GroupResponse | null) => void;
   deletedChannelId: string | null;
   setDeletedChannelId: (id: string | null) => void;
-
-  
 }
 
 export const useGlobalDataStore = create<GlobalData>((set) => ({
@@ -37,27 +37,24 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }));
   },
   setCreatedGroup: (group: GroupResponse | null) => {
-    set((state)=>({
-      
+    set((state) => ({
       ...state,
       createdGroup: group,
-    }))
+    }));
   },
 
-  setCreateGroupChannelData: (data: { channelId : string, channelName : string} | null) => {
+  setCreateGroupChannelData: (
+    data: { channelId: string; channelName: string } | null
+  ) => {
     set((state) => ({
       ...state,
       createChannelGroupData: data,
     }));
   },
   setCreatedChannel: (channel: ChannelResponse | null) => {
-    set((state)=> ({
+    set((state) => ({
       ...state,
-      createdChannel: channel
-    }))
+      createdChannel: channel,
+    }));
   },
-  
- 
-
- 
 }));

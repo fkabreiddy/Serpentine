@@ -8,8 +8,10 @@ interface ActiveChannelsStore {
   activeChannels: string[];
   setConnection: (hub: HubConnection | null) => void;
   quitConnection: () => void;
-  setActiveChannelsHubConnectionState: (connetionState: HubConnectionState) => void;
-  addChannel: (channelId: string ) => void;
+  setActiveChannelsHubConnectionState: (
+    connetionState: HubConnectionState
+  ) => void;
+  addChannel: (channelId: string) => void;
   removeChannel: (channelId: string) => void;
   clearChannels: () => void;
 }
@@ -19,53 +21,49 @@ export const useActiveChannelsHubStore = create<ActiveChannelsStore>((set) => ({
   activeChannelsHubsState: HubConnectionState.Disconnected,
   activeChannels: [],
 
-    setActiveChannelsHubConnectionState: (connectionState: HubConnectionState)=>{
-        set((state) => ({
-            ...state,
-            activeChannelsHubsState: connectionState,
-        
-        }));
-    },
+  setActiveChannelsHubConnectionState: (
+    connectionState: HubConnectionState
+  ) => {
+    set((state) => ({
+      ...state,
+      activeChannelsHubsState: connectionState,
+    }));
+  },
 
-  
   setConnection: (hub) => {
     set((state) => ({
-        ...state,
-        activeChannelsHub: hub,
+      ...state,
+      activeChannelsHub: hub,
     }));
   },
 
   quitConnection: () => {
     set((state) => ({
-        ...state,
+      ...state,
 
       activeChannelsHub: null,
-      
     }));
   },
-  
-
 
   addChannel: (channel) => {
     set((state) => ({
-        ...state,
+      ...state,
       activeChannels: [...state.activeChannels, channel],
     }));
   },
 
   removeChannel: (channelToRemove) => {
     set((state) => ({
-        ...state,
+      ...state,
 
-      activeChannels: state.activeChannels.filter(c => c !== channelToRemove),
+      activeChannels: state.activeChannels.filter((c) => c !== channelToRemove),
     }));
   },
 
   clearChannels: () => {
-    
-    set((state) => ({ 
-        ...state,
-        activeChannels: [] 
+    set((state) => ({
+      ...state,
+      activeChannels: [],
     }));
   },
 }));
