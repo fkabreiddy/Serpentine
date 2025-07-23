@@ -14,6 +14,7 @@ import GroupsContainer from "@/components/groups/common/groups-container";
 import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 import { start } from "repl";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
+import { channel } from "diagnostics_channel";
 interface LeftSideBarProps{
 
 }
@@ -101,6 +102,16 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
         
     };
  
+    const handleGroupsUnreadMessagesCount = (unreadMessages: number) =>{
+      
+      if(!selectedChannel) return;
+
+      const channel = channels.find(ch => ch.id === selectedChannel.id);
+
+      if(!channel) return;
+
+      channel.unreadMessages = unreadMessages;
+    }
 
 
 
@@ -154,7 +165,12 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () =>{
             onSearch={setFilter}
           />
         )}
-        {layout.sideBarExpanded && selectedChannel && <GroupsContainer filter={filter} channel={selectedChannel}/>}
+        {layout.sideBarExpanded && selectedChannel && 
+        <GroupsContainer 
+          filter={filter} 
+          channel={selectedChannel}
+          callbackUnreadMessagesCount={handleGroupsUnreadMessagesCount}
+        />}
         {!selectedChannel && layout.sideBarExpanded && !loadingChannels &&
                     
             <div className="h-full w-full flex items-center justify-center">

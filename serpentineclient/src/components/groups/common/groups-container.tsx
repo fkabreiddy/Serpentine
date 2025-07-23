@@ -18,10 +18,11 @@ interface GroupsContainerProps {
 
     channel: ChannelResponse | null;
     filter?: string;
+    callbackUnreadMessagesCount: (notifications: number) => void
     
 }
 
-export default function GroupsContainer({channel, filter = ""}:GroupsContainerProps) {
+export default function GroupsContainer({channel, filter = "", callbackUnreadMessagesCount}:GroupsContainerProps) {
 
     const {getGroupsByChannelId, groups, setGroups, loadingGroups} = useGetGroupsByChannelId();
     const prevChannelId = useRef("");
@@ -61,6 +62,20 @@ export default function GroupsContainer({channel, filter = ""}:GroupsContainerPr
             setCreatedGroup(null);
         }
     }, [createdGroup]);
+
+    useEffect(()=>{
+        if(groups){
+
+            let counter = 0;
+            groups.map((group, _)=>{
+
+                counter += group.unreadMessages;
+
+            })
+
+            callbackUnreadMessagesCount(counter);
+        }
+    },[groups])
     
     useEffect(() => {
         if(channel === null) return;

@@ -68,7 +68,9 @@ export default function ChatroomPage(){
             <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
                <WarmBeigeBg/>
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
-                <CurrentGroupChatroomInfo/>
+                {group && 
+                   <CurrentGroupChatroomInfo group={group}/>
+                }
 
                 <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
             </ScrollShadow>

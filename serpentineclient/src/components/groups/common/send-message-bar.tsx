@@ -65,7 +65,7 @@ export default function SendMessageBar({group, loading = false, hasPermisson = f
                             
                                
                         }
-                        {loading && <Spinner size="sm" variant="spinner"/>}
+                        
 
                     </div>
 
@@ -87,20 +87,27 @@ export default function SendMessageBar({group, loading = false, hasPermisson = f
                         
                         
                         </IconButton>
-                        <IconButton disabled={true} onClick={()=>{}} tooltipText="Send">
-                            <motion.div
-                                key="send-icon"
-                                whileHover={{ rotate: -40 }}
-                                animate={{ rotate: 0 }}
-                                exit={{ rotate: 40}}
-                                className="flex  relative"
-                            >
-                                <ArrowRight className="size-[16px] "/>
 
-                            </motion.div>
+                        {loading ?
+                        
+                            <Spinner size="sm" variant="spinner"/> :
+                             <IconButton disabled={true} onClick={()=>{}} tooltipText="Send">
+                                <motion.div
+                                    key="send-icon"
+                                    whileHover={{ rotate: -40 }}
+                                    animate={{ rotate: 0 }}
+                                    exit={{ rotate: 40}}
+                                    className="flex  relative"
+                                >
+                                    <ArrowRight className="size-[16px] "/>
+
+                                </motion.div>
                         
                         
                         </IconButton>
+                            
+                        }
+                       
                     </div>
 
 
