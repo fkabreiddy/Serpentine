@@ -49,11 +49,7 @@ export default function SearchPopover() {
       <PopoverContent className="backdrop-blur-sm border-neutral-100 dark:bg-neutral-900/30  max-w-[400px] w-full  ">
         <div className="px-1 py-2 flex flex-col gap-3">
           <GeneralSearcher
-            onSearching={(value) => setIsSearching(value)}
-            onChannelsSearched={(value) => setChannels(value)}
-            onFilterChanged={(value) => {
-              setFilter(value);
-            }}
+            
           />
         </div>
       </PopoverContent>

@@ -119,7 +119,7 @@ export default function GroupsContainer({
                 onClick={() => {
                   setChannelInfoId(channel?.id);
                   setLayout({
-                    currentRightPanelView: RightPanelView.ManageChannelView,
+                    currentRightPanelView: RightPanelView.ChannelInfo,
                   });
                 }}
                 tooltipText="About"

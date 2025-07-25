@@ -8,6 +8,7 @@ import CreateChannelForm from "@/components/channels/forms/create-channel-form";
 import IconButton from "@/components/common/icon-button";
 import CreateGroupForm from "@/components/groups/forms/create-group-form.tsx";
 import ManageChannelView from "@/components/channels/common/manage-channel";
+import { motion } from "framer-motion";
 
 interface RightSideBarProps {}
 
@@ -34,6 +35,8 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
       offset={0}
       className={`h-scren ${isMobile ? "w-[100%] ml-[50px]" : "!min-w-[300px] !max-w-[300px]"}  bg-white dark:bg-black/40 backdrop-blur-lg   animate-all flex flex-col items-center border-l  border-default-100 p-3 overflow-auto gap-2  scroll-smooth scrollbar-hide `}
     >
+
+    
       {layout.currentRightPanelView !== RightPanelView.DefaultView && (
         <div className="absolute top-2 right-2">
           <IconButton tooltipText="Close" onClick={() => close()}>
@@ -49,9 +52,10 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
       {layout.currentRightPanelView === RightPanelView.CreateGroupFormView && (
         <CreateGroupForm onCreate={() => close()} />
       )}
-      {layout.currentRightPanelView === RightPanelView.ManageChannelView && (
+      {layout.currentRightPanelView === RightPanelView.ChannelInfo && (
         <ManageChannelView />
       )}
+     
     </ScrollShadow>
   );
 };

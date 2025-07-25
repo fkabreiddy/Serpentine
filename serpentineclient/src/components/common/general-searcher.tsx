@@ -5,74 +5,42 @@ import {
   DropdownItem,
 } from "@heroui/dropdown";
 import { Settings2Icon, CheckIcon, SearchIcon } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import SearchBar from "../search-channel-bar";
 import IconButton from "./icon-button";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { useGetManyChannelsByNameOrId } from "@/hooks/channel-hooks";
-interface GeneralSearcherProps {
-  onChannelsSearched: (channels: ChannelResponse[]) => void;
-  onFilterChanged?: (value: string) => void;
-  onSearching?: (value: boolean) => void;
-}
+import { useNavigate } from "react-router-dom";
+import { Input } from "@heroui/input";
 
-export default function GeneralSearcher({
-  onChannelsSearched,
-  onSearching = () => {},
-  onFilterChanged = () => {},
-}: GeneralSearcherProps) {
+
+export default function GeneralSearcher() {
   const [filter, setFilter] = React.useState<string>("");
-  const { getManyChannelsByNameOrId, channels, loadingChannels } =
-    useGetManyChannelsByNameOrId();
-  const [searchById, setSearchById] = React.useState<boolean>(false);
-  const [channelsSearch, setChannelsSearch] =
-    React.useState<GetManyByNameOrIdRequest>({
-      channelId: null,
-      channelName: null,
-    });
-
-  useEffect(() => {
-    onFilterChanged(filter);
-
-    if (filter === "" || !filter) {
-      onChannelsSearched([]);
-      return;
-    }
-
-    const handler = setTimeout(async () => {
-      await getManyChannelsByNameOrId(channelsSearch);
-    }, 1000);
-
-    return () => clearTimeout(handler);
-  }, [channelsSearch.channelId, channelsSearch.channelName]);
-
-  useEffect(() => {
-    searchById
-      ? setChannelsSearch((prev) => ({
-          ...prev,
-          channelId: filter,
-          channelName: null,
-        }))
-      : setChannelsSearch((prev) => ({
-          ...prev,
-          channelId: null,
-          channelName: filter,
-        }));
-  }, [searchById]);
-
-  useEffect(() => {
-    onSearching(loadingChannels);
-    onChannelsSearched(channels);
-  }, [loadingChannels]);
-
+  const navigate = useNavigate();
+ const handleChange = (event : React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(event.target.value);
+  };
+  
   return (
-    <SearchBar
-      searchButton={true}
-      maxLength={100}
-      placeholder="Search something..."
-      onSearch={(value) => {
-        setFilter(value);
-      }}
+   <Input
+     
+      value={filter}
+      labelPlacement="outside"
+      autoComplete="current-password"
+      style={{ fontSize: "12px" }}
+      endContent={
+        
+          <IconButton 
+            tooltipText="Search" 
+            disabled={filter === "" || filter === null} 
+            onClick={()=>{navigate(`/search/${filter}`)}}
+          >
+            <SearchIcon className="size-[18px] " />
+          </IconButton>
+        
+      }
+      className={`w-[50%] max-md:w-full !text-[12px] `}
+      onChange={(e) =>{handleChange(e)} }
     />
   );
 }

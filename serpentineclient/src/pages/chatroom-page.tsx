@@ -1,3 +1,4 @@
+import DotsPatter from "@/components/common/dots-pattern";
 import WarmBeigeBg from "@/components/common/warm-beige-bg";
 import CurrentGroupChatroomInfo from "@/components/groups/common/current-group-chatroom-info";
 import SendMessageBar from "@/components/groups/common/send-message-bar";
@@ -11,13 +12,15 @@ import { useParams } from "react-router-dom";
 export default function ChatroomPage(){
 
     const {layout} = useLayoutStore();
-    const {id} = useParams();
+    const {groupId} = useParams();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
-    const fetchGroup = async(groupId: string)=>{
+    
+    
+    const fetchGroup = async(id: string)=>{
 
-        await getGroupById({groupId: groupId});
+        await getGroupById({groupId: id});
 
     }
     const fetchPermisson = async (channelId: string) =>{
@@ -27,13 +30,13 @@ export default function ChatroomPage(){
     
     useEffect(()=>{
 
-        if(id)
+        if(groupId)
         {
-            fetchGroup(id);
+            fetchGroup(groupId);
             
 
         }
-    },[id])
+    },[groupId])
 
 
     useEffect(()=>{
@@ -66,7 +69,6 @@ export default function ChatroomPage(){
     return(
         <>
             <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
-               <WarmBeigeBg/>
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
                 {group && 
                    <CurrentGroupChatroomInfo group={group}/>

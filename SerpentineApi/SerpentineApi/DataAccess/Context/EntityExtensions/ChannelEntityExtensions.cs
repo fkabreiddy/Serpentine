@@ -81,7 +81,7 @@ public static class ChannelEntityExtensions
         var channels = await query
             .OrderBy(ch => ch.Id)
             .Skip(0)
-            .Take(5)
+            .Take(15)
             .Select(ch => new Channel()
             {
                 MembersCount = ch.Members.Count,

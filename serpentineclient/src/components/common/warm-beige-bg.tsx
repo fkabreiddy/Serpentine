@@ -1,7 +1,7 @@
 export default function WarmBeigeBg() {
   return (
     <div
-      className="absolute inset-0 z-0 dark:opacity-[0.15] opacity-20"
+      className="fixed inset-0 z-[-10] dark:opacity-[0] opacity-20"
       style={{
         backgroundImage: `
                 radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),

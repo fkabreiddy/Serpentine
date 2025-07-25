@@ -12,7 +12,7 @@ export default function SquarePattern() {
 
   return (
     <div
-      className="absolute inset-0 z-0 h-full w-full opacity-50"
+      className="absolute inset-0 z-0 h-full w-full opacity-20"
       style={{
         background: "transparent",
         backgroundImage: `

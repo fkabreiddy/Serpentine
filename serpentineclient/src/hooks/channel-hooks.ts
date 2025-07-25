@@ -198,9 +198,8 @@ export function useGetManyChannelsByNameOrId() {
 
         
 
-        if (result.data && result.statusCode === 200) {
-           setChannels(prev => [...prev, ...(result.data || [])]);
-           console.log("Channels fetched: ", result.data);
+        if (result.data && result.isSuccess) {
+           setChannels(result.data);
 
         } 
         else {
@@ -208,7 +207,6 @@ export function useGetManyChannelsByNameOrId() {
             handleApiErrors(result);
         }
 
-        setLoadingChannels(false);
         setResult(null);
 
 
@@ -217,8 +215,9 @@ export function useGetManyChannelsByNameOrId() {
    
     const getManyChannelsByNameOrId = async (data: GetManyChannelsByNameOrIdRequest) => {
         
-        setResult(null);
         setChannels([]);
+        
+        setResult(null);
         setLoadingChannels(true);
     
         const response = await get({endpoint: "channels/by-id-or-name" }, data );

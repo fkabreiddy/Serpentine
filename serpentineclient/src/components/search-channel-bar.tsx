@@ -1,4 +1,4 @@
-import { Input } from "@heroui/input";
+import { Input, InputProps } from "@heroui/input";
 import React, { useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { InputOtpVariantProps } from "@heroui/theme";
@@ -9,7 +9,7 @@ type SearchBarProps = {
   onCancel?: () => void;
   searchButton?: boolean;
   width?: string;
-} & InputOtpVariantProps;
+} & InputProps;
 
 const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,

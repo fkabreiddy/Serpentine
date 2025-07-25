@@ -63,6 +63,8 @@ export default function CreateGroupForm({ onCreate }: CreateGroupFormProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
+         className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4"
+
         >
           <div className="">
             <h2 className="text-md font-semibold max-md:text-center">

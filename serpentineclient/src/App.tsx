@@ -8,6 +8,8 @@ import { AuthorizeView } from "./components/common/authorize-view";
 import ChatroomPage from "./pages/chatroom-page";
 import ClickSpark from "./components/common/spark-click";
 import { useEffect, useState } from "react";
+import SearchResultsPage from "./pages/explore-page";
+import ExplorePage from "./pages/explore-page";
 
 
 function App() {
@@ -46,7 +48,18 @@ function App() {
         </AuthorizeView>
           </DefaultLayout>
         } 
-        path="/group/:id">
+        path="/group/:groupId">
+      </Route>
+      
+      <Route 
+        element={
+          <DefaultLayout>
+          <AuthorizeView>
+            <ExplorePage/> 
+          </AuthorizeView>
+          </DefaultLayout>
+        } 
+        path="/explore">
       </Route>
 
     </Routes>

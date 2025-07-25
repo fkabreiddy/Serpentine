@@ -15,7 +15,6 @@ export default function HomePage () {
 
     const [isMounted, setIsMounted] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
-    const {currentChatId} = useGlobalDataStore();
     const isMobile = useIsMobile();
 
     useEffect(() =>{

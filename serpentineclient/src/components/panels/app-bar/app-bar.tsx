@@ -7,7 +7,7 @@ import { Image } from "@heroui/image";
 import { useCloseSession } from "@/hooks/user-hooks";
 import IconButton from "@/components/common/icon-button";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { PlugIcon } from "lucide-react";
+import { Compass, PlugIcon } from "lucide-react";
 import SearchPopover from "./search-popover";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GeneralSearcher from "@/components/common/general-searcher";
@@ -23,6 +23,7 @@ import {
   DropdownTrigger,
 } from "@heroui/dropdown";
 import CrosshatchPattern from "@/components/common/crosshatch-pattern";
+import { useNavigate } from "react-router-dom";
 
 interface ProfilePanelProps {}
 
@@ -32,6 +33,7 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   const { activeUserHubConnectionState, activeUsersHub } =
     useActiveUserHubStore();
   const alreadyMounted = useRef<boolean>(false);
+  const navigate = useNavigate();
 
   const { disconnectFromActiveUsersHub } = useActiveUser();
   const { closeSession } = useCloseSession();
@@ -78,16 +80,12 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
 
       <div />
 
-      {!isMobile ? (
-        <GeneralSearcher onChannelsSearched={() => {}} />
-      ) : (
-        <SearchPopover />
-      )}
-
+      
       <div className=" flex  items-center justify-end gap-4 ">
+        <ExploreIcon/>
         <ThemeSwitch />
-
-        <NotificationsIcon />
+        
+        <NotificationsIcon/>
 
         {isAuthenticated && (
           <Tooltip
@@ -149,6 +147,27 @@ const NotificationsIcon = () => (
     </motion.div>
   </IconButton>
 );
+
+const ExploreIcon = () => {
+
+  const navigate = useNavigate();
+  return(
+  <IconButton onClick={() => {navigate("/explore")}} tooltipText="Explore">
+    <motion.div
+      key="compass-icon"
+      whileHover={{ rotate: 90 }}
+      animate={{ rotate: 0 }}
+      exit={{ rotate: -30 }}
+      className="flex  relative"
+    >
+     
+        <Compass size={20}/>
+   
+    </motion.div>
+  </IconButton>
+  )
+};
+
 
 interface AvatarDropdownProps {
   children: ReactNode;
