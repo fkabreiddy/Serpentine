@@ -1,6 +1,6 @@
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useIsMobile } from '../hooks/use-mobile';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@heroui/use-theme";
 import {  useLayoutStore } from "@/contexts/layout-context";
 import { ArrowLeft, ArrowRight, MenuIcon, X } from "lucide-react";
@@ -9,6 +9,10 @@ import AppBar from "@/components/panels/app-bar/app-bar";
 import LeftSideBar from "@/components/panels/left-pannel/left-side-bar";
 import RightSideBar from "@/components/panels/right-panel/right-side-bar";
 import { RightPanelView } from "@/models/right-panel-view";
+import { useJwtHelper } from "@/helpers/jwt-helper";
+import { useAuthStore } from "@/contexts/authentication-context";
+import { Spinner } from "@heroui/react";
+import { useNavigate } from "react-router-dom";
 
 export default function DefaultLayout({
   children,
@@ -17,8 +21,27 @@ export default function DefaultLayout({
 }) {
 
   const { setTheme } = useTheme("dark");
+  const {getToken} = useJwtHelper();
+  const {isAuthenticated} = useAuthStore();
+  const firstRender = useRef(false);
+  const navigate = useNavigate();
+  const [loadLayout, setLoadLayout] = useState(false);
+
 
   useEffect(() => {
+
+    if(!firstRender.current)
+    {
+      firstRender.current = true;
+      const token = getToken();
+
+      if(!token)
+      {
+          navigate("/");
+      }
+
+      setLoadLayout(true);
+    }
     setTheme("dark");
   }, []);
 
@@ -39,6 +62,8 @@ export default function DefaultLayout({
   const changeSidebarState = () =>{
       setLayout({sideBarExpanded : !layout.sideBarExpanded})
   }
+
+  if(!loadLayout) return (<div className="flex items-center justify-center w-full h-screen bg-black"><Spinner size="sm" variant="spinner"/></div>)
 
   return (
     <div className="w-screen h-screen flex">

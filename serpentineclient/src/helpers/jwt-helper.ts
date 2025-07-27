@@ -34,7 +34,8 @@ export const useJwtHelper = ()=>{
 
     try {
       
-      const token = getToken();
+      const token   = localStorage.getItem(TOKEN_KEY);
+
 
       if (!token)
       {

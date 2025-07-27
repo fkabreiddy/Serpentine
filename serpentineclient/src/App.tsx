@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import IndexPage from "@/pages/index";
 import HomePage from "./pages/home";
@@ -6,13 +6,7 @@ import LoginLayout from "./layouts/login-layout";
 import DefaultLayout from "./layouts/default";
 import { AuthorizeView } from "./components/common/authorize-view";
 import ChatroomPage from "./pages/chatroom-page";
-import ClickSpark from "./components/common/spark-click";
-import { useEffect, useRef, useState } from "react";
-import SearchResultsPage from "./pages/explore-page";
 import ExplorePage from "./pages/explore-page";
-import { useAuthStore } from "./contexts/authentication-context";
-import LoginWithCurrentAccount from "./components/users/forms/login-current-account";
-import { useJwtHelper } from "./helpers/jwt-helper";
 
 
 function App() {

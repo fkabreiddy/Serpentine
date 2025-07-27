@@ -27,10 +27,13 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   const {disconnectFromActiveUsersHub} = useActiveUser();
   const {isAuthenticated, user} = useAuthStore();
   const navigate = useNavigate();
+  
+
+
 
   useEffect(()=>{
   
-      
+    
     if(!user && !isAuthenticated)
     {
       disconnectFromActiveUsersHub();
