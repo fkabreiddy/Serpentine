@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { showToast } from "./sonner-helper";
 import { HubConnectionState } from '@microsoft/signalr';
 import { set } from "zod";
-import { JwtHelper } from "./jwt-helper";
+import { useJwtHelper } from "./jwt-helper";
 
 
 
@@ -15,7 +15,7 @@ export function useActiveUser() {
     const alreadyRendered = useRef<boolean>();
     const activeUsersHubRef = useRef<signalR.HubConnection | null>(null);
 
-    const {getToken} = JwtHelper();
+    const {getToken} = useJwtHelper();
 
 
     useEffect(()=>{

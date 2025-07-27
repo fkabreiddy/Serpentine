@@ -6,12 +6,12 @@ import { useAuthStore } from "@/contexts/authentication-context";
 import { useNavigate } from "react-router-dom";
 import Divider from "@/components/common/divider";
 import UserAvatar from "../common/user-avatar";
-import { JwtHelper } from "@/helpers/jwt-helper";
+import { useJwtHelper } from "@/helpers/jwt-helper";
 
 export default function LoginWithCurrentAccount() {
   const navigate = useNavigate();
   const {user} = useAuthStore();
-      const {removeToken} = JwtHelper();
+      const {removeToken} = useJwtHelper();
   
 
   const dismiss = () =>{

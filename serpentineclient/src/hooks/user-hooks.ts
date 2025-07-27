@@ -9,7 +9,7 @@ import { GetByUsernameRequest } from '@/models/requests/user/get-by-username';
 import { useAuthStore } from '@/contexts/authentication-context';
 import { useNavigate } from 'react-router-dom';
 import { handleApiErrors, handleApiSuccess } from '@/helpers/api-results-handler-helper';
-import { JwtHelper } from '@/helpers/jwt-helper';
+import { useJwtHelper } from '@/helpers/jwt-helper';
 
 
 const initialApiState = <T>(): ApiResult<T> => ({
@@ -24,7 +24,7 @@ const initialApiState = <T>(): ApiResult<T> => ({
 
 
 export function useLoginUser() {
-    const {setToken} = JwtHelper();
+    const {setToken} = useJwtHelper();
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [result, setResult] = useState<ApiResult<JWTResponse> | null>(null);
     const navigate = useNavigate();
@@ -157,7 +157,7 @@ export function useGetByUsername() {
 
 export function useCloseSession() {
     const [loading, setLoading] = useState<boolean>(false);
-    const {removeToken} = JwtHelper();
+    const {removeToken} = useJwtHelper();
     const navigator = useNavigate();
     
     const closeSession = () =>{

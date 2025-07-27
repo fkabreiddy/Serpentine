@@ -6,7 +6,7 @@ import SerpentineBanner from "@/components/common/serpentine-banner";
 import CreateAccountForm from "@/components/users/forms/create-account-form";
 import LoginWithCurrentAccount from "@/components/users/forms/login-current-account";
 import LoginForm from "@/components/users/forms/login-form";
-import { JwtHelper } from "@/helpers/jwt-helper";
+import { useJwtHelper } from "@/helpers/jwt-helper";
 
 export default function IndexPage() {
 
@@ -15,7 +15,7 @@ export default function IndexPage() {
   const [isMounted, setIsMounted] = useState(false);
   const firstRender = useRef(false);
   const [loginWithCurrent, setLoginWithCurrent] = useState(false);
-  const {getToken} = JwtHelper();
+  const {getToken} = useJwtHelper();
   
 
 

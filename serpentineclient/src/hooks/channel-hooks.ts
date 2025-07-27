@@ -144,7 +144,6 @@ export function useGetChannelsByUserId() {
             handleApiErrors(result);
         }
 
-        setLoadingChannels(false);
         setResult(null);
 
 
@@ -154,13 +153,13 @@ export function useGetChannelsByUserId() {
 
    
     const getChannelsByUserId = async (data: GetChannelsByUserIdRequest) => {
+        setResult(null);
+        setLoadingChannels(true);
         let has = true;
         let channelCount = 0;
         setIsBusy(true);
-        setResult(null);
         setChannels([]);
         setHasMore(true);
-        setLoadingChannels(true);
         do{
 
             

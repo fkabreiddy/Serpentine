@@ -5,7 +5,7 @@ import { AxiosError, isAxiosError } from "axios";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useNavigate } from "react-router-dom";
 import HttpVerbsEnum from '../models/http-verbs-enum';
-import { JwtHelper } from "./jwt-helper";
+import { useJwtHelper } from "./jwt-helper";
 interface RequestConfig {
   endpoint: string;
   contentType?: string;
@@ -54,7 +54,7 @@ const handleApiError = <T>(error: unknown): ApiResult<T> => {
 
 export function useFetch<T>() {
  
-  const {removeToken, getToken} = JwtHelper();
+  const {removeToken, getToken} = useJwtHelper();
   const navigate = useNavigate();
  
 

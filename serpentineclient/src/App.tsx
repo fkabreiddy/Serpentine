@@ -12,7 +12,7 @@ import SearchResultsPage from "./pages/explore-page";
 import ExplorePage from "./pages/explore-page";
 import { useAuthStore } from "./contexts/authentication-context";
 import LoginWithCurrentAccount from "./components/users/forms/login-current-account";
-import { JwtHelper } from "./helpers/jwt-helper";
+import { useJwtHelper } from "./helpers/jwt-helper";
 
 
 function App() {

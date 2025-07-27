@@ -4,7 +4,7 @@ import { UserResponse } from "@/models/responses/user-response";
 import { jwtDecode } from "jwt-decode";
 const TOKEN_KEY = "serpentine-token" as const;
 
-export const JwtHelper = ()=>{
+export const useJwtHelper = ()=>{
 
   const {setAuthenticationState} = useAuthStore();
 

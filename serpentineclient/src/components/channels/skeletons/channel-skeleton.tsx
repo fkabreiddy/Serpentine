@@ -10,7 +10,7 @@ export default function ChannelSkeleton()
         <div>
 
             {layout.sideBarExpanded ? 
-            <Skeleton color="bg-muted"  className="flex rounded-full size-[40px]"/>: 
+            <Skeleton color="bg-muted"  className="flex rounded-full size-[50px]"/>: 
             <Skeleton color="bg-muted" className="flex rounded-full size-[28px]" />}
  
 

@@ -9,7 +9,7 @@ import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { HubConnectionState } from "@microsoft/signalr";
 import { clear } from "console";
 import { showToast } from "./sonner-helper";
-import { JwtHelper } from "./jwt-helper";
+import { useJwtHelper } from "./jwt-helper";
 
 export function useActiveChannels() {
   const {
@@ -19,7 +19,7 @@ export function useActiveChannels() {
     setActiveChannelsHubConnectionState,
     activeChannelsHub,
   } = useActiveChannelsHubStore();
-  const {getToken} = JwtHelper();
+  const {getToken} = useJwtHelper();
 
 
   const alreadyRendered = useRef<boolean>(false);
