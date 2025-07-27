@@ -187,12 +187,17 @@ internal class CreateChannelRequestHandler(
             
             var creation = await context.Channels.AddAsync(channel, cancellationToken);
 
+            await context.SaveChangesAsync(cancellationToken);
+
             if (request.CoverPictureFile is not null)
             {
                 var coverUploadResponse = await cloudinaryService.UploadImage(
                     request.CoverPictureFile,
                     CloudinaryFolders.ChannelCovers.ToString(),
-                    creation.Entity.Id.ToString()
+                    creation.Entity.Id.ToString(),
+                    false,
+                    100,
+                    100
                 );
                 if (coverUploadResponse.IsSuccess)
                 {
@@ -213,7 +218,11 @@ internal class CreateChannelRequestHandler(
                 var bannerUploadResponse = await cloudinaryService.UploadImage(
                     request.BannerPictureFile,
                     CloudinaryFolders.ChannelBanners.ToString(),
-                    creation.Entity.Id.ToString()
+                    creation.Entity.Id.ToString(),
+                    false,
+                    300,
+                    300
+                  
                 );
                 if (bannerUploadResponse.IsSuccess)
                 {
@@ -230,9 +239,7 @@ internal class CreateChannelRequestHandler(
             }
 
             await context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
 
-            context.ChangeTracker.Clear();
 
             Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
                 creation.Entity.Id,
@@ -240,12 +247,16 @@ internal class CreateChannelRequestHandler(
                 cancellationToken
             );
 
+
             if (response is null)
             {
+                await transaction.RollbackAsync(cancellationToken);
                 return new NotFoundApiResult(
                     "We could not find the channel you created. Try again."
                 );
             }
+
+            await transaction.CommitAsync(cancellationToken);
             return response.ToResponse();
         }
         catch (Exception)

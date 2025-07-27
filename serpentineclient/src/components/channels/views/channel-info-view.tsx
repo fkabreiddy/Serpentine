@@ -2,8 +2,8 @@ import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useDeleteChannel, useGetChannelById } from "@/hooks/channel-hooks";
 import { useEffect, useState, useRef } from "react";
 import { Spinner } from "@heroui/spinner";
-import { ChannelBanner } from "./channel-banner";
-import { ChannelCover } from "./channel-cover";
+import { ChannelBanner } from "../common/channel-banner";
+import { ChannelCover } from "../common/channel-cover";
 import {
   Activity,
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
   InfoIcon,
   MessageCircleWarningIcon,
   MoreVertical,
+  PlusCircle,
   TrashIcon,
   UserIcon,
 } from "lucide-react";
@@ -33,8 +34,10 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { ChannelMemberRoleResponse } from "@/models/responses/channel-member-role-response";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { RightPanelView } from "@/models/right-panel-view";
+import { showToast } from "@/helpers/sonner-helper";
+import { useCreateChannelMember } from "@/hooks/channel-member-hooks";
 
-export default function ManageChannelView() {
+export default function ChannelInfoView() {
   const { channelInfoId } = useGlobalDataStore();
   const { getChannelById, channel, loadingChannel } = useGetChannelById();
   const { activeChannelsHub } = useActiveChannelsHubStore();
@@ -133,10 +136,9 @@ export default function ManageChannelView() {
               </p>
             </div>
 
-            {(channel.myMember?.isOwner ||
-              channel.myMember?.role?.name === "admin") && (
-              <OptionsDropdown channel={channel}></OptionsDropdown>
-            )}
+            
+            <OptionsDropdown channel={channel}></OptionsDropdown>
+            
           </div>
           <div className="w-full" id={"channel-description-container"}>
             <p
@@ -192,9 +194,30 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   channel,
 }) => {
   const { deleteChannel, deletingChannel, channelDeleted } = useDeleteChannel();
-  const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
+  const { setChannelInfoId, setDeletedChannelId, setChannelJoined } = useGlobalDataStore();
+  const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
+  const {setLayout} = useLayoutStore();
 
-  const { setLayout } = useLayoutStore();
+
+  const join = async () =>{
+
+  
+    await createChannelMember({channelId: channel.id});
+  }
+
+  useEffect(()=>{
+
+    if(channelMember)
+    {
+       channel.myMember = channelMember;
+       setChannelJoined(channel);
+       showToast({title: `Channel joined`, description: `You've joined "${channel.name}'s" channel`})
+       setChannelMember(null);
+       setLayout({currentRightPanelView: RightPanelView.DefaultView});
+       setChannelInfoId(null);
+    }
+
+  },[channelMember])
 
   const fetchDeleteChannel = async () => {
     await deleteChannel({ channelId: channel.id });
@@ -208,7 +231,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
     }
   }, [channelDeleted]);
   return (
-    <Dropdown placement="bottom-end">
+    <Dropdown placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
       <DropdownTrigger>
         <button>
           <IconButton tooltipText="Manage">
@@ -217,7 +240,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
         </button>
       </DropdownTrigger>
       <DropdownMenu
-        disabledKeys={["divider", "divider2"]}
+        disabledKeys={["divider", "divider2", "channelInf"]}
         aria-label="Channel Actions"
         variant="flat"
       >
@@ -242,7 +265,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
             </>
           )}
         </>
-        <>{!channel.myMember && <DropdownItem key="join">Join</DropdownItem>}</>
+       
         <DropdownItem
           key="report"
           endContent={<MessageCircleWarningIcon size={16} />}
@@ -253,30 +276,59 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
           <DropdownItem key="divider2" isReadOnly={true}>
             <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
           </DropdownItem>
-          {channel.myMember?.isOwner ? (
+          {channel.myMember  ?
+          
+            <>
+
+              {channel.myMember?.isOwner ?
+                <DropdownItem
+                  color="danger"
+                  key="delete"
+                  onClick={() => fetchDeleteChannel()}
+                  endContent={
+                    deletingChannel ? (
+                      <Spinner variant="spinner" size="sm" />
+                    ) : (
+                      <TrashIcon size={16} />
+                    )
+                  }
+                >
+                  <p className="font-normal text-[13px]">Delete this channel</p>
+                </DropdownItem> 
+                :
+                <DropdownItem
+                  color="danger"
+                  key="leave"
+                  endContent={
+                   <ArrowLeft size={16}/>
+                  }
+                >
+                  <p className="font-normal text-[13px]">Leave this channel</p>
+                </DropdownItem> 
+
+                
+              } 
+
+
+            </> :
             <DropdownItem
-              color="danger"
-              key="delete"
-              onClick={() => fetchDeleteChannel()}
-              endContent={
-                deletingChannel ? (
-                  <Spinner variant="spinner" size="sm" />
-                ) : (
-                  <TrashIcon size={16} />
-                )
-              }
-            >
-              <p className="font-normal text-[13px]">Delete this channel</p>
-            </DropdownItem>
-          ) : (
-            <DropdownItem
-              color="danger"
-              key="delete"
-              endContent={<ArrowLeft size={16} />}
-            >
-              <p className="font-normal text-[13px]">Leave this channel</p>
-            </DropdownItem>
-          )}
+                  key="join"
+                  onClick={()=>{join();}}
+                  endContent={
+                    joining ? <Spinner size="sm" variant="spinner"/> :
+                   <PlusCircle size={16}/>
+                  }
+                >
+                  <p className="font-normal text-[13px]">Join this channel</p>
+                </DropdownItem> 
+           
+          
+
+           
+           
+           
+           
+          }
         </>
       </DropdownMenu>
     </Dropdown>

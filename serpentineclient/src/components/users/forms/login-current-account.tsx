@@ -3,30 +3,26 @@ import { Image } from "@heroui/image";
 import Avatar from "boring-avatars";
 import { Button } from "@heroui/button";
 import { useAuthStore } from "@/contexts/authentication-context";
-import { getToken } from "@/helpers/jwt-helper";
 import { useNavigate } from "react-router-dom";
 import Divider from "@/components/common/divider";
-interface LoginWithCurrentAccountProps {
-  username: string;
-  profilePicture: string | null;
-  name: string;
-  onDismiss: () => void;
-}
-export default function LoginWithCurrentAccount({
-  username,
-  profilePicture,
-  onDismiss,
-  name,
-}: LoginWithCurrentAccountProps): JSX.Element {
-  const { setUser } = useAuthStore();
-  const navigate = useNavigate();
-  const onContinue = () => {
-    setUser(() => {}, onSuccess);
-  };
+import UserAvatar from "../common/user-avatar";
+import { JwtHelper } from "@/helpers/jwt-helper";
 
-  const onSuccess = () => {
+export default function LoginWithCurrentAccount() {
+  const navigate = useNavigate();
+  const {user} = useAuthStore();
+      const {removeToken} = JwtHelper();
+  
+
+  const dismiss = () =>{
+    removeToken();
+  }
+
+  const accept = () => {
     navigate("/home");
   };
+
+  if(!user) return <></>;
 
   return (
     <div className="w-full flex items-center justify-center flex-col gap-5">
@@ -39,24 +35,14 @@ export default function LoginWithCurrentAccount({
         </h5>
       </div>
 
-      {profilePicture ? (
-        <Image
-          isBlurred
-          src={profilePicture}
-          width={80}
-          height={80}
-          className="shrink-0 min-w-[80px] min-h-[80px] rounded-full"
-        />
-      ) : (
-        <Avatar variant="beam" size={80} name={username ?? "adam"} />
-      )}
+      <UserAvatar size={80} isBlurred={true} src={user?.profilePictureUrl ?? null} userNameFallback={user?.username} />
       <div className="flex flex-col items-center gap-1 justify-center">
-        <label className="font-semibold text-sm">{name}</label>
-        <label className="font-semibold text-xs opacity-50">{username}</label>
+        <label className="font-semibold text-sm">{user.username}</label>
+        <label className="font-semibold text-xs opacity-50">{user.fullName}</label>
       </div>
 
       <Button
-        onPress={onContinue}
+        onPress={accept}
         size="sm"
         radius="md"
         className={`w-fit backdrop-blur-xl bg-default-100/80 max-h-9 border border-default-100/20 transition-all text-xs font-semibold`}
@@ -66,7 +52,7 @@ export default function LoginWithCurrentAccount({
       </Button>
       <Divider text="OR" />
       <a
-        onClick={onDismiss}
+        onClick={dismiss}
         className={`w-fit opacity-80 cursor-pointer underline text-xs font-semibold`}
       >
         Log in with another account

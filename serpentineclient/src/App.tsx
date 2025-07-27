@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
 import IndexPage from "@/pages/index";
 import HomePage from "./pages/home";
@@ -7,17 +7,24 @@ import DefaultLayout from "./layouts/default";
 import { AuthorizeView } from "./components/common/authorize-view";
 import ChatroomPage from "./pages/chatroom-page";
 import ClickSpark from "./components/common/spark-click";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SearchResultsPage from "./pages/explore-page";
 import ExplorePage from "./pages/explore-page";
+import { useAuthStore } from "./contexts/authentication-context";
+import LoginWithCurrentAccount from "./components/users/forms/login-current-account";
+import { JwtHelper } from "./helpers/jwt-helper";
 
 
 function App() {
 
+
+
+
+ 
   
   return (
    
-       <Routes>
+    <Routes>
       <Route 
         element={
           <LoginLayout>
@@ -26,6 +33,8 @@ function App() {
         } 
         path="/" 
       />
+
+     
 
       <Route 
         element={

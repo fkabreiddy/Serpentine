@@ -18,8 +18,8 @@ public class Message : BaseEntity
 
     public MessageResponse ToResponse() => new()
     {
-        Sender = Sender?.ToResponse(),
-        Parent = Parent?.ToResponse(),
+        Sender = Sender?.ToResponse() ?? null,
+        Parent = Parent?.ToResponse() ?? null,
         Content = Content,
         GroupId = GroupId,
         IsNotification = IsNotification,

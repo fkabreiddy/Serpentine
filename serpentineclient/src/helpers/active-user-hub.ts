@@ -1,11 +1,11 @@
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import * as signalR from "@microsoft/signalr";
-import { getToken } from "./jwt-helper";
 import { HubResult } from "@/models/hub-result";
 import { useEffect, useRef, useState } from "react";
 import { showToast } from "./sonner-helper";
 import { HubConnectionState } from '@microsoft/signalr';
 import { set } from "zod";
+import { JwtHelper } from "./jwt-helper";
 
 
 
@@ -14,6 +14,8 @@ export function useActiveUser() {
     const { setConnection, quitConnection, setConnectionState, activeUsersHub } = useActiveUserHubStore();
     const alreadyRendered = useRef<boolean>();
     const activeUsersHubRef = useRef<signalR.HubConnection | null>(null);
+
+    const {getToken} = JwtHelper();
 
 
     useEffect(()=>{
@@ -49,7 +51,6 @@ export function useActiveUser() {
             await activeUsersHub.stop();
             quitConnection();
             setConnectionState(HubConnectionState.Disconnected);
-            showToast({title: "Disconnected", description: "You were disconnected from serpentine. Try again"})
 
         }
     };

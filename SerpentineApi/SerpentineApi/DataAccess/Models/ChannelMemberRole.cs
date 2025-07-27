@@ -10,7 +10,7 @@ public class ChannelMemberRole : BaseEntity
 
     public ChannelMemberRoleResponse ToResponse() => new()
     {
-        Name = Name,
+        Name = Name ?? "default",
         Id = Id,
         CreatedAt = CreatedAt,
         UpdatedAt = UpdatedAt

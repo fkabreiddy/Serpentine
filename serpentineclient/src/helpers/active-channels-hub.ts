@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
-import { getToken } from "./jwt-helper";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { HubResult } from "@/models/hub-result";
@@ -10,6 +9,7 @@ import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { HubConnectionState } from "@microsoft/signalr";
 import { clear } from "console";
 import { showToast } from "./sonner-helper";
+import { JwtHelper } from "./jwt-helper";
 
 export function useActiveChannels() {
   const {
@@ -19,6 +19,8 @@ export function useActiveChannels() {
     setActiveChannelsHubConnectionState,
     activeChannelsHub,
   } = useActiveChannelsHubStore();
+  const {getToken} = JwtHelper();
+
 
   const alreadyRendered = useRef<boolean>(false);
 

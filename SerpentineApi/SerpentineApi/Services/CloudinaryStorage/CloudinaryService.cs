@@ -47,7 +47,9 @@ public class CloudinaryService
         IFormFile image,
         string folderName,
         string fileName,
-        bool isUnique = false
+        bool isUnique = false,
+        int? width = null,
+        int? height = null
     )
     {
         if (VerifyImage(image) is var reason && reason.Item2 != ImageVerificationResult.Success)
@@ -59,6 +61,31 @@ public class CloudinaryService
 
         await using var stream = image.OpenReadStream();
 
+        var transformation = new Transformation();
+
+        transformation.Quality(100);
+        transformation.Gravity("auto");
+        transformation.Crop("fill");
+
+
+
+        if (width is not null)
+        {
+            transformation.Width(width);
+
+        }
+
+        if (height is not null)
+        {
+            transformation.Height(height);
+        }
+
+        
+
+
+        
+            
+
         var uploadParams = new ImageUploadParams()
         {
             File = new FileDescription(fileName, stream),
@@ -67,12 +94,7 @@ public class CloudinaryService
             UseFilename = true,
             UniqueFilename = isUnique,
             Folder = folderName,
-            Transformation = new Transformation()
-                .Width(300)
-                .Height(300)
-                .Quality(100)
-                .Crop("thumb")
-                .Gravity("face"),
+            Transformation = transformation
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);

@@ -12,8 +12,9 @@ public static class MessageEntityExtensions
         CancellationToken token = default
     )
     {
+        
         return await messageSet.CountAsync(
-            x => x.GroupId == groupId && x.CreatedAt <= date && x.SenderId != currentUserId,
+            x => x.GroupId == groupId && x.CreatedAt >= date && x.SenderId != currentUserId,
             token
         );
     }

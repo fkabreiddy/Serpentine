@@ -1,43 +1,41 @@
 import LoginLayout from "@/layouts/login-layout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { Spinner } from "@heroui/spinner";
 import SerpentineBanner from "@/components/common/serpentine-banner";
 import CreateAccountForm from "@/components/users/forms/create-account-form";
 import LoginWithCurrentAccount from "@/components/users/forms/login-current-account";
 import LoginForm from "@/components/users/forms/login-form";
+import { JwtHelper } from "@/helpers/jwt-helper";
 
 export default function IndexPage() {
 
-  const {user, setUser} = useAuthStore();
+  const {user} = useAuthStore();
   const [view, setView] = useState("login");
   const [isMounted, setIsMounted] = useState(false);
-  const [isAlreadyLoggedIn, setIsAlreadyLoggedIn] = useState<boolean>(false);
-  
+  const firstRender = useRef(false);
+  const [loginWithCurrent, setLoginWithCurrent] = useState(false);
+  const {getToken} = JwtHelper();
   
 
 
   useEffect(()=>{
 
+    if(!firstRender.current)
+    {
+      firstRender.current = true;
+      const token = getToken();
+      setIsMounted(true);
+      setLoginWithCurrent(token !== null);
 
-    setUser(() => {}, ()=>{});   
-    setIsMounted(true);
 
+    }
+    
   }, [])
 
-  useEffect(()=>{
+ 
 
-    if(user)
-    {
-      setIsAlreadyLoggedIn(true);
-    }
-
-  }, [user])
-
-  const handleDismiss = () =>{
-    useAuthStore.getState().logout();
-    setIsAlreadyLoggedIn(false);
-  }
+  
 
   const handleViewChange = () => {
     setView(prev => prev === "login" ? "create_account" : "login");
@@ -56,11 +54,10 @@ export default function IndexPage() {
 
         </div>
       <div className="w-[30%]  z-[2] max-xl:w-[30%] max-md:w-[80%] absolute flex overflow-y-scroll scrollbar-hide items-center justify-center flex-col max-h-screen px-2 py-4">
-        {user && isAlreadyLoggedIn ? <LoginWithCurrentAccount onDismiss={handleDismiss} username={user?.nickname ?? ""} name={user?.name ?? ""} profilePicture={user?.picture ?? ""} /> :       
-            <>
-              {view === "login" ? <LoginForm onViewChange={handleViewChange}/> : <><CreateAccountForm  onClose={handleViewChange}/></> }
-            </>   
-        }
+          {user && loginWithCurrent ? <LoginWithCurrentAccount/> :
+            <>{view === "login" ? <LoginForm onViewChange={handleViewChange}/> : <><CreateAccountForm  onClose={handleViewChange}/></> }</>
+          }
+          
         </div>
      </div>
     </LoginLayout>

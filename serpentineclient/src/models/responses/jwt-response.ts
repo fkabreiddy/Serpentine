@@ -17,6 +17,8 @@ export class JWTResponse {
 
 export interface JwtPayload {
   nickname: string;
+  age: number,
+  createdAt: string
   sub: string;
   picture: string;
   name: string;

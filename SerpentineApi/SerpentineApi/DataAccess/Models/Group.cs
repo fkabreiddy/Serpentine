@@ -36,14 +36,14 @@ public class Group : BaseEntity
             Id = Id,
             CreatedAt = CreatedAt,
             UpdatedAt = UpdatedAt,
-            MyAccess = MyAccess?.ToResponse(),
+            MyAccess = MyAccess?.ToResponse() ?? null,
             Name = Name,
             ChannelId = ChannelId,
             UnreadMessages = UnreadMessages,
             ChannelName = ChannelName,
             Rules = Rules,
             Public = Public,
-            LastMessage = LastMessage?.ToResponse() 
+            LastMessage = LastMessage?.ToResponse() ?? null 
         };
 
     public static Group Create(CreateGroupRequest request) =>

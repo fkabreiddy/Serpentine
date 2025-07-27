@@ -1,0 +1,4 @@
+interface CreateChannelMemberRequest{
+
+    channelId: string
+}

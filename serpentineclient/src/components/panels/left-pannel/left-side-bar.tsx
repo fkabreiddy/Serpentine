@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useTransition } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useLayoutStore } from "@/contexts/layout-context";
 import ChannelsContainer from "@/components/channels/common/channels-container";
@@ -12,9 +12,6 @@ import StatusBar from "./status-bar";
 import GroupsContainer from "@/components/groups/common/groups-container";
 
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
-import { start } from "repl";
-import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
-import { channel } from "diagnostics_channel";
 interface LeftSideBarProps {}
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () => {
@@ -37,11 +34,21 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     setCreatedChannel,
     deletedChannelId,
     setDeletedChannelId,
+    channelJoined,
+    setChannelJoined
   } = useGlobalDataStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
 
+  useEffect(()=>{
+
+    if(channelJoined)
+    {
+      setChannels((prev)=>([...prev, channelJoined]))
+      setChannelJoined(null);
+    }
+  },[channelJoined])
   useEffect(() => {
     if (deletedChannelId) {
       setChannels(

@@ -9,6 +9,7 @@ import { GetByUsernameRequest } from '@/models/requests/user/get-by-username';
 import { useAuthStore } from '@/contexts/authentication-context';
 import { useNavigate } from 'react-router-dom';
 import { handleApiErrors, handleApiSuccess } from '@/helpers/api-results-handler-helper';
+import { JwtHelper } from '@/helpers/jwt-helper';
 
 
 const initialApiState = <T>(): ApiResult<T> => ({
@@ -23,11 +24,11 @@ const initialApiState = <T>(): ApiResult<T> => ({
 
 
 export function useLoginUser() {
+    const {setToken} = JwtHelper();
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [result, setResult] = useState<ApiResult<JWTResponse> | null>(null);
     const navigate = useNavigate();
     const { post } = useFetch<JWTResponse>();
-    const {login} = useAuthStore();
 
     useEffect(() => {
 
@@ -41,10 +42,11 @@ export function useLoginUser() {
         if (result.data && result.statusCode === 200) {
 
             let token = result.data.token;
-            login(token, ()=>{}, ()=>{navigate("/home")});
+            
+            setToken(token);
             handleApiSuccess(result);
             setIsLoggingIn(false);
-            navigate("/home")
+            navigate("/home");
 
         } else {
             handleApiErrors(result);
@@ -155,14 +157,13 @@ export function useGetByUsername() {
 
 export function useCloseSession() {
     const [loading, setLoading] = useState<boolean>(false);
-    const {logout} = useAuthStore();
+    const {removeToken} = JwtHelper();
     const navigator = useNavigate();
     
     const closeSession = () =>{
         setLoading(true);
-        logout();
+        removeToken();
         setLoading(false);
-        navigator("/");
         
     }
 

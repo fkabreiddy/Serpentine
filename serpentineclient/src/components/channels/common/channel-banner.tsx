@@ -1,16 +1,21 @@
 import Noise from "@/components/common/noise-ext";
+import { Image } from "@heroui/react";
 import { Skeleton } from "@heroui/skeleton";
 
 export interface ChannelBannerProps {
   pictureUrl: string | null;
+  isBlurred?: boolean
   
 }
 
-export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl }) => (
-  <div className="w-full rounded-lg dark:bg-neutral-950 bg-neutral-100  h-[100px] ">
+export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl, isBlurred = false }) => (
+  <>
     {pictureUrl ? (
-      <img
-        className="rounded-lg w-full h-full object-cover flex-shrink-0 "
+      <Image
+       isBlurred={isBlurred}
+       width={"100%"}
+       height={130}
+        className="rounded-lg   object-cover  z-[0]"
         src={pictureUrl}
       />
     ) : (
@@ -24,5 +29,5 @@ export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl }) => (
         width="100%"
       />
     )}
-  </div>
+  </>
 );

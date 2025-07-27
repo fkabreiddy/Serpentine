@@ -41,7 +41,7 @@ public class Channel : BaseEntity
             Name = Name,
             Description = Description,
             UpdatedAt = UpdatedAt,
-            MyMember = MyMember?.ToResponse(),
+            MyMember = MyMember?.ToResponse() ?? null,
             BannerPicture = BannerPicture ?? "",
             CoverPicture = CoverPicture ?? "",
             UnreadMessages = UnreadMessages,

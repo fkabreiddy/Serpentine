@@ -304,6 +304,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onClose }) => {
               <DateInput
                 minValue={maxAge()}
                 maxValue={minAge()}
+                description="You must be 16+ to create an account"
                 endContent={<CakeIcon size={20} />}
                 label="Day of birth"
                 labelPlacement="outside"

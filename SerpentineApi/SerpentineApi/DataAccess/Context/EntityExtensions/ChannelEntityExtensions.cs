@@ -23,8 +23,8 @@ public static class ChannelEntityExtensions
             .Take(take)
             .Select(ch => new Channel()
             {
-                MembersCount = ch.Members.Count,
-                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
+                MembersCount = ch.Members.Count(),
+                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId),
             }.Spread(ch, new string[]{nameof(Channel.MyMember), nameof(Channel.MembersCount)}))
             .ToListAsync(token);
 
@@ -42,13 +42,12 @@ public static class ChannelEntityExtensions
             .Include(ch => ch.Members)
             .AsNoTracking()
             .AsSplitQuery()
-            .Where(ch => ch.Members.Any(m => m.UserId == userId) && ch.Id == channelId)
+            .Where(ch =>  ch.Id == channelId)
             .OrderBy(ch => ch.Id)
             .Select(ch => new Channel()
             {
-                MembersCount = ch.Members.Count,
-                
-                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new ChannelMember(),
+                MembersCount = ch.Members.Count(),
+                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId),
             }.Spread(ch, new string[]{nameof(Channel.MyMember), nameof(Channel.MembersCount)}))
             .FirstOrDefaultAsync(token);
 
@@ -84,8 +83,8 @@ public static class ChannelEntityExtensions
             .Take(15)
             .Select(ch => new Channel()
             {
-                MembersCount = ch.Members.Count,
-                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId) ?? new(),
+                MembersCount = ch.Members.Count(),
+                MyMember = ch.Members.FirstOrDefault(m => m.UserId == userId),
             }.Spread(ch, new string[]{nameof(Channel.MyMember), nameof(Channel.MembersCount)}))
             .ToListAsync(token);
 

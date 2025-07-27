@@ -2,10 +2,10 @@ import api from "@/config/axios-config";
 import ApiResult from "@/models/api-result";
 import { showToast } from "./sonner-helper";
 import { AxiosError, isAxiosError } from "axios";
-import { getToken, decode } from "./jwt-helper";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useNavigate } from "react-router-dom";
 import HttpVerbsEnum from '../models/http-verbs-enum';
+import { JwtHelper } from "./jwt-helper";
 interface RequestConfig {
   endpoint: string;
   contentType?: string;
@@ -54,7 +54,7 @@ const handleApiError = <T>(error: unknown): ApiResult<T> => {
 
 export function useFetch<T>() {
  
-  const {logout} = useAuthStore();
+  const {removeToken, getToken} = JwtHelper();
   const navigate = useNavigate();
  
 
@@ -92,8 +92,8 @@ export function useFetch<T>() {
 
 
       if (response.status === 401) {
-        logout();
-        navigate("/");
+        
+        removeToken();
         showToast({title: "Session expired", description: "Your session has expired. Login again." })
         return createApiResult(false, 401, response.data.message, "Session Expired", ["Your session has expired, please login again"]);
 

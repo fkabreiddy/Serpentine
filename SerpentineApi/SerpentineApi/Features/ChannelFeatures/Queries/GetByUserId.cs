@@ -111,6 +111,7 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
         );
 
        foreach(var channel in channels){
+        
             channel.UnreadMessages = await context.GroupAccesses.GetMessagesCountByChannelId(
                 channel.Id,
                 request.CurrentUserId,

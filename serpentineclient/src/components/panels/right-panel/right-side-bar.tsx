@@ -7,7 +7,7 @@ import { RightPanelView } from "@/models/right-panel-view";
 import CreateChannelForm from "@/components/channels/forms/create-channel-form";
 import IconButton from "@/components/common/icon-button";
 import CreateGroupForm from "@/components/groups/forms/create-group-form.tsx";
-import ManageChannelView from "@/components/channels/common/manage-channel";
+import ChannelInfoView from "@/components/channels/views/channel-info-view";
 import { motion } from "framer-motion";
 
 interface RightSideBarProps {}
@@ -53,7 +53,7 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
         <CreateGroupForm onCreate={() => close()} />
       )}
       {layout.currentRightPanelView === RightPanelView.ChannelInfo && (
-        <ManageChannelView />
+        <ChannelInfoView />
       )}
      
     </ScrollShadow>

@@ -1,4 +1,4 @@
-import ChannelInfo from '../components/channels/common/channel-info';
+import ChannelInfo from '../components/channels/views/channel-info-view';
 export enum RightPanelView{
     DefaultView,
     CreateChannelFormView,

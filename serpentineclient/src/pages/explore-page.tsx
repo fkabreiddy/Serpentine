@@ -5,6 +5,7 @@ import WarmBeigeBg from "@/components/common/warm-beige-bg";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useGetManyChannelsByNameOrId } from "@/hooks/channel-hooks";
+import { ChannelResponse } from "@/models/responses/channel-response";
 import { RightPanelView } from "@/models/right-panel-view";
 import { Badge, Input, Spinner, Tab, Tabs } from "@heroui/react";
 import { channel } from "diagnostics_channel";
@@ -36,12 +37,12 @@ export default function ExplorePage() {
   return (
       <>
 
-          <div className="w-full h-screen max-h-screen relative max-sm:h-fit flex max-sm:flex-col items-center justify-center ">
+          <div className="w-full h-screen max-h-screen relative  max-sm:h-fit flex max-sm:flex-col items-center justify-center ">
               <Background/>
 
-              <div className="flex flex-col z-[10]   p-3 w-[90%]  top-0">
+              <div className="flex flex-col z-[10]  overflow-auto  p-3 w-[90%]  top-0">
                   <h1 className="text-3xl text-center mt-3 font-normal opacity-80">
-                      Explore{" "}
+                      Explore
                   </h1>
                   <h1 className="text-[50px] text-center font-semibold opacity-90">
                       Serpentine
@@ -100,12 +101,12 @@ interface ChannelsResultsProps {
   filter?: string;
 }
 const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
-    const {
-      
-        setChannelInfoId,
-        
-      } = useGlobalDataStore();
-      const { layout, setLayout } = useLayoutStore();
+
+  const {setChannelJoined} = useGlobalDataStore();
+
+  const {setChannelInfoId} = useGlobalDataStore();
+  const { layout, setLayout } = useLayoutStore();
+
   const { getManyChannelsByNameOrId, channels, loadingChannels } = useGetManyChannelsByNameOrId();
 
     useEffect(()=>{
@@ -118,6 +119,11 @@ const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
         fetch();
 
     },[filter])
+
+    function handleChannelJoined(channel: ChannelResponse){
+
+      setChannelJoined(channel);
+    }
     
     function handleOnInfoClicked(channelId:string){
 
@@ -135,7 +141,7 @@ if(loadingChannels) return <div className="flex  w-full justify-center"> <Spinne
 
                 {channels.map((channel, index)=>(
 
-                    <SearchChannelCard infoClicked={handleOnInfoClicked} key={channel.id} channel={channel} />
+                    <SearchChannelCard onJoin={handleChannelJoined} infoClicked={handleOnInfoClicked} key={channel.id} channel={channel} />
 
                 ))}
 

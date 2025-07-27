@@ -102,6 +102,7 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
         CancellationToken cancellationToken
     )
     {
+        
         if (!await context.Channels.AnyAsync(ch => ch.Id == request.ChannelId, cancellationToken))
         {
             return new NotFoundApiResult("The channel do not exist");
@@ -117,21 +118,50 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
             return new ConflictApiResult("You already belong to this channel");
         }
 
-        ChannelMember creation = ChannelMember.Create(request);
+        using var transaction = await context.Database.BeginTransactionAsync();
 
-        var role = await context.ChannelMemberRoles.AsNoTracking().FirstOrDefaultAsync(cr => cr.Name == "default", cancellationToken);
+        try
+        {
 
-        if (role is null)
-            return new ServerErrorApiResult("Something went wrong with this request. Try again later");
+            ChannelMember creation = ChannelMember.Create(request);
+
+            var role = await context.ChannelMemberRoles.AsNoTracking().FirstOrDefaultAsync(cr => cr.Name == "default", cancellationToken);
+
+            if (role is null)
+                return new ServerErrorApiResult("Something went wrong with this request. Try again later");
+
+            creation.RoleId = role.Id;
+
+            await context.ChannelMembers.AddAsync(
+                creation,
+                cancellationToken
+            );
+
+
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            context.ChangeTracker.Clear();
+
+            var result = await context.ChannelMembers.AsSplitQuery().AsNoTracking().FirstOrDefaultAsync(cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId, cancellationToken);
+
+            if (result is null)
+            {
+                await transaction.RollbackAsync();
+                return new ServerErrorApiResult("Could not create the memebership. Try again later");
+            }
+
+            await transaction.CommitAsync(cancellationToken);
+
+            return result.ToResponse();
+
+
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
         
-        creation.RoleId = role.Id;
-        
-        EntityEntry<ChannelMember> response = await context.ChannelMembers.AddAsync(
-            creation,
-            cancellationToken
-        );
-
-        await context.SaveChangesAsync(cancellationToken);
-        return response.Entity.ToResponse();
     }
 }
