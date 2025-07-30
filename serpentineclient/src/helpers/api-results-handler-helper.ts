@@ -9,7 +9,7 @@ export const handleApiErrors = (data: ApiResult<any>) => {
         showToast({
        
             description: error,
-            color: "red"
+            color: "danger"
         });
     });
     

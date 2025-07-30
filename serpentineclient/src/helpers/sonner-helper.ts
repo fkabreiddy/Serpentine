@@ -4,21 +4,23 @@ import { cn } from "@heroui/theme";
 interface ToastConfig {
   title?: string;
   description: string;
-  color?: string
+  color?: "danger" | "default" | "foreground" | "primary" | "secondary" | "success" 
+  
 }
 
-export const showToast = ({ title = "", description, color = "neutral" }: ToastConfig): void => {
+export const showToast = ({ title = "", description, color = "foreground" }: ToastConfig): void => {
   addToast({
     title,
     description,
-    
+    variant: "solid",
+    color:color ,   
     hideIcon: true,
     radius: "lg",
     closeIcon: true,
     classNames:{
       base: cn([
           
-        `shadow-md !text-[10px] border-0 bg-${color.trim()}-100 dark:bg-${color.trim()}-900 `
+        `shadow-md !text-[10px] border-0`
       ])
     }
     
