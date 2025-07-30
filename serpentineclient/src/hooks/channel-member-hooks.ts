@@ -107,3 +107,51 @@ export function useCreateChannelMember(){
         channelMember
     }
 }
+
+export function useTest(){
+
+    const [result, setResult] = useState<ApiResult<string> | null>(null);
+    const [fetching, setFetching] = useState<boolean>(false);
+    const [channelMember, setChannelMember] = useState<string | null>(null);
+    const {delete: fetchDelete} = useFetch<string>();
+
+    useEffect(()=>{
+
+
+        if(!result)
+        {
+            return;
+        }
+
+        if(result.data && result.isSuccess)
+        {
+            setChannelMember(result.data);
+        }
+        else{
+            handleApiErrors(result);
+        }
+
+        setFetching(false);
+        setResult(null);
+    },[result])
+
+    const test  = async (data: {typeOfResponse : string}) => {
+
+        setResult(null);
+        setChannelMember(null);
+        setFetching(true);
+
+        const response = await fetchDelete({endpoint: "channel-members/test", contentType: "application/json" }, data)
+
+        setResult(response);
+
+    }   
+
+    return{
+
+        fetching,
+        test,
+        setChannelMember,
+        channelMember
+    }
+}

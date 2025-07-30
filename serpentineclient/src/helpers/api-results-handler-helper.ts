@@ -3,13 +3,13 @@ import { playSound } from "react-sounds";
 import { showToast } from "./sonner-helper";
 
 export const handleApiErrors = (data: ApiResult<any>) => {
-    const playError = () => playSound("notification/error")
-
+    const playError = () => playSound("game/void")
     playError();
     data.errors?.forEach(error => {
         showToast({
-            title: data.resultTitle,
+       
             description: error,
+            color: "red"
         });
     });
     
@@ -25,27 +25,5 @@ export const handleApiSuccess = (data: ApiResult<any>) =>{
 }
 
 
-const getErrorName = (statusCode: number) =>{
 
-    switch (statusCode) {
-        case 400:
-            return "Bad Request";
-        case 409:
-            return "Conflict";
-        case 401:
-            return "Unauthorized";
-        case 403:
-            return "Forbidden";
-        case 404:
-            return "Not Found";
-        case 500:
-            return "Internal Server Error";
-        case 502:
-            return "Bad Gateway";
-        case 503:
-            return "Service Unavailable";
-        default:
-            return "Error";
-    }
-}
 

@@ -19,6 +19,8 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   },
 
   setLayout: (updates: Partial<Layout>) => {
+
+    
     set((state) => ({
       layout: {
         ...state.layout,

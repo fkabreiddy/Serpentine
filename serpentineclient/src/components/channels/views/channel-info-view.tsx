@@ -8,6 +8,7 @@ import {
   Activity,
   ArrowLeft,
   CakeIcon,
+  CopyIcon,
   Edit,
   Edit3Icon,
   EditIcon,
@@ -36,6 +37,7 @@ import { useLayoutStore } from "@/contexts/layout-context";
 import { RightPanelView } from "@/models/right-panel-view";
 import { showToast } from "@/helpers/sonner-helper";
 import { useCreateChannelMember } from "@/hooks/channel-member-hooks";
+import { useUiSound } from "@/helpers/sound-helper";
 
 export default function ChannelInfoView() {
   const { channelInfoId } = useGlobalDataStore();
@@ -197,6 +199,17 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   const { setChannelInfoId, setDeletedChannelId, setChannelJoined } = useGlobalDataStore();
   const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
   const {setLayout} = useLayoutStore();
+  const {playUiSound} = useUiSound();
+
+
+  function handleOpenChanged(open: boolean)
+  {
+      if(open)
+      {
+        playUiSound("ui/radio_select");
+
+      }
+  }
 
 
   const join = async () =>{
@@ -223,6 +236,13 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
     await deleteChannel({ channelId: channel.id });
   };
 
+  async function copyIdToClipboard()
+  {
+    await navigator.clipboard.writeText(channel.id);
+    showToast({ description: "Channel Id copied to clipboard!"})
+
+  }
+
   useEffect(() => {
     if (channelDeleted) {
       setChannelInfoId(null);
@@ -231,7 +251,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
     }
   }, [channelDeleted]);
   return (
-    <Dropdown placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
+    <Dropdown onOpenChange={handleOpenChanged} placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
       <DropdownTrigger>
         <button>
           <IconButton tooltipText="Manage">
@@ -271,6 +291,9 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
           endContent={<MessageCircleWarningIcon size={16} />}
         >
           <p className="font-normal text-[13px]">Report an issue</p>
+        </DropdownItem>
+        <DropdownItem key="copy_id" onClick={async ()=>{await copyIdToClipboard()}} endContent={<CopyIcon size={16} />}>
+                <p className="font-normal text-[13px]">Copy Id</p>
         </DropdownItem>
         <>
           <DropdownItem key="divider2" isReadOnly={true}>

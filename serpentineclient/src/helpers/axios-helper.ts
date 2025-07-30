@@ -6,6 +6,7 @@ import { useAuthStore } from "@/contexts/authentication-context";
 import { useNavigate } from "react-router-dom";
 import HttpVerbsEnum from '../models/http-verbs-enum';
 import { useJwtHelper } from "./jwt-helper";
+import { playSound } from "react-sounds";
 interface RequestConfig {
   endpoint: string;
   contentType?: string;
@@ -37,14 +38,14 @@ const handleApiError = <T>(error: unknown): ApiResult<T> => {
 
   if (!isAxiosError(error)) {
     showToast({ title: "Oops", description: "Something went wrong, try again later" });
-    return createApiResult(false, 500, "");
+    return createApiResult(false, 500,"Server Error", "Something went wrong, try again later", ["Something went wrong with Serpentine"] );
   }
 
   const { response } = error as AxiosError<ApiResult<T>>;
   
   if (!response?.data) {
     showToast({ title: "Oops", description: "Something went wrong, try again later"});
-    return createApiResult(false, 0, "");
+    return createApiResult(false, 500,"Server Error", "Something went wrong, try again later", ["Something went wrong with Serpentine"] );
   }
 
   
@@ -55,7 +56,6 @@ const handleApiError = <T>(error: unknown): ApiResult<T> => {
 export function useFetch<T>() {
  
   const {removeToken, getToken} = useJwtHelper();
-  const navigate = useNavigate();
  
 
   const handleRequest = async (
@@ -65,7 +65,7 @@ export function useFetch<T>() {
   ): Promise<ApiResult<T>> => {
     try {
      
-     
+      
       const config = {headers:  {'Content-Type': contentType, Accept: contentType, Authorization: `Bearer ${getToken() ?? ""}`}}
       
 
@@ -94,7 +94,6 @@ export function useFetch<T>() {
       if (response.status === 401) {
         
         removeToken();
-        showToast({title: "Session expired", description: "Your session has expired. Login again." })
         return createApiResult(false, 401, response.data.message, "Session Expired", ["Your session has expired, please login again"]);
 
       }

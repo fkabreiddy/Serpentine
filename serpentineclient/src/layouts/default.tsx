@@ -13,6 +13,7 @@ import { useJwtHelper } from "@/helpers/jwt-helper";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { Spinner } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
+import { useUiSound } from "@/helpers/sound-helper";
 
 export default function DefaultLayout({
   children,
@@ -22,16 +23,30 @@ export default function DefaultLayout({
 
   const { setTheme } = useTheme("dark");
   const {getToken} = useJwtHelper();
-  const {isAuthenticated} = useAuthStore();
+  const {isAuthenticated, user} = useAuthStore();
   const firstRender = useRef(false);
   const navigate = useNavigate();
   const [loadLayout, setLoadLayout] = useState(false);
+  const {playUiSound} = useUiSound();
 
+ useEffect(()=>{
+  
+    
+    if(!user && !isAuthenticated)
+    {
+      navigate("/");
+
+    }
+    
+
+  },[user, isAuthenticated])
 
   useEffect(() => {
 
+
     if(!firstRender.current)
     {
+      playUiSound("system/boot_up")
       firstRender.current = true;
       const token = getToken();
 

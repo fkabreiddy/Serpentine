@@ -2,20 +2,23 @@ import { addToast } from "@heroui/toast";
 import { cn } from "@heroui/theme";
 
 interface ToastConfig {
-  title: string;
+  title?: string;
   description: string;
+  color?: string
 }
 
-export const showToast = ({ title, description }: ToastConfig): void => {
+export const showToast = ({ title = "", description, color = "neutral" }: ToastConfig): void => {
   addToast({
     title,
     description,
     
     hideIcon: true,
+    radius: "lg",
+    closeIcon: true,
     classNames:{
       base: cn([
           
-        "backdrop-blur-xl !bg-transparent"
+        `shadow-md !text-[10px] border-0 bg-${color.trim()}-100 dark:bg-${color.trim()}-900 `
       ])
     }
     

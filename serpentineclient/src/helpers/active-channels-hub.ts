@@ -23,6 +23,20 @@ export function useActiveChannels() {
 
 
   const alreadyRendered = useRef<boolean>(false);
+  const connectionRef = useRef<signalR.HubConnection | null>(null);
+
+  useEffect(()=>{
+
+    return () =>{
+
+      setActiveChannelsHubConnectionState(HubConnectionState.Disconnected);
+      clearChannels();
+      quitConnection();
+      connectionRef.current?.stop();
+
+    }
+
+  },[])
 
   useEffect(() => {
     const connect = async () => {
@@ -84,6 +98,7 @@ export function useActiveChannels() {
       await newHub.start();
 
       setConnection(newHub);
+      connectionRef.current = newHub;
       unregisterHandlers();
       registerHandlers();
       setActiveChannelsHubConnectionState(newHub.state);

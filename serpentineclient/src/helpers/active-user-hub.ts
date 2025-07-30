@@ -17,6 +17,18 @@ export function useActiveUser() {
 
     const {getToken} = useJwtHelper();
 
+    
+    useEffect(()=>{
+    
+        return () =>{
+    
+          setConnectionState(HubConnectionState.Disconnected);
+          quitConnection();
+          activeUsersHubRef.current?.stop();
+    
+        }
+    
+    },[])
 
     useEffect(()=>{
         if(!alreadyRendered.current)
@@ -77,6 +89,7 @@ export function useActiveUser() {
             await hub.start();
         
             
+            activeUsersHubRef.current = hub;
             registerHandlers();
             setConnection(hub);
             setConnectionState(hub.state);

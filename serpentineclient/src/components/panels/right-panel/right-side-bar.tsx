@@ -9,12 +9,14 @@ import IconButton from "@/components/common/icon-button";
 import CreateGroupForm from "@/components/groups/forms/create-group-form.tsx";
 import ChannelInfoView from "@/components/channels/views/channel-info-view";
 import { motion } from "framer-motion";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 
 interface RightSideBarProps {}
 
 const RightSideBar: React.FC<RightSideBarProps> = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { layout, setLayout } = useLayoutStore();
+  const {clearGlobalData} = useGlobalDataStore();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -23,6 +25,7 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
 
   const close = () => {
     setLayout({ currentRightPanelView: RightPanelView.DefaultView });
+    clearGlobalData();
   };
 
   if (!isMounted) {

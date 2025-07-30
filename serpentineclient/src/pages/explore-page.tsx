@@ -11,7 +11,7 @@ import { Badge, Input, Spinner, Tab, Tabs } from "@heroui/react";
 import { channel } from "diagnostics_channel";
 import { Search, SearchIcon, X } from "lucide-react";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useParams } from "react-router-dom";
 
 export default function ExplorePage() {
@@ -106,17 +106,32 @@ const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
 
   const {setChannelInfoId} = useGlobalDataStore();
   const { layout, setLayout } = useLayoutStore();
+  const [fetching, startFetching] = useTransition();
+  const [loading, setLoading] = useState();
 
-  const { getManyChannelsByNameOrId, channels, loadingChannels } = useGetManyChannelsByNameOrId();
+  useEffect(()=>{
+
+    setLoading(fetching);
+  },[fetching])
+  const { getManyChannelsByNameOrId, channels } = useGetManyChannelsByNameOrId();
 
     useEffect(()=>{
 
-        const fetch = async () => {
+       
 
-            await getManyChannelsByNameOrId({channelName: filter, channelId: null});
-        }
+        startFetching( async ()=>{
 
-        fetch();
+          const fetch = await getManyChannelsByNameOrId({channelName: filter, channelId: null});
+
+
+          startFetching( ()=>{
+            fetch();
+          })
+
+
+        })
+
+
 
     },[filter])
 
@@ -131,7 +146,7 @@ const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
         setLayout({currentRightPanelView: RightPanelView.ChannelInfo});
     }
 
-if(loadingChannels) return <div className="flex  w-full justify-center"> <Spinner size="sm" variant="spinner"/></div>;
+if(loading) return <div className="flex   w-full justify-center"> <Spinner size="sm" variant="spinner"/></div>;
   return (
     <motion.div className="flex w-full items-center justify-center">
         {channels.length === 0  ? <div className="flex  w-full justify-center"><p className="text-xs">No channels found</p> </div>:

@@ -17,7 +17,7 @@ public class EndpointExecutor<T>
     {
         try
         {
-            _logger.LogInformation($"Calling endpoint: {typeof(T).Name}");
+            _logger.LogInformation($"[{typeof(T).Name}] A Call was made to this endpoint...");
 
             return await func();
         }
@@ -50,7 +50,9 @@ public class EndpointExecutor<T>
         {
             if (caughtException is not null)
             {
-                _logger?.LogError(
+                _logger?.LogCritical(
+
+                    $"[{typeof(T).Name}] An exception has occurred: " +
                     caughtException.InnerException?.Message ?? caughtException.Message
                 );
             }

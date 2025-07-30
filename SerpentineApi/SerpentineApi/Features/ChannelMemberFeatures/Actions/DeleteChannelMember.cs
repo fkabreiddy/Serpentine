@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,8 @@ namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
 
 public class DeleteChannelMemberRequest : IRequest<OneOf<ChannelMemberResponse, Failure>>
 {
-    // Aquí va la estructura de tu request
+    [Required]
+    public string TypeOfResponse { get; set; }
 }
 
 public class DeleteChannelMemberRequestValidator : AbstractValidator<DeleteChannelMemberRequest>
@@ -32,18 +34,46 @@ internal class DeleteChannelMemberEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete(
-                _settings.BaseUrl + "/delete",
-                async (
+                _settings.BaseUrl + "/test",
+                async(
                     [AsParameters] DeleteChannelMemberRequest command,
-                    EndpointExecutor<DeleteChannelMemberEndpoint> executor,
+                    EndpointExecutor < DeleteChannelMemberEndpoint > executor,
                     CancellationToken cancellationToken,
+                    ILogger<DeleteChannelMemberEndpoint> logger,
                     ISender sender,
                     HttpContext context
                 ) =>
-                    await executor.ExecuteAsync<ChannelMemberResponse>(async () =>
+                    await executor.ExecuteAsync<string>(async () =>
                     {
                         await Task.CompletedTask;
-                        return ResultsBuilder.Match(new NotFoundApiResult());
+                        IApiResult result;
+                        switch (command.TypeOfResponse)
+                        {
+                            case "ok":
+                                result = new SuccessApiResult<string>("Ok");
+                                break;
+
+                            case "not found":
+                                result = new NotFoundApiResult();
+                                break;
+
+                            case "bad request":
+                                result = new BadRequestApiResult();
+                                break;
+
+                            case "conflict":
+                                result = new ConflictApiResult();
+                                break;
+
+                            case "validation":
+                                result = new ValidationApiResult();
+                                break;
+
+                            default:
+                                result = new BadRequestApiResult();
+                                break;                        }
+                        logger.LogError($"Fetch to {typeof(DeleteChannelMemberEndpoint).Name } endpoint failed. Reason: " + result.Message);
+                        return ResultsBuilder.Match<string>(result);
                     })
             )
             .DisableAntiforgery()
@@ -51,7 +81,7 @@ internal class DeleteChannelMemberEndpoint : IEndpoint
             .RequireCors()
             .Experimental()
             .WithOpenApi()
-            .Accepts<DeleteChannelMemberRequest>(false, "multipart/form-data")
+            .Accepts<DeleteChannelMemberRequest>(false, "application/json")
             .Produces<SuccessApiResult<ChannelMemberResponse>>(200)
             .Produces<BadRequestApiResult>(400, "application/json")
             .Produces<ServerErrorApiResult>(500, "application/json")

@@ -17,7 +17,7 @@ public sealed class ActiveChannelsHub(
         await executor.InvokeVoidAsync(async () =>
         {
             var userId = Context.UserIdentifier ?? throw new UnauthorizedAccessException();
-            logger.LogInformation($"diconnecting {userId} from active channels hub");
+            logger.LogInformation($"Diconnecting user with Id: {userId} from {typeof(ActiveChannelsHub).Name}");
 
             cache.LeaveAllChannels(userId);
             await Task.CompletedTask;
@@ -51,9 +51,12 @@ public sealed class ActiveChannelsHub(
 
             if (added)
             {
+                logger.LogInformation($"[{typeof(ActiveChannelsHub).Name}] User with Id: {userId} was added to channel {channelId}");
                 await Groups.AddToGroupAsync(Context.ConnectionId, channelId);
                 return new HubResult<bool>(true);
             }
+
+            logger.LogWarning($"[{typeof(ActiveChannelsHub).Name}] Could not connect user with Id: {userId} to the channel {channelId}");
 
             return new HubResult<bool>(
                 succeeded: false,
@@ -72,10 +75,12 @@ public sealed class ActiveChannelsHub(
 
             if (removed)
             {
+                logger.LogInformation($"[{typeof(ActiveChannelsHub).Name}] User with Id: {userId} was removed from channel {channelId}");
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, channelId);
                 return new HubResult<bool>(true);
             }
 
+            logger.LogWarning($"[{typeof(ActiveChannelsHub).Name}] Could not disconnect user with Id: {userId} from the channel {channelId}. This may result in errors but may be solved on reconection.");
             return new HubResult<bool>(
                 succeeded: false,
                 "Could not disconnect to the channel. Try again later"

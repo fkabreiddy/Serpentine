@@ -8,6 +8,12 @@ using SerpentineApi.Helpers;
 using SerpentineApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddSimpleConsole(options =>
+{
+    options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+    options.IncludeScopes = false;
+    options.SingleLine = false;
+});
 builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddApiServices(builder);
@@ -66,7 +72,7 @@ app.UseExceptionHandler(appError =>
         var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
         if (contextFeature is not null)
         {
-            logger.LogError($"Server error: {contextFeature.Error.Message}");
+            logger.LogCritical($"Server Error: {contextFeature.Error.Message}");
 
             await context.Response.WriteAsJsonAsync(
                 new ServerErrorApiResult() { Errors = [contextFeature.Error.Message] }

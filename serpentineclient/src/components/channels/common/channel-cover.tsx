@@ -27,12 +27,12 @@ export const ChannelCover: React.FC<ChannelCoverProps> = ({
     {pictureUrl ? (
       <img
         src={pictureUrl}
-        className={`shrink-0  ${absolute && "absolute -bottom-[2px] right-[20px] ring-[5px] dark:ring-black ring-white"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
+        className={`shrink-0  ${absolute && "absolute -bottom-[2px] right-[20px] ring-[5px] dark:ring-black  ring-white"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
       />
     ) : (
       <Avatar
         size={!isSmall ? 50 : 28}
-        className={`shrink-0 rounded-full ${absolute && "absolute -bottom-[10px] right-[20px] ring-2 dark:ring-black ring-white"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}`}
+        className={`shrink-0 rounded-full ${absolute && "absolute -bottom-[10px] right-[20px] ring-2 ring-transparent"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}`}
         variant="marble"
         name={channelName ?? "serpentine"}
       />

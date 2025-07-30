@@ -17,6 +17,7 @@ interface GlobalData {
   setDeletedChannelId: (id: string | null) => void;
   channelJoined: ChannelResponse | null;
   setChannelJoined: (channel: ChannelResponse | null) => void;
+  clearGlobalData: ()=>void
 }
 
 export const useGlobalDataStore = create<GlobalData>((set) => ({
@@ -67,6 +68,13 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
       channelJoined: channel,
     }));
   },
+  clearGlobalData:()=>{
+    set((state)=>({
+      ...state,
+      createChannelGroupData: null,
+      channelInfoId: null
+    }))
+  }
 
 
 

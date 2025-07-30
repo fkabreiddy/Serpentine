@@ -5,7 +5,7 @@ import { Spinner } from "@heroui/spinner";
 import { useCloseSession } from "@/hooks/user-hooks";
 import IconButton from "@/components/common/icon-button";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { Compass, Home, Inbox, PlugIcon, Settings2 } from "lucide-react";
+import { Compass, Home, Inbox, PlugIcon, Settings2, TestTubeIcon } from "lucide-react";
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import { HubConnectionState } from "@microsoft/signalr";
 import {
@@ -18,6 +18,7 @@ import CrosshatchPattern from "@/components/common/crosshatch-pattern";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "@/components/users/common/user-avatar";
 import { useActiveUser } from "@/helpers/active-user-hub";
+import { useTest } from "@/hooks/channel-member-hooks";
 
 interface ProfilePanelProps {}
 
@@ -25,28 +26,22 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
 
   
   const {disconnectFromActiveUsersHub} = useActiveUser();
-  const {isAuthenticated, user} = useAuthStore();
   const navigate = useNavigate();
-  
+
+  const {fetching, test} = useTest();
+
+  async function tryTest()
+  {
+    await test({typeOfResponse: "validation"});
+  }
 
 
-
-  useEffect(()=>{
-  
-    
-    if(!user && !isAuthenticated)
-    {
-      disconnectFromActiveUsersHub();
-      navigate("/");
-    }
-    
-
-  },[user, isAuthenticated])
+ 
 
   return (
     <nav
       id="app-bar"
-      className=" z-[10]  bg-white dark:bg-neutral-950/50   sticky top-0 w-full    border-b border-default-100 flex items-center px-3 py-2 max-md:justify-end justify-between gap-3 h-fit transition-all"
+      className=" z-[10]  bg-white dark:bg-neutral-950/50   sticky top-0 w-full    border-b border-default-100 flex items-center px-4 py-3 max-md:justify-end justify-between gap-3 h-fit transition-all"
     >
       <div className="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-opacity-70   z-[-1]" />
 
@@ -55,6 +50,9 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
       <div />
 
       <div className=" flex  items-center justify-end gap-4 ">
+        <IconButton tooltipText="Test" onClick={() => tryTest()}>
+          <TestTubeIcon size={20}/>
+        </IconButton>
         <HomeIcon/>
         <ExploreIcon />
         <ThemeSwitch />

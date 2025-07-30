@@ -3,17 +3,8 @@ import { useFetch } from '../helpers/axios-helper';
  import ApiResult from "@/models/api-result";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
-
-
-const initialApiState = <T>(): ApiResult<T> => ({
-    statusCode: 0,
-    message: "",
-    isSuccess: false,
-    errors: [],
-    resultTitle: "",
-    data: null
-});
-
+import { useUiSound } from "@/helpers/sound-helper";
+     
 
 export function useDeleteChannel() {
 
@@ -80,9 +71,7 @@ export function useCreateChannel() {
 
         if (result.data && result.statusCode === 200) {
            setChannel(result.data);
-            console.log(result.data);
-
-           handleApiSuccess(result);
+            
 
         } 
         else {
@@ -99,6 +88,7 @@ export function useCreateChannel() {
    
     const createChannel = async (data: FormData) => {
        
+        
         setResult(null);
         setCreatingChannel(true);
         setChannel(null);
@@ -129,7 +119,6 @@ export function useGetChannelsByUserId() {
 
         if(!result)
         {
-            setLoadingChannels(false);
             return;
         }
 
@@ -144,6 +133,7 @@ export function useGetChannelsByUserId() {
             handleApiErrors(result);
         }
 
+        setLoadingChannels(false);
         setResult(null);
 
 
@@ -160,6 +150,7 @@ export function useGetChannelsByUserId() {
         setIsBusy(true);
         setChannels([]);
         setHasMore(true);
+
         do{
 
             
@@ -215,11 +206,13 @@ export function useGetManyChannelsByNameOrId() {
    
     const getManyChannelsByNameOrId = async (data: GetManyChannelsByNameOrIdRequest) => {
         
+
         setChannels([]);
         
         setResult(null);
         setLoadingChannels(true);
     
+
         const response = await get({endpoint: "channels/by-id-or-name" }, data );
         
         setResult(response);
