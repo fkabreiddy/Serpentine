@@ -46,7 +46,6 @@ export default function DefaultLayout({
 
     if(!firstRender.current)
     {
-      playUiSound("system/boot_up")
       firstRender.current = true;
       const token = getToken();
 
@@ -54,7 +53,7 @@ export default function DefaultLayout({
       {
           navigate("/");
       }
-
+      playUiSound("system/boot_up")
       setLoadLayout(true);
     }
     setTheme("dark");

@@ -183,7 +183,6 @@ export function useGetManyChannelsByNameOrId() {
 
         if(!result)
         {
-            setLoadingChannels(false);
             return;
         }
 
@@ -197,6 +196,8 @@ export function useGetManyChannelsByNameOrId() {
             
             handleApiErrors(result);
         }
+
+     setLoadingChannels(false);
 
         setResult(null);
 

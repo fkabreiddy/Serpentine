@@ -101,7 +101,7 @@ export default function GroupsContainer({
             />
           </div>
 
-          <div className="flex items-center gap-3 w-full justify-between">
+          <div className="flex items-center gap-3  w-full justify-between">
             <div className="flex items-center gap-3">
               {((channel.myMember?.role &&
                 channel.myMember?.role?.name == "admin") ||
@@ -147,7 +147,7 @@ export default function GroupsContainer({
           </div>
 
           <div
-            className="relative  w-full ml-[10px] pt-[25px]"
+            className="relative mb-[100px] w-full ml-[10px] pt-[25px]"
             style={{ width: `calc(100% - 18px)` }}
           >
             {groups.filter((g) =>

@@ -120,6 +120,7 @@ export default function CreateGroupForm({ onCreate }: CreateGroupFormProps) {
               isSelected={watch("public")}
               {...register("public")}
               size="sm"
+              color="default"
             >
               Is Public
             </Checkbox>

@@ -59,12 +59,7 @@ input{
     -webkit-text-stroke-color: transparent !important;
 }
 
-.group[data-checked="true"] {
 
-    svg {
-        opacity: 100 !important;
-    }
-}
 .rainbow {
     text-align: center;
     font-size: 32px;

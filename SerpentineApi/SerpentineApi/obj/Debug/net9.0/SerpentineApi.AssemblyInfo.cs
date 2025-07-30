@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SerpentineApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ea18e4d3c60c0983354288b1f4a702f25ed6585")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+463fb0643acf28964f583909dc34e193e12c9bd3")]
 [assembly: System.Reflection.AssemblyProductAttribute("SerpentineApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SerpentineApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

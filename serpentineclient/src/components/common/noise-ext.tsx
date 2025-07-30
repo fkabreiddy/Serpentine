@@ -83,7 +83,7 @@ const Noise: React.FC<NoiseProps> = ({
 
   return (
     <canvas
-      className="pointer-events-none  "
+      className="pointer-events-none rounded-lg "
       ref={grainRef}
       style={{
         imageRendering: "pixelated",
