@@ -30,7 +30,7 @@ export default function StatusBar({ channels }: StatusBarProps) {
   const [listeningToChannel, setListeningToChannel] = useState(false);
   const alreadyRendered = useRef<boolean>(false);
   const { layout } = useLayoutStore();
-  const { user, username } = useAuthStore();
+  const { user } = useAuthStore();
   const { deletedChannelId } = useGlobalDataStore();
   const { listenToChannel, stopListeningToChannel } =
     useActiveChannelsHubActions();

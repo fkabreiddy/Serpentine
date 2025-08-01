@@ -7,16 +7,48 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { set } from "zod";
 import { useJwtHelper } from "./jwt-helper";
 
+export function useActiveUsersActions(){
 
+    const { setConnection, quitConnection, setConnectionState, activeUsersHub } = useActiveUserHubStore();
+
+     const unregisterHandlers = () =>{
+        if (!activeUsersHub) return;
+        activeUsersHub.off("SendUserConnected");
+        activeUsersHub.off("SendUserDisconnected");
+
+    }
+    const disconnectFromActiveUsersHub = async () => {
+        if (activeUsersHub) {
+            unregisterHandlers();
+            await activeUsersHub.stop();
+            quitConnection();
+            setConnectionState(HubConnectionState.Disconnected);
+
+        }
+    };
+
+    return{
+
+        disconnectFromActiveUsersHub
+    }
+
+}
 
 
 export function useActiveUser() {
     const { setConnection, quitConnection, setConnectionState, activeUsersHub } = useActiveUserHubStore();
     const alreadyRendered = useRef<boolean>();
+    const {disconnectFromActiveUsersHub} = useActiveUsersActions();
     const activeUsersHubRef = useRef<signalR.HubConnection | null>(null);
 
     const {getToken} = useJwtHelper();
 
+
+    useEffect(()=>{
+
+
+        setConnection(activeUsersHubRef.current);
+    },[activeUsersHubRef])
     
     useEffect(()=>{
     
@@ -57,15 +89,7 @@ export function useActiveUser() {
 
     }
 
-    const disconnectFromActiveUsersHub = async () => {
-        if (activeUsersHub) {
-            unregisterHandlers();
-            await activeUsersHub.stop();
-            quitConnection();
-            setConnectionState(HubConnectionState.Disconnected);
-
-        }
-    };
+    
 
     const connectToActiveUsersHub = async () => {
         try{

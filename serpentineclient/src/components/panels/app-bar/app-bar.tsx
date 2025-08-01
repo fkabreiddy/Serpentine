@@ -17,16 +17,18 @@ import {
 import CrosshatchPattern from "@/components/common/crosshatch-pattern";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "@/components/users/common/user-avatar";
-import { useActiveUser } from "@/helpers/active-user-hub";
+import { useActiveUser, useActiveUsersActions } from "@/helpers/active-user-hub";
 import { useTest } from "@/hooks/channel-member-hooks";
+import { useLayoutStore } from "@/contexts/layout-context";
 
 interface ProfilePanelProps {}
 
 const AppBar: React.FC<ProfilePanelProps> = () => {
 
   
-  const {disconnectFromActiveUsersHub} = useActiveUser();
+  const {} = useActiveUser();
   const navigate = useNavigate();
+  const {layout} = useLayoutStore();
 
   const {fetching, test} = useTest();
 
@@ -36,7 +38,6 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   }
 
 
- 
 
   return (
     <nav

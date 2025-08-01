@@ -87,9 +87,9 @@ export default function GroupsContainer({
 
   return (
     <>
-      {channel && (
+      {channel && layout.sideBarExpanded && (
         <div
-          className={`${layout.sideBarExpanded ? "visible" : "invisible"} flex flex-col  items-center   `}
+          className={`flex flex-col  items-center   `}
         >
           <div className="flex flex-col w-full gap-2 relative mt-2 mb-4">
             <ChannelBanner pictureUrl={channel?.bannerPicture} />
