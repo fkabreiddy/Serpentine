@@ -38,6 +38,7 @@ import { RightPanelView } from "@/models/right-panel-view";
 import { showToast } from "@/helpers/sonner-helper";
 import { useCreateChannelMember } from "@/hooks/channel-member-hooks";
 import { useUiSound } from "@/helpers/sound-helper";
+import UserCard from "@/components/users/common/user-hor-card";
 
 export default function ChannelInfoView() {
   const { channelInfoId } = useGlobalDataStore();
@@ -186,6 +187,7 @@ export default function ChannelInfoView() {
             </div>
           </div>
           <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
+          <UserCard/>
         </div>
       </>
     );
