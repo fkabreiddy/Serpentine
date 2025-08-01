@@ -59,7 +59,19 @@ public class NotFoundApiResult : Failure
     {
         Build(message, 404, new() { "The requested resource does not exist or has been deleted." });
     }
+
+    
 }
+
+public class ForbiddenApiResult : Failure
+{
+    public ForbiddenApiResult(string message = "Forbidden Resource", List<string>? messages = null)
+    {
+        Build(message, 403, new() { "The requested resource is forbbiden." });
+    }
+}
+
+
 
 public class ValidationApiResult : Failure
 {

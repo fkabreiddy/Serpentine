@@ -61,6 +61,7 @@ export const useJwtHelper = ()=>{
         username: decoded.nickname,
         fullName: decoded.name,
         age: decoded.age,
+        dayOfBirth: new Date(decoded.birthdate),
         createdAt: new Date(decoded.createdAt),
         profilePictureUrl: decoded.picture,
         id: decoded.sub,

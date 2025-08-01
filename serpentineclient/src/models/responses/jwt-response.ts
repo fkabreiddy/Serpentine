@@ -17,13 +17,16 @@ export class JWTResponse {
 
 export interface JwtPayload {
   nickname: string;
-  age: number,
-  createdAt: string
+  age: number;
+  createdAt: string;
+  birthdate: string;
   sub: string;
   picture: string;
   name: string;
   exp: number;
   iss: string;
   aud: string;
+
+
   
 }

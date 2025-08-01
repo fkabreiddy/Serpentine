@@ -11,7 +11,8 @@ export interface UserIdentity{
   profilePictureUrl?: string | null,
   age: number,
   createdAt: Date,
-  id: string
+  id: string,
+  dayOfBirth: Date
 
 }
 

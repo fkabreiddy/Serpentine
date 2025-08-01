@@ -21,7 +21,7 @@ public class User : BaseEntity
     public List<GroupAccess> MyAccesses { get; set; } = new List<GroupAccess>();
     public List<Message> MyMessages { get; set; } = new List<Message>();
 
-    private int GetAge(DateTime dateOfBirth)
+    public int GetAge(DateTime dateOfBirth)
     {
         DateTime hoy = DateTime.Now;
         int edad = hoy.Year - dateOfBirth.Year;
@@ -43,6 +43,7 @@ public class User : BaseEntity
             Username = Username,
             ProfilePictureUrl = ProfilePictureUrl ?? "",
             Age = GetAge(DayOfBirth),
+            DayOfBirth = DayOfBirth
         };
 
     public static User Create(CreateUserRequest request) =>

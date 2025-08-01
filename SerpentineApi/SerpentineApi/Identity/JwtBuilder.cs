@@ -29,6 +29,7 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
                     new Claim(JwtRegisteredClaimNames.Picture, user.ProfilePictureUrl),
                     new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                     new Claim("age", user.Age.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Birthdate, user.DayOfBirth.ToString()),
                     new Claim("createdAt", user.CreatedAt.ToString())
                 ]
             ),

@@ -54,7 +54,7 @@ export default function IndexPage() {
 
         </div>
       <div className="w-[30%]  z-[2] max-xl:w-[30%] max-md:w-[80%] absolute flex overflow-y-scroll scrollbar-hide items-center justify-center flex-col max-h-screen px-2 py-4">
-          {user && loginWithCurrent ? <LoginWithCurrentAccount/> :
+          {(user && loginWithCurrent) ? <LoginWithCurrentAccount/> :
             <>{view === "login" ? <LoginForm onViewChange={handleViewChange}/> : <><CreateAccountForm  onClose={handleViewChange}/></> }</>
           }
           

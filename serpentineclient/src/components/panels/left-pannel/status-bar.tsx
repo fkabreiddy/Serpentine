@@ -74,7 +74,7 @@ export default function StatusBar({ channels }: StatusBarProps) {
       {layout.sideBarExpanded && (
         <div
           id="status-bar"
-          className="fixed left-0 max-md:z-[9999]  bottom-0 z-10 backdrop-blur-xl px-2 py-3 justify-center min-w-[300px]  items-center flex gap-3 border-t border-r border-default-100 "
+          className="fixed left-0 max-md:z-[999999]  bottom-0 z-10 backdrop-blur-xl px-2 py-3 justify-center min-w-[300px]  items-center flex gap-3 border-t border-r border-default-100 "
           style={{
             width: layout.sideBarExpanded ? 250 : 50,
             transition: "width 0.2s",

@@ -90,6 +90,7 @@ public class CreateChannelMemberEndpoint : IEndpoint
             .Produces<ConflictApiResult>(409, "application/json")
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<SuccessApiResult<ChannelResponse>>(200, "application/json")
+            .Produces<ForbiddenApiResult>(403, "application/json")
             .Produces<BadRequestApiResult>(400, "application/json");
     }
 }
@@ -103,20 +104,33 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
     )
     {
         
-        if (!await context.Channels.AnyAsync(ch => ch.Id == request.ChannelId, cancellationToken))
+        
+        if (await context.Channels.FirstOrDefaultAsync(ch => ch.Id == request.ChannelId, cancellationToken) is var channel && channel is null)
         {
             return new NotFoundApiResult("The channel do not exist");
         }
 
-        if (
-            await context.ChannelMembers.AnyAsync(
-                cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
-                cancellationToken
-            )
-        )
+        if (await context.Users.FirstOrDefaultAsync(u => u.Id == request.CurrentUserId) is var user && user is null)
         {
-            return new ConflictApiResult("You already belong to this channel");
+            return new NotFoundApiResult("We couldn't find your account");
         }
+
+        if (channel.AdultContent && user.GetAge(user.DayOfBirth) < 18)
+        {
+            return new ForbiddenApiResult("This channel contains adult content. You cannot access to this channel if you are not overage.");
+        }
+
+        
+
+        if (
+                    await context.ChannelMembers.AnyAsync(
+                        cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
+                        cancellationToken
+                    )
+                )
+            {
+                return new ConflictApiResult("You already belong to this channel");
+            }
 
         using var transaction = await context.Database.BeginTransactionAsync();
 
@@ -165,3 +179,4 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
         
     }
 }
+

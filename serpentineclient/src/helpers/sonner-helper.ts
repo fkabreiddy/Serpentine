@@ -13,8 +13,8 @@ export const showToast = ({ title = "", description, color = "foreground" }: Toa
     title,
     description,
     variant: "solid",
+    size: "lg",
     color:color ,   
-    hideIcon: true,
     radius: "lg",
     closeIcon: true,
     classNames:{
