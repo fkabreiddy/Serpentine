@@ -90,10 +90,9 @@ export default function DefaultLayout({
             </div>
           }
 
-        {isMobile && layout.currentRightPanelView !== RightPanelView.DefaultView ? 
-          <></> :
+       
 
-          <div className="flex flex-col w-full h-screen  " style={{marginLeft: !layout.sideBarExpanded ? "50px" : "0px" }}>
+          <div className="flex flex-col w-full h-screen  " style={{marginLeft: !layout.sideBarExpanded ? "50px" : "0px", display: (isMobile && layout.currentRightPanelView !== RightPanelView.DefaultView) ? "none" : "block" }}>
               <AppBar />
               <main className="flex flex-col animate-[width] bg-white  dark:bg-black  float-left h-full overflow-auto "  >
               {children}
@@ -102,7 +101,7 @@ export default function DefaultLayout({
 
           </div>
          
-        }
+        
        
 
        {layout.currentRightPanelView === RightPanelView.DefaultView ? <></> :    <RightSideBar/> }

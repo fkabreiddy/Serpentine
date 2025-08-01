@@ -64,7 +64,6 @@ export default function StatusBar({ channels }: StatusBarProps) {
 
   useEffect(() => {
     if (activeChannelsHubsState === HubConnectionState.Connected) {
-      console.log("channels to remove", channels);
       listenToChannels(channels);
     }
   }, [activeChannelsHubsState, channels]);
@@ -105,7 +104,7 @@ export default function StatusBar({ channels }: StatusBarProps) {
               <p className="text-xs">
                 {activeChannelsHubsState.toString()}{" "}
                 {activeChannelsHubsState === HubConnectionState.Connected &&
-                  "as @" + username}
+                  "as @" + user?.username}
               </p>
 
               {activeChannelsHubsState !== HubConnectionState.Connected ? (

@@ -1,17 +1,16 @@
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useDeleteChannel, useGetChannelById } from "@/hooks/channel-hooks";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Spinner } from "@heroui/spinner";
 import { ChannelBanner } from "../common/channel-banner";
 import { ChannelCover } from "../common/channel-cover";
+import InfiniteScroll from "react-infinite-scroll-component"
 import {
   Activity,
   ArrowLeft,
   CakeIcon,
   CopyIcon,
-  Edit,
   Edit3Icon,
-  EditIcon,
   InfoIcon,
   MessageCircleWarningIcon,
   MoreVertical,
@@ -21,24 +20,22 @@ import {
 } from "lucide-react";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { HubResult } from "@/models/hub-result";
-import { Accordion, AccordionItem } from "@heroui/accordion";
+
 import IconButton from "@/components/common/icon-button";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Avatar,
-  User,
 } from "@heroui/react";
 import { ChannelResponse } from "@/models/responses/channel-response";
-import { ChannelMemberRoleResponse } from "@/models/responses/channel-member-role-response";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { RightPanelView } from "@/models/right-panel-view";
 import { showToast } from "@/helpers/sonner-helper";
-import { useCreateChannelMember } from "@/hooks/channel-member-hooks";
+import { useCreateChannelMember, useGetChannelMembersByChannelId } from "@/hooks/channel-member-hooks";
 import { useUiSound } from "@/helpers/sound-helper";
 import UserCard from "@/components/users/common/user-hor-card";
+import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 
 export default function ChannelInfoView() {
   const { channelInfoId } = useGlobalDataStore();
@@ -187,7 +184,7 @@ export default function ChannelInfoView() {
             </div>
           </div>
           <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
-          <UserCard/>
+          <UsersContainer myMember={channel.myMember} channelId={channel.id}/>
         </div>
       </>
     );
@@ -359,3 +356,87 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
     </Dropdown>
   );
 };
+
+
+interface UserContainerProps{
+
+  myMember: ChannelMemberResponse | null,
+  channelId: string
+}
+
+const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>{
+
+  const {getChannelMembersByChannelId,hasMore, channelMembers, loadingChannelMembers} = useGetChannelMembersByChannelId();
+  const firstRender = useRef(false);
+
+   const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useRef<HTMLDivElement | null>(null);
+ const fetchChannelMembers = async () =>{
+
+   
+    await getChannelMembersByChannelId({channelId: channelId, skip:  channelMembers.length, take: 5})
+
+  }
+  const observeLastElement = useCallback((node: HTMLDivElement | null) => {
+    if (loadingChannelMembers) return;
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        fetchChannelMembers();
+      }
+    });
+
+    if (node) observerRef.current.observe(node);
+    lastElementRef.current = node;
+  }, [loadingChannelMembers, hasMore, fetchChannelMembers]);
+ 
+
+  useEffect(()=>{
+
+    if(firstRender.current) return;
+
+
+    firstRender.current = true;
+    fetchChannelMembers();
+
+  },[channelId])
+
+  
+ 
+  return(
+ 
+
+          <div className="flex flex-col gap-3">
+              <p className="text-xs ">Members of this channel</p>
+
+              {
+                channelMembers.map((cm, idx)=>
+
+                  {
+                    const isLast = idx === channelMembers.length - 1;
+
+                    return(
+
+                      <div  ref={isLast ? observeLastElement : null} className="w-full flex flex-col gap-2" key={cm.id}>
+                        <UserCard myChannelMember={myMember}  channelMember={cm} />
+
+                        <hr  className="ml-auto w-[80%] dark:border-neutral-950 border-neutral-100 border-t "/>
+                        
+                      </div>
+                    )
+                  }
+
+
+                  
+
+                  
+                )
+              }
+
+              {loadingChannelMembers && <Spinner size="sm" variant="spinner"/>}
+            </div>
+   
+   
+  )
+}

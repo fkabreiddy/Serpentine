@@ -58,6 +58,69 @@ export function useGetChannelMemberByUserAndChannelId() {
 }
 
 
+export function useGetChannelMembersByChannelId() {
+
+    
+    const [channelMembers, setChannelMembers] = useState<ChannelMemberResponse[]>([]);
+    const [loadingChannelMembers, setloadingChannelMembers] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<ChannelMemberResponse[]> | null>(null);
+    const { get } = useFetch<ChannelMemberResponse[]>();
+    const [hasMore, setHasMore] = useState(true);
+
+   
+    useEffect(() => {
+       
+
+        if(!result)
+        {
+
+            setloadingChannelMembers(false);
+            return;
+        }
+
+        
+
+        if (result.data  && result.isSuccess) {
+            setChannelMembers((prev) => [...prev, ...(result.data ?? [])]);
+
+            if(result.data.length <= 4)
+            {
+            setHasMore(false);
+
+              setResult(null);
+
+            }
+
+        } 
+        else {
+            handleApiErrors(result);
+        }
+
+        setResult(null);
+
+
+    }, [result]);
+    
+    
+
+   
+    const getChannelMembersByChannelId = async (data: GetChannelMembersByChannelIdRequest) => {
+        
+        setHasMore(true);
+        setResult(null);
+        setloadingChannelMembers(true);
+       
+        const response = await get({endpoint: "channel-members/by-channelId" }, data );
+        
+        setResult(response);
+
+       
+    };
+
+    return { getChannelMembersByChannelId, channelMembers, hasMore, loadingChannelMembers};
+}
+
+
 
 export function useCreateChannelMember(){
 

@@ -41,6 +41,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.60.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-router-dom": "6.23.0",
     "react-sounds": "^1.0.25",
     "sonner": "^2.0.6",

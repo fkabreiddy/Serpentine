@@ -5,7 +5,7 @@ type IconButtonProps = {
   children: React.ReactNode;
   tooltipText: string;
   placement?: "top" | "bottom" | "left" | "right";
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+} & React.ButtonHTMLAttributes<HTMLDivElement>;
 
 export default function IconButton({
   children,
@@ -17,7 +17,7 @@ export default function IconButton({
   return (
     <>
       <Tooltip content={tootltipText} size="sm" placement={placement}>
-        <button
+        <div
           onClick={(e) => {
             if (onClick) onClick(e);
           }}
@@ -27,7 +27,7 @@ export default function IconButton({
         >
           <div className="grain w-4 h-4 absolute inset-0 opacity-50 rounded-lg" />
           {children}
-        </button>
+        </div>
       </Tooltip>
     </>
   );

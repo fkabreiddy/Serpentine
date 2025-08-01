@@ -102,9 +102,13 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
     )
     {
         List<ChannelMember> channels = await context
-            .ChannelMembers.AsNoTracking()
+            .ChannelMembers
+            .AsNoTracking()
             .AsSplitQuery()
             .Where(ch => ch.ChannelId == request.ChannelId)
+            .OrderBy(ch => ch.Id)
+            .Skip(request.Skip)
+            .Take(request.Take)
             .ToListAsync(cancellationToken);
 
         return channels.Select(ch => ch.ToResponse()).ToList();
