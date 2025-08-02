@@ -1,6 +1,6 @@
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useDeleteChannel, useGetChannelById } from "@/hooks/channel-hooks";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, EventHandler } from "react";
 import { Spinner } from "@heroui/spinner";
 import { ChannelBanner } from "../common/channel-banner";
 import { ChannelCover } from "../common/channel-cover";
@@ -27,6 +27,13 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { useLayoutStore } from "@/contexts/layout-context";
@@ -199,16 +206,10 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
   const {setLayout} = useLayoutStore();
   const {playUiSound} = useUiSound();
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
 
-  function handleOpenChanged(open: boolean)
-  {
-      if(open)
-      {
-        playUiSound("ui/radio_select");
-
-      }
-  }
+ 
 
 
   const join = async () =>{
@@ -250,7 +251,9 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
     }
   }, [channelDeleted]);
   return (
-    <Dropdown onOpenChange={handleOpenChanged} placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
+    <>
+      <DeleteChannelModal onActionAccepted={fetchDeleteChannel} channelName={channel.name} open={openDeleteModal} onOpenChanged={setOpenDeleteModal}/>
+        <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
       <DropdownTrigger>
         <button>
           <IconButton tooltipText="Manage">
@@ -306,7 +309,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
                 <DropdownItem
                   color="danger"
                   key="delete"
-                  onClick={() => fetchDeleteChannel()}
+                  onClick={() => setOpenDeleteModal(true)}
                   endContent={
                     deletingChannel ? (
                       <Spinner variant="spinner" size="sm" />
@@ -354,6 +357,8 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
         </>
       </DropdownMenu>
     </Dropdown>
+    </>
+  
   );
 };
 
@@ -439,4 +444,59 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
    
    
   )
+}
+
+interface DeleteChannelModalProps{
+    open: boolean
+    onOpenChanged?: (change:boolean) => void;
+    onActionAccepted: () => void;
+    channelName: string
+}
+
+const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, onActionAccepted, onOpenChanged, channelName}) =>{
+
+    
+    const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setChannelNameConfirmation(value);
+    };
+    return(
+
+        <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
+        <ModalContent style={{zIndex: "9999999"}} className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg">
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Delete Channel</ModalHeader>
+              <ModalBody>
+                <p className="text-[13px] font-normal">
+                 Deleting the channel <strong>@{channelName}</strong> ALL groups and messages will be deleted PERMANENTLY, do you wanna procceed?
+                </p>
+                <Input
+                  label="Channel name"
+                  type="text"
+                  placeholder="Write the name of the channel to delete"
+                  minLength={3}
+                  maxLength={100}
+                  value={channelNameConfirmation}
+                  labelPlacement="outside"
+                  isRequired={true}
+                  onChange={handleInputChange}
+                  errorMessage={"Input the channel name to confirm"}
+                  isInvalid={channelName !== channelNameConfirmation}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button size="sm" variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button isDisabled={channelName !== channelNameConfirmation} className="bg-red-700 text-white" size="sm" onPress={() => onActionAccepted}>
+                  Yes, delete this channel
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    )
 }

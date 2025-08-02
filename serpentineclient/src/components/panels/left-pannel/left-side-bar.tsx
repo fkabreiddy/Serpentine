@@ -115,7 +115,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
   return (
     <>
-      <div className={`relative z-[999999]  h-screen bg-white dark:bg-black`}>
+      <div className={`relative z-[31] max-md:z-[33]  h-screen bg-white dark:bg-black`}>
         <ScrollShadow
           hideScrollBar
           offset={0}
@@ -124,7 +124,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
             layout.sideBarExpanded
               ? "!max-w-[300px] !min-w-[300px]"
               : "!max-w-[50px] !min-w-[50px]"
-          } h-full  py-4 max-md:z-[99999] max-md:h-full bg-white dark:bg-black animate-all flex flex-col border-r max-md:absolute border-default-100 px-2 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
+          } h-full  py-4  max-md:h-full bg-white dark:bg-black animate-all flex flex-col border-r max-md:absolute border-default-100 px-2 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
           style={{ paddingBottom: statusBarHeight }}
         >
           <div className="flex flex-col w-full items-center gap-3">

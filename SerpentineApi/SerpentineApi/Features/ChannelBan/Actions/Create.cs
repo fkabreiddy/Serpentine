@@ -57,15 +57,15 @@
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
         app.MapPost(
-            _settings.BaseUrl + "/ban",
+            _settings.BaseUrl + "/create",
             async (
                 [FromBody] CreateChannelBanRequest command,
                 EndpointExecutor<CreateChannelBanEndpoint> executor,
                 CancellationToken cancellationToken,
                 ISender sender,
                 HttpContext context,
-                IHubContext<ActiveUsersHub, IActiveUsersHub> activeUsersHub
-                
+                IHubContext<ActiveChannelsHub, IActiveChannelsHub> activeUsersHub
+
             ) => await executor.ExecuteAsync<ChannelBanResponse>(async () =>
             {
                 {
@@ -101,6 +101,8 @@
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<ConflictApiResult>(409, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")
+            .Produces<NotFoundApiResult>(404, "application/json")
+
             .WithName(nameof(CreateChannelBanEndpoint));
             }
         }
@@ -117,10 +119,23 @@
                         x => x.ChannelId == request.ChannelId && x.UserId == request.CurrentUserId &&
                              (x.IsAdmin || x.IsOwner), cancellationToken))
                     return new ForbiddenApiResult("You dont have permisson to ban this user");
-                
-                if (!await context.ChannelMembers.AnyAsync(
-                        x => x.ChannelId == request.ChannelId && x.UserId == request.UserId && (x.IsOwner || x.IsAdmin), cancellationToken))
-                    return new ForbiddenApiResult("You cant ban an administrator or the owner of the channel");
+
+                 var membership = await context.ChannelMembers.AsNoTracking().FirstOrDefaultAsync(x => x.ChannelId == request.ChannelId && x.UserId == request.UserId, cancellationToken);
+
+                if (membership is null)
+                {
+                    return new NotFoundApiResult("User membership not found");
+                }
+
+                if (membership.IsAdmin || membership.IsOwner)
+                {      
+                      return new ForbiddenApiResult("You cant ban an administrator or the owner of the channel");
+
+                    
+                }
+
+
+
                 
                 using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
@@ -145,7 +160,7 @@
                     if(deletedRows <= 0)
                     {
                         await transaction.RollbackAsync(cancellationToken);
-                        return new BadRequestApiResult("We could not ban this user");
+                        return new NotFoundApiResult("We could not ban this user");
                     }
 
                     await transaction.CommitAsync(cancellationToken);

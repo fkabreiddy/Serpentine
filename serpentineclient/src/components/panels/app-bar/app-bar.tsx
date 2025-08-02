@@ -20,6 +20,7 @@ import UserAvatar from "@/components/users/common/user-avatar";
 import { useActiveUser, useActiveUsersActions } from "@/helpers/active-user-hub";
 import { useTest } from "@/hooks/channel-member-hooks";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useUiSound } from "@/helpers/sound-helper";
 
 interface ProfilePanelProps {}
 
@@ -29,6 +30,7 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   const {} = useActiveUser();
   const navigate = useNavigate();
   const {layout} = useLayoutStore();
+  const {playUiSound} = useUiSound();
 
   const {fetching, test} = useTest();
 
@@ -37,12 +39,17 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
     await test({typeOfResponse: "validation"});
   }
 
+  useEffect(()=>{
+          playUiSound("system/boot_up")
+
+  },[])
+
 
 
   return (
     <nav
       id="app-bar"
-      className=" z-[9999]  bg-white dark:bg-neutral-950/50   sticky top-0 w-full    border-b border-default-100 flex items-center px-4 py-3 max-md:justify-end justify-between gap-3 h-fit transition-all"
+      className=" z-[30]  bg-white dark:bg-neutral-950/50   sticky top-0 w-full    border-b border-default-100 flex items-center px-4 py-3 max-md:justify-end justify-between gap-3 h-fit transition-all"
     >
       <div className="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-opacity-70   z-[-1]" />
 

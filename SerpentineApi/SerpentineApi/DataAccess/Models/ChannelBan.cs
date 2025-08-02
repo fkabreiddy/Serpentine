@@ -14,8 +14,8 @@ public class ChannelBan : BaseEntity
 
     public static ChannelBan Create(CreateChannelBanRequest request) => new()
     {
-        UserId = request.ChannelId,
-        ChannelId = request.UserId,
+        UserId = request.UserId,
+        ChannelId = request.ChannelId,
         Reason = request.Reason
 
     };

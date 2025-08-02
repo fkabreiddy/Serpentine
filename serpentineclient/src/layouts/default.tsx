@@ -27,7 +27,6 @@ export default function DefaultLayout({
   const firstRender = useRef(false);
   const navigate = useNavigate();
   const [loadLayout, setLoadLayout] = useState(false);
-  const {playUiSound} = useUiSound();
 
  useEffect(()=>{
   
@@ -53,7 +52,6 @@ export default function DefaultLayout({
       {
           navigate("/");
       }
-      playUiSound("system/boot_up")
       setLoadLayout(true);
     }
     setTheme("dark");

@@ -10,6 +10,7 @@ import { HubConnectionState } from "@microsoft/signalr";
 import { clear } from "console";
 import { showToast } from "./sonner-helper";
 import { useJwtHelper } from "./jwt-helper";
+import ChannelBanResponse from "@/models/responses/channel-ban-response";
 
 export function useActiveChannels() {
   const {
@@ -17,10 +18,21 @@ export function useActiveChannels() {
     quitConnection,
     clearChannels,
     setActiveChannelsHubConnectionState,
+    removeChannel,
     activeChannelsHub,
   } = useActiveChannelsHubStore();
   const {getToken} = useJwtHelper();
 
+
+  function handleSendUserBanned(ban: ChannelBanResponse | null){
+
+    if(!ban) return;
+    removeChannel(ban.channelId);
+
+    showToast({title: "Banned from channel!", description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`})
+
+    
+  }
 
   const alreadyRendered = useRef<boolean>(false);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
@@ -50,10 +62,13 @@ export function useActiveChannels() {
 
   const registerHandlers = () => {
     if (!activeChannelsHub) return;
+    activeChannelsHub.on("SendUserBanned", (ban: HubResult<ChannelBanResponse>)=> handleSendUserBanned(ban.data))
+
   };
 
   const unregisterHandlers = () => {
     if (!activeChannelsHub) return;
+    activeChannelsHub.off("SendUserBanned")
   };
 
   const handleDisconnect = () => {
