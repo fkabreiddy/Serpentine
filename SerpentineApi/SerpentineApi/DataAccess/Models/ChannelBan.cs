@@ -20,4 +20,15 @@ public class ChannelBan : BaseEntity
 
     };
 
+    public ChannelBanResponse ToResponse() => new()
+    {
+        Id = Id,
+        CreatedAt = CreatedAt,
+        Reason = Reason,
+        UserId = UserId,
+        ChannelId = ChannelId
+
+
+    };
+
 }

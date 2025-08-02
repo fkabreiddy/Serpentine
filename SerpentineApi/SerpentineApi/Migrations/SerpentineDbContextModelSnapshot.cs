@@ -60,6 +60,40 @@ namespace SerpentineApi.Migrations
                     b.ToTable("Channels");
                 });
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelBan", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ChannelId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ChannelId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ChannelBans");
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelMember", b =>
                 {
                     b.Property<string>("Id")
@@ -71,6 +105,9 @@ namespace SerpentineApi.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
@@ -84,9 +121,6 @@ namespace SerpentineApi.Migrations
                     b.Property<DateTime>("LastAccess")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -96,50 +130,12 @@ namespace SerpentineApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
                     b.HasIndex("UserId");
 
                     b.HasIndex("ChannelId", "UserId")
                         .IsUnique();
 
                     b.ToTable("ChannelMembers");
-                });
-
-            modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelMemberRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ChannelMemberRoles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "01K0J4A5K31FJVPKZY094JTFNB",
-                            CreatedAt = new DateTime(2025, 7, 19, 15, 59, 24, 261, DateTimeKind.Local).AddTicks(9509),
-                            Name = "admin",
-                            UpdatedAt = new DateTime(2025, 7, 19, 15, 59, 24, 264, DateTimeKind.Local).AddTicks(5376)
-                        },
-                        new
-                        {
-                            Id = "01K0J4A5K8Y9ZF2AVDHBPYATHD",
-                            CreatedAt = new DateTime(2025, 7, 19, 15, 59, 24, 264, DateTimeKind.Local).AddTicks(6760),
-                            Name = "default",
-                            UpdatedAt = new DateTime(2025, 7, 19, 15, 59, 24, 264, DateTimeKind.Local).AddTicks(6765)
-                        });
                 });
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.Group", b =>
@@ -289,6 +285,25 @@ namespace SerpentineApi.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelBan", b =>
+                {
+                    b.HasOne("SerpentineApi.DataAccess.Models.Channel", "Channel")
+                        .WithMany("Bans")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SerpentineApi.DataAccess.Models.User", "User")
+                        .WithMany("Bans")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelMember", b =>
                 {
                     b.HasOne("SerpentineApi.DataAccess.Models.Channel", "Channel")
@@ -297,11 +312,6 @@ namespace SerpentineApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SerpentineApi.DataAccess.Models.ChannelMemberRole", "Role")
-                        .WithMany("Members")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("SerpentineApi.DataAccess.Models.User", "User")
                         .WithMany("MyChannels")
                         .HasForeignKey("UserId")
@@ -309,8 +319,6 @@ namespace SerpentineApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Channel");
-
-                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -372,13 +380,10 @@ namespace SerpentineApi.Migrations
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.Channel", b =>
                 {
+                    b.Navigation("Bans");
+
                     b.Navigation("Groups");
 
-                    b.Navigation("Members");
-                });
-
-            modelBuilder.Entity("SerpentineApi.DataAccess.Models.ChannelMemberRole", b =>
-                {
                     b.Navigation("Members");
                 });
 
@@ -396,6 +401,8 @@ namespace SerpentineApi.Migrations
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
                 {
+                    b.Navigation("Bans");
+
                     b.Navigation("MyAccesses");
 
                     b.Navigation("MyChannels");

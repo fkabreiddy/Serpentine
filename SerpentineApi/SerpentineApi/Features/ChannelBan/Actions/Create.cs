@@ -3,6 +3,7 @@
         using Microsoft.AspNetCore.Authentication.JwtBearer;
         using Microsoft.AspNetCore.Mvc;
         using Microsoft.AspNetCore.Mvc.ModelBinding;
+        using Microsoft.AspNetCore.SignalR;
         using Microsoft.EntityFrameworkCore;
         using Scalar.AspNetCore;
         using SerpentineApi.DataAccess.Context.EntityExtensions;
@@ -11,10 +12,11 @@
         using SerpentineApi.Identity;
         using SerpentineApi.Services.CloudinaryStorage;
         using SerpentineApi.Helpers;
+        using SerpentineApi.Hubs;
 
         namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
 
-        public class CreateChannelBanRequest : RequestWithUserCredentials, IRequest<OneOf<bool, Failure>>
+        public class CreateChannelBanRequest : RequestWithUserCredentials, IRequest<OneOf<ChannelBanResponse, Failure>>
         {
 
             [JsonPropertyName("channelId"), Required, FromBody]
@@ -61,8 +63,10 @@
                 EndpointExecutor<CreateChannelBanEndpoint> executor,
                 CancellationToken cancellationToken,
                 ISender sender,
-                HttpContext context
-            ) => await executor.ExecuteAsync<bool>(async () =>
+                HttpContext context,
+                IHubContext<ActiveUsersHub, IActiveUsersHub> activeUsersHub
+                
+            ) => await executor.ExecuteAsync<ChannelBanResponse>(async () =>
             {
                 {
 
@@ -78,8 +82,9 @@
                     }
 
                     var t0 = result.AsT0;
-
-                    return ResultsBuilder.Match<bool>(new SuccessApiResult<bool>(t0));
+                    await activeUsersHub.Clients.User(t0.UserId.ToString())
+                        .SendUserBanned(new HubResult<ChannelBanResponse>(t0));
+                    return ResultsBuilder.Match<ChannelBanResponse>(new SuccessApiResult<ChannelBanResponse>(t0));
 
                 }
             })
@@ -100,9 +105,9 @@
             }
         }
 
-        internal class CreateChannelBanEndpointHandler(SerpentineDbContext context) : IEndpointHandler<CreateChannelBanRequest, OneOf<bool, Failure>>
+        internal class CreateChannelBanEndpointHandler(SerpentineDbContext context) : IEndpointHandler<CreateChannelBanRequest, OneOf<ChannelBanResponse, Failure>>
         {
-            public async Task<OneOf<bool, Failure>> HandleAsync(CreateChannelBanRequest request, CancellationToken cancellationToken = default)
+            public async Task<OneOf<ChannelBanResponse, Failure>> HandleAsync(CreateChannelBanRequest request, CancellationToken cancellationToken = default)
             {
                 if (await context.ChannelBans.AnyAsync(
                         x => x.ChannelId == request.ChannelId && x.UserId == request.UserId, cancellationToken))
@@ -144,7 +149,7 @@
                     }
 
                     await transaction.CommitAsync(cancellationToken);
-                    return true;
+                    return channelBan.ToResponse();
 
 
 

@@ -47,4 +47,7 @@ public interface IActiveUsersHub
 {
     Task SendUserConnected(HubResult<string> result);
     Task SendUserDisconnected(HubResult<string> result);
+    
+    public Task SendUserBanned(HubResult<ChannelBanResponse> channelBan);
+
 }
