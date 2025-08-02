@@ -8,6 +8,7 @@ public class ResultsBuilder
         {
             case NotFoundApiResult:
                 return Results.NotFound(apiResult);
+           
 
             case ServerErrorApiResult:
                 return Results.InternalServerError(apiResult);

@@ -101,7 +101,7 @@ public class ConflictApiResult : Failure
 {
     public ConflictApiResult(string message = "Conflict Detected", List<string>? messages = null)
     {
-        Build(message, 404, new() { "The resource already exists or cannot be modified in its current state." });
+        Build(message, 409, new() { "The resource already exists or cannot be modified in its current state." });
     }
 }
 

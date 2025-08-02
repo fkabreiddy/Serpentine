@@ -22,6 +22,9 @@ public class Channel : BaseEntity
 
     public List<Group> Groups { get; set; } = new();
     
+    public List<ChannelBan> Bans { get; set; } = new();
+
+    
 
     [NotMapped]
     public ChannelMember? MyMember { get; set; } 

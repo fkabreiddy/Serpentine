@@ -103,7 +103,9 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
         CancellationToken cancellationToken
     )
     {
-        
+        if (await context.ChannelBans.FirstOrDefaultAsync(x =>
+                x.ChannelId == request.ChannelId && x.UserId == request.CurrentUserId, cancellationToken) is var ban && ban is not null)
+            return new BadRequestApiResult($"You have been banned from this channel. For {ban.Reason}");
         
         if (await context.Channels.FirstOrDefaultAsync(ch => ch.Id == request.ChannelId, cancellationToken) is var channel && channel is null)
         {
@@ -123,7 +125,7 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
         
 
         if (
-                    await context.ChannelMembers.AnyAsync(
+                await context.ChannelMembers.AnyAsync(
                         cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
                         cancellationToken
                     )

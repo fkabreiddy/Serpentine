@@ -15,6 +15,8 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
     public DbSet<Message> Messages { get; set; }
     
     public DbSet<ChannelMemberRole> ChannelMemberRoles { get; set; }
+    
+    public DbSet<ChannelBan> ChannelBans { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +26,13 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            t.HasMany(u => u.Bans)
+                .WithOne(a => a.User)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            
             t.HasIndex(u => u.Username).IsUnique();
 
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
@@ -49,6 +58,11 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithOne(mc => mc.Channel)
                 .HasForeignKey(mc => mc.ChannelId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            t.HasMany(u => u.Bans)
+                .WithOne(mc => mc.Channel)
+                .HasForeignKey(mc => mc.ChannelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
 
@@ -56,7 +70,30 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithOne(g => g.Channel)
                 .HasForeignKey(g => g.ChannelId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+           
         });
+        
+        modelBuilder.Entity<ChannelBan>(t =>
+        {
+
+            t.HasOne(cb => cb.Channel)
+                .WithMany(c => c.Bans)
+                .HasForeignKey(mc => mc.ChannelId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
+
+            t.HasOne(cb => cb.User)
+                .WithMany(u => u.Bans)
+                .HasForeignKey(cb => cb.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            t.HasIndex(u => new { u.ChannelId, u.UserId }).IsUnique();
+
+        });
+        
+        
 
         modelBuilder.Entity<ChannelMember>(t =>
         {

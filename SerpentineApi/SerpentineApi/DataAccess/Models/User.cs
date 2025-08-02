@@ -21,6 +21,8 @@ public class User : BaseEntity
     public List<GroupAccess> MyAccesses { get; set; } = new List<GroupAccess>();
     public List<Message> MyMessages { get; set; } = new List<Message>();
 
+    public List<ChannelBan> Bans { get; set; } = new();
+
     public int GetAge(DateTime dateOfBirth)
     {
         DateTime hoy = DateTime.Now;

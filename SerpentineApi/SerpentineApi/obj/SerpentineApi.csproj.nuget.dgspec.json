@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Proyectos\\Serpentine-App\\serpentineapi\\serpentineapi\\SerpentineApi.csproj": {}
+    "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\SerpentineApi\\SerpentineApi.csproj": {}
   },
   "projects": {
-    "C:\\Proyectos\\Serpentine-App\\serpentineapi\\serpentineapi\\SerpentineApi.csproj": {
+    "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\SerpentineApi\\SerpentineApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\serpentineapi\\SerpentineApi.csproj",
+        "projectUniqueName": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\SerpentineApi\\SerpentineApi.csproj",
         "projectName": "SerpentineApi",
-        "projectPath": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\serpentineapi\\SerpentineApi.csproj",
+        "projectPath": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\SerpentineApi\\SerpentineApi.csproj",
         "packagesPath": "C:\\Users\\breid\\.nuget\\packages\\",
-        "outputPath": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\serpentineapi\\obj\\",
+        "outputPath": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\SerpentineApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\breid\\AppData\\Roaming\\NuGet\\NuGet.Config"
