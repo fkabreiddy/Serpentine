@@ -14,7 +14,6 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
 
     public DbSet<Message> Messages { get; set; }
     
-    public DbSet<ChannelMemberRole> ChannelMemberRoles { get; set; }
     
     public DbSet<ChannelBan> ChannelBans { get; set; }
 
@@ -99,8 +98,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
         {
             t.HasIndex(u => new { u.ChannelId, u.UserId }).IsUnique();
             t.Navigation(cm => cm.User).AutoInclude().IsRequired();
-            t.HasOne(cm => cm.Role).WithMany(r => r.Members).HasForeignKey(cm => cm.RoleId).IsRequired(false);
-            t.Navigation(cm => cm.Role).AutoInclude();
+            
             t.HasOne(cm => cm.Channel).WithMany(cm => cm.Members).HasForeignKey(c => c.ChannelId);
             t.HasOne(cm => cm.User).WithMany(cm => cm.MyChannels).HasForeignKey(c => c.UserId);
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
@@ -152,16 +150,6 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
             entity.HasOne(ga => ga.User).WithMany(u => u.MyAccesses).HasForeignKey(a => a.UserId);
         });
         
-        modelBuilder.Entity<ChannelMemberRole>(t => 
-        {
-            t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
-            t.HasMany(mr => mr.Members).WithOne(mc => mc.Role).HasForeignKey(mc => mc.RoleId).IsRequired(false).OnDelete(DeleteBehavior.SetNull);
-            t.HasData(new ChannelMemberRole[]
-            {
-                new(){Name = "admin"},
-                new(){Name = "default"}
-            });
-
-        });
+      
     }
 }

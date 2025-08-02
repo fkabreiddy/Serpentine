@@ -65,8 +65,8 @@ public class Channel : BaseEntity
                 {
                     UserId = request.CurrentUserId,
                     IsOwner = true,
+                    IsAdmin = true,
                     LastAccess = DateTime.Now,
-                    RoleId = request.RoleId
                 },
             ],
         };

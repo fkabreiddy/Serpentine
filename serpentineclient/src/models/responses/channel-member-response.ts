@@ -12,7 +12,7 @@ export class ChannelMemberResponse extends BaseResponse {
   userProfilePictureUrl : string = "";
   userUsername : string = "";
   userName : string = "";
-  role: ChannelMemberRoleResponse  = new ChannelMemberRoleResponse();
+  isAdmin: boolean = false;
 
   constructor(init?: Partial<ChannelMemberResponse>) {
     super(init); 

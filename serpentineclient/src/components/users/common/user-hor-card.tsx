@@ -23,12 +23,12 @@ const UserCard:React.FC<UserCardProps> = ({channelMember, myChannelMember} )=>{
             <UserAvatar src={channelMember?.userProfilePictureUrl ?? ""} userNameFallback={channelMember?.userUsername} size={40} />
             <div className="w-[90%]">
                 <p className="text-[13px] font-semibold">@{channelMember?.userUsername} {myChannelMember?.id === channelMember.id && <>(You)</>}</p>
-                <p className="text-xs font-normal opacity-60">{channelMember?.userName}{channelMember.isOwner && <> (Owner)</>}{!channelMember.isOwner && channelMember.role.name == "admin" && <>(Admin)</>}</p>
+                <p className="text-xs font-normal opacity-60">{channelMember?.userName}{channelMember.isOwner && <> (Owner)</>}{!channelMember.isOwner && channelMember.isAdmin && <>(Admin)</>}</p>
 
             </div>
 
             {channelMember.id === myChannelMember?.id ||  
-                <UserCardDropdown imAdmin={myChannelMember?.role.name == "admin"} imOwner={myChannelMember?.isOwner} channelMember={channelMember}/>
+                <UserCardDropdown imAdmin={myChannelMember?.isAdmin} imOwner={myChannelMember?.isOwner} channelMember={channelMember}/>
             }
         </div>
     )

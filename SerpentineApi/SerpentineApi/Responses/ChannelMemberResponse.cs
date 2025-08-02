@@ -7,6 +7,10 @@ public class ChannelMemberResponse : BaseResponse
     public bool IsSilenced { get; set; }
     public bool IsArchived { get; set; }
     public bool IsOwner { get; set; }
+    
+    public bool IsAdmin { get; set; }
+
+    
 
     public DateTime LastAccess { get; set; } = DateTime.Now;
 
@@ -16,7 +20,6 @@ public class ChannelMemberResponse : BaseResponse
 
     public string UserName { get; set; } = "";
 
-    public ChannelMemberRoleResponse Role { get; set; } = new();
     
     
 }

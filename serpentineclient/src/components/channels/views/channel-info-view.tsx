@@ -275,7 +275,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
           <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
         </DropdownItem>
         <>
-          {(channel.myMember?.role?.name === "admin" ||
+          {(channel.myMember?.isAdmin ||
             channel.myMember?.isOwner) && (
             <>
               <DropdownItem key="edit" endContent={<Edit3Icon size={16} />}>

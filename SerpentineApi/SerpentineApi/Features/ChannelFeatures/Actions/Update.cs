@@ -146,7 +146,7 @@ internal class UpdateChannelRequestChannel(SerpentineDbContext context)
             return new NotFoundApiResult("Channel not found");
         }
 
-        if (!permission.IsOwner || permission.Role is null || permission.Role.Name != "admin")
+        if (!permission.IsOwner || !permission.IsAdmin)
         {
             return new BadRequestApiResult("You dont have permissions to create a group in this channel");
 

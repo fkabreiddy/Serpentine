@@ -158,12 +158,7 @@ internal class CreateChannelRequestHandler(
                 "You are trying to create a channel without being logged in"
             );
         
-        var role = await context.ChannelMemberRoles.FirstOrDefaultAsync(r => r.Name == "admin", cancellationToken);
-
-        if (role is null)
-            return new ServerErrorApiResult("Something went wrong. Try again later");
-
-        request.SetRoleId(role.Id);
+       
         var channel = Channel.Create(request);
 
         var exist = await context.Channels.AnyAsync(

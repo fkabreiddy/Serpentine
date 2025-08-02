@@ -138,7 +138,7 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
             if (!await dbContext.Channels.AnyAsync(ch => ch.Id == request.ChannelId))
                 return new BadRequestApiResult("Channel do not exist");
 
-            if (await dbContext.ChannelMembers.Include(cm => cm.Role)
+            if (await dbContext.ChannelMembers
                                 .AsNoTracking()
                                 .AsSplitQuery()
                                 .FirstOrDefaultAsync(cm => cm.ChannelId == request.ChannelId && cm.UserId == request.CurrentUserId
@@ -148,7 +148,7 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
                  
             }
 
-            if (!permission.IsOwner || permission.Role is null || permission.Role.Name != "admin")
+            if (!permission.IsOwner || !permission.IsAdmin)
             {
                 return new BadRequestApiResult("You dont have permissions to create a group in this channel");
 

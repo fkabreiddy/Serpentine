@@ -12,9 +12,10 @@ public class ChannelMember : BaseEntity
     public bool IsSilenced { get; set; } = false;
     public bool IsArchived { get; set; } = false;
     public bool IsOwner { get; set; } = false;
+    
+    public bool IsAdmin { get; set; } = false;
+
     public DateTime LastAccess { get; set; } = DateTime.Now;
-    public Ulid? RoleId { get; set; }
-    public ChannelMemberRole? Role { get; set; }
 
     public ChannelMemberResponse ToResponse() =>
         new()
@@ -29,8 +30,8 @@ public class ChannelMember : BaseEntity
             IsArchived = IsArchived,
             UserProfilePictureUrl = User.ProfilePictureUrl ?? "",
             UserName = User.FullName,
-            Role = Role?.ToResponse() ?? new(),
             UserUsername = User.Username,
+            IsAdmin = IsAdmin
         };
 
     public static ChannelMember Create(CreateChannelMemberRequest request) =>
@@ -39,5 +40,6 @@ public class ChannelMember : BaseEntity
             ChannelId = request.ChannelId,
             UserId = request.CurrentUserId,
             IsOwner = false,
+            IsAdmin = false
         };
 }

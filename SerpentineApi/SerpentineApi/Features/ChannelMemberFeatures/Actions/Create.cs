@@ -141,12 +141,7 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
 
             ChannelMember creation = ChannelMember.Create(request);
 
-            var role = await context.ChannelMemberRoles.AsNoTracking().FirstOrDefaultAsync(cr => cr.Name == "default", cancellationToken);
-
-            if (role is null)
-                return new ServerErrorApiResult("Something went wrong with this request. Try again later");
-
-            creation.RoleId = role.Id;
+          
 
             await context.ChannelMembers.AddAsync(
                 creation,
