@@ -21,18 +21,33 @@ export function useActiveChannels() {
     removeChannel,
     activeChannelsHub,
   } = useActiveChannelsHubStore();
+  const { setDeletedChannelId} = useGlobalDataStore();
   const {getToken} = useJwtHelper();
 
 
   function handleSendUserBanned(ban: ChannelBanResponse | null){
 
     if(!ban) return;
-    removeChannel(ban.channelId);
-
+    setDeletedChannelId(ban.channelId);
     showToast({title: "Banned from channel!", description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`})
 
     
   }
+
+  function handelSendChannelRemoved(channelId: string | null){
+
+    if(!channelId) return;
+    
+    setDeletedChannelId(channelId);
+
+
+    showToast({title: "Channel Deleted", description: `Channel with id.${channelId} has been deleted`})
+
+    
+  }
+
+
+
 
   const alreadyRendered = useRef<boolean>(false);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
@@ -62,13 +77,17 @@ export function useActiveChannels() {
 
   const registerHandlers = () => {
     if (!activeChannelsHub) return;
-    activeChannelsHub.on("SendUserBanned", (ban: HubResult<ChannelBanResponse>)=> handleSendUserBanned(ban.data))
+
+    activeChannelsHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
+    activeChannelsHub.on("SendChannelRemoved", (result: HubResult<string>)=> handelSendChannelRemoved(result.data))
+
 
   };
 
   const unregisterHandlers = () => {
     if (!activeChannelsHub) return;
     activeChannelsHub.off("SendUserBanned")
+    activeChannelsHub.off("SendChannelRemoved")
   };
 
   const handleDisconnect = () => {
@@ -107,15 +126,20 @@ export function useActiveChannels() {
       });
 
       newHub.onreconnected(async () => {
-        handleReconnected(); //remember to listen to channels again manually outside of this hook
+        handleReconnected(); 
       });
+
+      unregisterHandlers();
+      newHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
+      newHub.on("SendChannelRemoved", (result: HubResult<string>)=> handelSendChannelRemoved(result.data))
+
+
 
       await newHub.start();
 
       setConnection(newHub);
       connectionRef.current = newHub;
-      unregisterHandlers();
-      registerHandlers();
+      
       setActiveChannelsHubConnectionState(newHub.state);
     } catch (error) {
       activeChannelsHub?.stop();

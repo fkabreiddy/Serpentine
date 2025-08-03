@@ -32,8 +32,7 @@ export default function StatusBar({ channels }: StatusBarProps) {
   const { layout } = useLayoutStore();
   const { user } = useAuthStore();
   const { deletedChannelId } = useGlobalDataStore();
-  const { listenToChannel, stopListeningToChannel } =
-    useActiveChannelsHubActions();
+  const { listenToChannel, stopListeningToChannel } =useActiveChannelsHubActions();
 
   const activeChannelsConnection = useActiveChannels();
 
@@ -59,6 +58,7 @@ export default function StatusBar({ channels }: StatusBarProps) {
       };
 
       desconnect();
+      removeChannel(deletedChannelId);
     }
   }, [deletedChannelId]);
 

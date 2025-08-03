@@ -232,9 +232,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
 
   },[channelMember])
 
-  const fetchDeleteChannel = async () => {
-    await deleteChannel({ channelId: channel.id });
-  };
+ 
 
   async function copyIdToClipboard()
   {
@@ -243,17 +241,11 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
 
   }
 
-  useEffect(() => {
-    if (channelDeleted) {
-      setChannelInfoId(null);
-      setDeletedChannelId(channel.id);
-      setLayout({ currentRightPanelView: RightPanelView.DefaultView });
-    }
-  }, [channelDeleted]);
+  
   return (
     <>
-      <DeleteChannelModal onActionAccepted={fetchDeleteChannel} channelName={channel.name} open={openDeleteModal} onOpenChanged={setOpenDeleteModal}/>
-        <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
+      <DeleteChannelModal channel={channel}  open={openDeleteModal} onOpenChanged={setOpenDeleteModal}/>
+      <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
       <DropdownTrigger>
         <button>
           <IconButton tooltipText="Manage">
@@ -449,18 +441,34 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
 interface DeleteChannelModalProps{
     open: boolean
     onOpenChanged?: (change:boolean) => void;
-    onActionAccepted: () => void;
-    channelName: string
+    channel: ChannelResponse
 }
 
-const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, onActionAccepted, onOpenChanged, channelName}) =>{
+const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, onOpenChanged, channelName}) =>{
 
-    
+    const { deleteChannel, deletingChannel, channelDeleted } = useDeleteChannel();
+    const { setChannelInfoId, setDeletedChannelId, setChannelJoined } = useGlobalDataStore();
     const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
+     const {setLayout} = useLayoutStore();
+
+
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       setChannelNameConfirmation(value);
     };
+
+    const fetchDeleteChannel = async () => {
+      await deleteChannel({ channelId: channel.id });
+    };
+
+    useEffect(() => {
+      if (channelDeleted) {
+        setChannelInfoId(null);
+        setDeletedChannelId(channel.id);
+        setLayout({ currentRightPanelView: RightPanelView.DefaultView });
+      }
+    }, [channelDeleted]);
     return(
 
         <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
@@ -470,7 +478,7 @@ const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, onActionA
               <ModalHeader className="flex flex-col gap-1">Delete Channel</ModalHeader>
               <ModalBody>
                 <p className="text-[13px] font-normal">
-                 Deleting the channel <strong>@{channelName}</strong> ALL groups and messages will be deleted PERMANENTLY, do you wanna procceed?
+                 Deleting the channel <strong>@{channel.name}</strong> ALL groups and messages will be deleted PERMANENTLY, do you wanna procceed?
                 </p>
                 <Input
                   label="Channel name"
@@ -483,14 +491,14 @@ const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, onActionA
                   isRequired={true}
                   onChange={handleInputChange}
                   errorMessage={"Input the channel name to confirm"}
-                  isInvalid={channelName !== channelNameConfirmation}
+                  isInvalid={channel.name !== channelNameConfirmation}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button size="sm" variant="light" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button isDisabled={channelName !== channelNameConfirmation} className="bg-red-700 text-white" size="sm" onPress={() => onActionAccepted}>
+                <Button isDisabled={channel.name !== channelNameConfirmation} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
                   Yes, delete this channel
                 </Button>
               </ModalFooter>

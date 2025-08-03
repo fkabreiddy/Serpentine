@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
+using SerpentineApi.Hubs;
 
 namespace SerpentineApi.Features.ChannelFeatures.Actions;
 
@@ -47,7 +49,8 @@ public class DeleteChannelEndpoint : IEndpoint
                     EndpointExecutor<DeleteChannelEndpoint> executor,
                     HttpContext context,
                     CancellationToken cancellationToken,
-                    ISender sender
+                    ISender sender,
+                    IHubContext<ActiveChannelsHub, IActiveChannelsHub> channelsHub
                 ) =>
                 {
                     return await executor.ExecuteAsync<bool>(async () =>
@@ -66,11 +69,16 @@ public class DeleteChannelEndpoint : IEndpoint
 
                         var deleted = result.AsT0;
 
+                        if (deleted)
+                        {
+                            await channelsHub.Clients.Group(command.ChannelId.ToString()).SendChannelRemoved(new HubResult<string>(command.ChannelId.ToString()));
+                        }
+
                         return deleted
-                            ? Results.Ok(new SuccessApiResult<bool>(true))
-                            : ResultsBuilder.Match<bool>(
-                                new NotFoundApiResult("Channel not found")
-                            );
+                                ? Results.Ok(new SuccessApiResult<bool>(true))
+                                : ResultsBuilder.Match<bool>(
+                                    new NotFoundApiResult("Channel not found")
+                                );
                     });
                 }
             )

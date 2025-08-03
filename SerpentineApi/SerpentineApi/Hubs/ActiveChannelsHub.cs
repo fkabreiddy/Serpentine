@@ -93,5 +93,7 @@ public interface IActiveChannelsHub
 {
     public Task UserDisconnected(HubResult<string> userId);
     public Task SendUserBanned(HubResult<ChannelBanResponse> channelBan);
+    public Task SendChannelRemoved(HubResult<string> channelId);
+
 
 }

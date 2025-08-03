@@ -77,15 +77,16 @@ export default function SearchChannelCard({
               <Info className="size-[18px]" />
             </IconButton>
             {canJoin ? 
-             (userIsOverage && channel.adultContent  ? 
-              <IconButton onClick={()=> join()}  tooltipText="Join">
-                <UserPlus2 size={18}/>
-              </IconButton> : 
-
-                <Tooltip size="sm" placement="bottom" showArrow={true} content="This channel contains +18 content. You must be overage to join">
+             (!userIsOverage && channel.adultContent  ?  
+              <Tooltip size="sm" placement="bottom" showArrow={true} content="This channel contains +18 content. You must be overage to join">
                    <UserLock size={18}/>
 
-                </Tooltip>
+                </Tooltip> :
+              <IconButton onClick={()=> join()}  tooltipText="Join">
+                {joining ? <Spinner size="sm" variant="spinner"/> : <UserPlus2 size={18}/>}
+              </IconButton> 
+
+              
             ) : 
                 <Tooltip size="sm" placement="bottom" showArrow={true} content="You've joined this channel">
                    <UserCheck2 size={18}/>
@@ -106,7 +107,7 @@ export default function SearchChannelCard({
         <p className="text-xs my-3 opacity-70 line-clamp-3"><strong>Description: </strong>{channel.description}</p>
 
         <div className="w-full  mt-auto flex items-center gap-3">
-            {!channel.adultContent &&  
+            {channel.adultContent &&  
               <Popover placement="bottom" showArrow={true}>
                 <PopoverTrigger>
                   <Chip size="sm" className="cursor-pointer" color="danger"> 
