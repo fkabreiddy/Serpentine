@@ -15,7 +15,7 @@ public class ChannelMember : BaseEntity
     
     public bool IsAdmin { get; set; } = false;
 
-    public DateTime LastAccess { get; set; } = DateTime.Now;
+    public DateTime LastAccess { get; set; } = DateTime.UtcNow;
 
     public ChannelMemberResponse ToResponse() =>
         new()

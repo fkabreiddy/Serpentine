@@ -17,6 +17,10 @@ interface GlobalData {
   setDeletedChannelId: (id: string | null) => void;
   channelJoined: ChannelResponse | null;
   setChannelJoined: (channel: ChannelResponse | null) => void;
+  updateChannelId: string | null;
+  setUpdateChannelid: (channelId : string | null) => void;
+  updatedChannel: ChannelResponse | null;
+  setUpdatedChannel: (channelId: ChannelResponse | null) => void;
   clearGlobalData: ()=>void
 }
 
@@ -27,6 +31,8 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   createdGroup: null,
   channelInfoId: null,
   channelJoined: null,
+  updateChannelId: null,
+  updatedChannel: null, 
 
   setDeletedChannelId: (id: string | null) => {
     set((state) => ({
@@ -68,6 +74,22 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
       channelJoined: channel,
     }));
   },
+  
+  setUpdateChannelid: (channelId: string | null) => {
+    set((state) => ({
+      ...state,
+      updateChannelId: channelId,
+    }));
+  },
+
+   setUpdatedChannel: (channel: ChannelResponse | null) => {
+    set((state) => ({
+      ...state,
+      updatedChannel: channel,
+    }));
+  },
+
+  
   clearGlobalData:()=>{
     set((state)=>({
       ...state,

@@ -4,6 +4,7 @@ import { useFetch } from '../helpers/axios-helper';
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
 import { useUiSound } from "@/helpers/sound-helper";
+import { UpdateChannelRequest } from "@/models/requests/channels/update-channel-request";
      
 
 export function useDeleteChannel() {
@@ -266,4 +267,53 @@ export function useGetChannelById() {
     };
 
     return { getChannelById, channel, loadingChannel, setChannel, result };
+}
+export function useUpdateChannel() {
+
+    const [updatedChannel, setUpdatedChannel] = useState<ChannelResponse | null>(null);
+    const [updatingChannel, setUpdatingChannel] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
+    const { put } = useFetch<ChannelResponse>();
+
+    useEffect(() => {
+       
+
+        if(!result)
+        {
+            setUpdatingChannel(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+           setUpdatedChannel(result.data);
+            
+
+        } 
+        else {
+            
+            handleApiErrors(result);
+        }
+
+        setUpdatingChannel(false);
+        setResult(null);
+
+
+    }, [result]);
+
+   
+    const updateChannel = async (data: UpdateChannelRequest) => {
+       
+        
+        setResult(null);
+        setUpdatingChannel(true);
+        setUpdatedChannel(null);
+        const response = await put({endpoint: "channels/update", contentType: "application/json"}, data );
+        setResult(response);
+
+            
+        
+       
+    };
+
+    return { updateChannel, updatedChannel,  updatingChannel};
 }

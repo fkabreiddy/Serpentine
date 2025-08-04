@@ -99,6 +99,7 @@ internal class GetChannelByIdEndpointHandler(SerpentineDbContext context)
         if (channel is null)
             return new NotFoundApiResult($"Channel with the id {request.ChannelId} not found");
 
+      
         return channel.ToResponse();
     }
 }

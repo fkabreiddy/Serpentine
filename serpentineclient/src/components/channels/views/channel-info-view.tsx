@@ -45,7 +45,7 @@ import UserCard from "@/components/users/common/user-hor-card";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 
 export default function ChannelInfoView() {
-  const { channelInfoId } = useGlobalDataStore();
+  const { channelInfoId, setChannelInfoId } = useGlobalDataStore();
   const { getChannelById, channel, loadingChannel } = useGetChannelById();
   const { activeChannelsHub } = useActiveChannelsHubStore();
   const [activeUsers, setActiveUsers] = useState(0);
@@ -90,6 +90,12 @@ export default function ChannelInfoView() {
 
   useEffect(() => {
     fetchChannel();
+
+
+    return()=>{
+
+      setChannelInfoId(null);
+    }
   }, [channelInfoId]);
 
   if (loadingChannel)
@@ -202,7 +208,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   channel,
 }) => {
   const { deleteChannel, deletingChannel, channelDeleted } = useDeleteChannel();
-  const { setChannelInfoId, setDeletedChannelId, setChannelJoined } = useGlobalDataStore();
+  const { setChannelInfoId, setDeletedChannelId, setChannelJoined, setUpdateChannelid } = useGlobalDataStore();
   const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
   const {setLayout} = useLayoutStore();
   const {playUiSound} = useUiSound();
@@ -211,7 +217,11 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
 
  
 
-
+  function showUpdateChannelForm()
+  {
+    setUpdateChannelid(channel.id);
+    setLayout({currentRightPanelView: RightPanelView.UpdateChannelFormView})
+  }
   const join = async () =>{
 
   
@@ -273,7 +283,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
           {(channel.myMember?.isAdmin ||
             channel.myMember?.isOwner) && (
             <>
-              <DropdownItem key="edit" endContent={<Edit3Icon size={16} />}>
+              <DropdownItem onClick={showUpdateChannelForm} key="edit" endContent={<Edit3Icon size={16} />}>
                 <p className="font-normal text-[13px]">Edit this channel</p>
               </DropdownItem>
             </>

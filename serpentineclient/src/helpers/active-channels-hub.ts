@@ -29,7 +29,7 @@ export function useActiveChannels() {
 
     if(!ban) return;
     setDeletedChannelId(ban.channelId);
-    showToast({title: "Banned from channel!", description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`})
+    showToast({title: "Banned from channel!", description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`, color: "danger"})
 
     
   }

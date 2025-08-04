@@ -10,6 +10,7 @@ import CreateGroupForm from "@/components/groups/forms/create-group-form.tsx";
 import ChannelInfoView from "@/components/channels/views/channel-info-view";
 import { motion } from "framer-motion";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
+import EditChannelForm from "@/components/channels/forms/edit-channel-form";
 
 interface RightSideBarProps {}
 
@@ -58,6 +59,10 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
       )}
       {layout.currentRightPanelView === RightPanelView.ChannelInfo && (
         <ChannelInfoView />
+      )}
+
+      {layout.currentRightPanelView === RightPanelView.UpdateChannelFormView && (
+        <EditChannelForm />
       )}
      
     </ScrollShadow>

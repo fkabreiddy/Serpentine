@@ -14,10 +14,15 @@ namespace SerpentineApi.Helpers
                 return false;
             }
 
-            if (!Ulid.TryParse(ulid.ToString(), out Ulid parsedUlid))
+            if (ulid == Ulid.Empty)
             {
                 return false;
             }
+
+            if (!Ulid.TryParse(ulid.ToString(), out Ulid parsedUlid))
+                {
+                    return false;
+                }
 
             return true;
         }

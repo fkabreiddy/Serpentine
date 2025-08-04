@@ -35,7 +35,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     deletedChannelId,
     setDeletedChannelId,
     channelJoined,
-    setChannelJoined
+    setChannelJoined,
+    setUpdatedChannel,
+    updatedChannel
   } = useGlobalDataStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
@@ -49,6 +51,16 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
       setChannelJoined(null);
     }
   },[channelJoined])
+
+  useEffect(()=>{
+
+    if(!updatedChannel) return;
+
+    setChannels(prev =>
+      prev.map(c => c.id === updatedChannel.id ? updatedChannel : c)
+    );
+  },[updatedChannel])
+
   useEffect(() => {
     if (deletedChannelId) {
       setChannels(
@@ -69,7 +81,6 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
   useEffect(() => {
     if (createdChannel) {
-      console.log(createdChannel);
       setChannels((prev) => [...prev, createdChannel]);
     }
   }, [createdChannel]);

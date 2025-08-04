@@ -54,7 +54,7 @@ public class Channel : BaseEntity
     public static Channel Create(CreateChannelRequest request) =>
         new()
         {
-            Name = request.Name.ToLower().Trim(),
+            Name = request.Name.Trim(),
             Description = request.Description.Trim(),
             AdultContent = request.AdultContent,
             UpdatedAt = DateTime.Now,
@@ -95,7 +95,7 @@ public class Channel : BaseEntity
 
         if (hasBeenUpdated)
         {
-            UpdatedAt = DateTime.Now;
+            UpdatedAt = DateTime.UtcNow;
         }
         return hasBeenUpdated;
     }

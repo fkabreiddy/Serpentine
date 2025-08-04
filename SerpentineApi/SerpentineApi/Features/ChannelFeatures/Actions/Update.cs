@@ -130,25 +130,35 @@ internal class UpdateChannelRequestChannel(SerpentineDbContext context)
         CancellationToken cancellationToken = default
     )
     {
+
+        request.Name.Trim();
+
         if (request.CurrentUserId.ToString() == "")
             return new UnauthorizedApiResult(
-                "You are trying to create a channel without being logged in"
-            );
+                "You are trying to update a channel without being logged in"
+        );
 
-        if (
-            await context.ChannelMembers.FirstOrDefaultAsync(cm =>
-                cm.UserId == request.CurrentUserId
-                && cm.ChannelId == request.ChannelId,
-                 cancellationToken
-            ) is var permission && permission is null
-        )
+
+
+        if (await context.Channels.AnyAsync(ch => ch.Name.ToLower() == request.Name.ToLower() && ch.Id != request.ChannelId))
         {
-            return new NotFoundApiResult("Channel not found");
+            return new ConflictApiResult("Another channel with the same name already exist");
         }
 
-        if (!permission.IsOwner || !permission.IsAdmin)
+        if (
+                await context.ChannelMembers.AsNoTracking().FirstOrDefaultAsync(cm =>
+                    cm.UserId == request.CurrentUserId
+                    && cm.ChannelId == request.ChannelId,
+                        cancellationToken
+                ) is var permission && permission is null
+            )
+            {
+                return new NotFoundApiResult("Channel not found");
+            }
+
+        if (!permission.IsOwner && !permission.IsAdmin)
         {
-            return new BadRequestApiResult("You dont have permissions to create a group in this channel");
+            return new BadRequestApiResult("You dont have permissions to update this channel");
 
         }
 
@@ -166,17 +176,23 @@ internal class UpdateChannelRequestChannel(SerpentineDbContext context)
         await context.SaveChangesAsync(cancellationToken);
         context.ChangeTracker.Clear();
 
-        Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
+        Channel? result = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
             request.ChannelId,
             request.CurrentUserId,
             cancellationToken
         );
 
-        if (response is null)
+        if (result is null)
         {
             return new NotFoundApiResult("Channel not found");
         }
 
-        return response.ToResponse();
+        result.UnreadMessages = await context.GroupAccesses.GetMessagesCountByChannelId(
+                channel.Id,
+                request.CurrentUserId,
+                cancellationToken
+        );
+
+        return result.ToResponse();
     }
 }
