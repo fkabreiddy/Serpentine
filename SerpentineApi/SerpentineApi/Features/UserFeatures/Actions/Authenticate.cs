@@ -94,16 +94,16 @@ internal class AuthenticateUserEndpoint : IEndpoint
             .AllowAnonymous()
             .RequireCors()
             .WithOpenApi()
-            .WithTags(new[] { "POST", $"{nameof(User)}" })
-            .Accepts<AuthenticateUserRequest>(false, "application/json")
-            .Produces<SuccessApiResult<Jwt>>(200, "application/json")
-            .Produces<NotFoundApiResult>(404, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(User) })
+            .Accepts<AuthenticateUserRequest>(false, ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<Jwt>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .Stable()
             .WithDescription(
-                $"Authenticates an user based on the credentials. Requires a {nameof(AuthenticateUserRequest)}. Returns {nameof(Jwt)}"
+                $"Authenticates an user based on the credentials and returns a JWT. Require CORS."
             )
             .WithName(nameof(AuthenticateUserEndpoint));
     }

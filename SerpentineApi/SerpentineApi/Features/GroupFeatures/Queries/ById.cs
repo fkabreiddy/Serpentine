@@ -66,7 +66,7 @@
                 .DisableAntiforgery()
                 .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
                 .RequireCors()
-                .Experimental()
+                .Stable()
                 .WithOpenApi()
                 .WithTags(new []{nameof(ApiHttpVerbs.Get), nameof(Group)})
                 .Accepts<GetByIdRequest>(false, ApiContentTypes.ApplicationJson)

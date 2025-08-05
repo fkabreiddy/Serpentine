@@ -74,8 +74,8 @@ internal class GetByUserIdEndpoint : IEndpoint
                 }
             )
             .DisableAntiforgery()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
-            .Experimental()
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
+            .Stable()
             .WithOpenApi()
             .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(Channel) })
             .RequireCors()

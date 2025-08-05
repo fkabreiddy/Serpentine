@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Helpers;
 
@@ -81,8 +82,9 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
                     }
                 )
                 .DisableAntiforgery()
-                .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
                 .WithOpenApi()
+                .Stable()
                 .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(Channel) })
                 .RequireCors()
                 .Accepts<GetManyByIdOrNameRequest>(false, ApiContentTypes.ApplicationJson)

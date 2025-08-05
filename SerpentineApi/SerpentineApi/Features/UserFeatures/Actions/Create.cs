@@ -171,16 +171,16 @@ public class CreateUserEndpoint : IEndpoint
             .AllowAnonymous()
             .RequireCors()
             .WithOpenApi()
-            .WithTags(new[] { "POST", $"{nameof(User)}" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(User) })
             .WithDescription(
-                $"Creates an user. Not requires authorization. Accepts an {nameof(CreateUserRequest)}. Returns a ApiResult with an {nameof(UserResponse)}"
+                $"Creates an user. Require CORS."
             )
-            .Accepts<AuthenticateUserRequest>(false, "multipart/form-data")
-            .Produces<SuccessApiResult<UserResponse>>(200, "application/json")
-            .Produces<ConflictApiResult>(409, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .Accepts<AuthenticateUserRequest>(false, ApiContentTypes.MultipartForm)
+            .Produces<SuccessApiResult<UserResponse>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<ConflictApiResult>(409, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .WithName(nameof(CreateUserEndpoint))
             .Stable();
     }

@@ -2,5 +2,5 @@
 
 public class GroupEndpointSettings : IEndpointSettings
 {
-    public string BaseUrl { get; set; } = "api/groups";
+    public string BaseUrl { get; set; } = "api/v1/groups";
 }
