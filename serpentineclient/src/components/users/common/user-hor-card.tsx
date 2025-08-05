@@ -1,6 +1,20 @@
 import IconButton from "@/components/common/icon-button"
 import UserAvatar from "./user-avatar"
-import { ArrowLeft, ArrowUp, Ban, CopyIcon, Edit3Icon, InfoIcon, MessageCircleWarningIcon, MoreVertical, PlusCircle, TrashIcon, UserIcon, X } from "lucide-react"
+import {
+    ArrowDown,
+    ArrowLeft,
+    ArrowUp,
+    Ban,
+    CopyIcon,
+    Edit3Icon,
+    InfoIcon,
+    MessageCircleWarningIcon,
+    MoreVertical,
+    PlusCircle,
+    TrashIcon,
+    UserIcon,
+    X
+} from "lucide-react"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown"
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Textarea } from "@heroui/react"
 import { channel } from "diagnostics_channel"
@@ -12,28 +26,33 @@ import { CreateChannelBanRequest, createChannelBanSchema } from "@/models/reques
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useAuthStore } from "@/contexts/authentication-context"
+import {useUpdateChannelMember} from "@/hooks/channel-member-hooks.ts";
 
 interface UserCardProps{
 
     channelMember : ChannelMemberResponse
     myChannelMember? : ChannelMemberResponse | null
+    onUpdated:(channelMember: ChannelMemberResponse) => void
 }
 
 
-const UserCard:React.FC<UserCardProps> = ({channelMember, myChannelMember} )=>{
+const UserCard:React.FC<UserCardProps> = ({channelMember, onUpdated, myChannelMember} )=>{
 
+    function handleChannelMemberUpdated(channelMember: ChannelMemberResponse){
+        onUpdated(channelMember)
+    }
     return(
 
         <div className="w-full items-center flex  gap-3 ">
             <UserAvatar src={channelMember?.userProfilePictureUrl ?? ""} userNameFallback={channelMember?.userUsername} size={30} />
             <div className="w-[90%]">
                 <p className="text-[13px] font-semibold">@{channelMember?.userUsername} {myChannelMember?.id === channelMember.id && <>(You)</>}</p>
-                <p className="text-xs font-normal opacity-60">{channelMember?.userName}{channelMember.isOwner && <> (Owner)</>}{!channelMember.isOwner && channelMember.isAdmin && <>(Admin)</>}</p>
+                <p className="text-xs font-normal opacity-60">{channelMember?.userName}{channelMember.isOwner && <> (Owner)</>}{!channelMember.isOwner && channelMember.isAdmin && <> (Admin)</>}</p>
 
             </div>
 
             {channelMember.id === myChannelMember?.id ||  
-                <UserCardDropdown imAdmin={myChannelMember?.isAdmin} imOwner={myChannelMember?.isOwner} channelMember={channelMember}/>
+                <UserCardDropdown onMemberUpdated={handleChannelMemberUpdated} imAdmin={myChannelMember?.isAdmin} imOwner={myChannelMember?.isOwner} channelMember={channelMember}/>
             }
         </div>
     )
@@ -44,15 +63,25 @@ interface UserCardDropdownProps{
     imAdmin? : boolean,
     imOwner? : boolean,
     channelMember: ChannelMemberResponse 
+    onMemberUpdated: (channelMember:ChannelMemberResponse) => void 
 }
 
-const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false, imOwner = false, channelMember}) =>{
+const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false, onMemberUpdated, imOwner = false, channelMember}) =>{
 
     const [showBanModal, setShowBanModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    
+    function handleMemberUpdated(channelMember : ChannelMemberResponse){
+        onMemberUpdated(channelMember)
+    }
+   
+    
+    
 
    
     return(
         <>
+            <UpdateUserModal onUpdated={handleMemberUpdated} shouldBeAdmin={!channelMember.isAdmin} channelMember={channelMember} open={showUpdateModal} onOpenChanged={setShowUpdateModal}/>
             <BanUserModal  open={showBanModal} onOpenChanged={setShowBanModal} channelMember={channelMember}/>
             <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
         <DropdownTrigger>
@@ -62,61 +91,70 @@ const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false, im
                 </IconButton>
             </button>
            
-        </DropdownTrigger>
-        <DropdownMenu
-            disabledKeys={ ["divider2", "divider"]}
-            aria-label="Channel Actions"
-            variant="flat"
-        >
-            
-            <DropdownItem key="visit-profile" startContent={<UserIcon size={14}/>} isReadOnly={true}>
-                <p className="text-[13px] font-normal">Visit profile</p>
-            </DropdownItem>
-
-            {imOwner ? 
-            
-                <>
-
-
-                    <DropdownItem key="divider" isReadOnly={true}>
-                        <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
-                    </DropdownItem>
-                     <DropdownItem key="promote-member" startContent={<ArrowUp size={14}/>} isReadOnly={true}>
-                        <p className="text-[13px] font-normal">Pormote member</p>
-                        <p className="text-xs opacity-80">Promote user as an administrator</p>
-                    </DropdownItem>
-                </> :
-                null
-            }
-          
-            
-            <DropdownItem key="divider2" isReadOnly={true}>
-                <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
-            </DropdownItem>
-           
-
-
-           {(channelMember !== null && (imOwner || (imAdmin && !channelMember.isAdmin)))
-            ? (
-                <>
-                <DropdownItem color="danger" key="remove-user" startContent={<X size={14} />}>
-                    <p className="text-[13px] font-normal">Kick user</p>
+            </DropdownTrigger>
+            <DropdownMenu
+                
+                disabledKeys={ ["divider2", "divider"]}
+                aria-label="Channel Actions"
+                variant="flat"
+            >
+                
+                <DropdownItem textValue={"visitProfile"} key="visit-profile" startContent={<UserIcon size={14}/>} isReadOnly={true}>
+                    <p className="text-[13px] font-normal">Visit profile</p>
                 </DropdownItem>
-                <DropdownItem onClick={()=>{setShowBanModal(true)}} color="danger" key="ban-user" startContent={<Ban size={14} />}>
-                    <p className="text-[13px] font-normal">Ban user</p>
-                    <p className="text-xs opacity-80">Banned user can't no longer join</p>
-
+    
+                {imOwner ? 
+                
+                    <>
+    
+    
+                        <DropdownItem textValue={"divider"} key="divider" isReadOnly={true}>
+                            <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
+                        </DropdownItem>
+    
+                        {!channelMember.isAdmin ? 
+                             <DropdownItem textValue={"promote"} key="promote-member" onClick={() => {setShowUpdateModal(true)}} startContent={<ArrowUp size={14}/>} >
+                                <p className="text-[13px] font-normal">Promote member</p>
+                                <p className="text-xs opacity-80">Promote user as an administrator</p>
+                            </DropdownItem> :
+                            <DropdownItem textValue={"demote"} key="demote-member" onClick={() => {setShowUpdateModal(true)}} startContent={<ArrowDown size={14}/>}>
+                                <p className="text-[13px] font-normal">Demote member</p>
+                                <p className="text-xs opacity-80">Demote user as a default user</p>
+                            </DropdownItem>
+                        
+                        }
+                    </> :
+                    null
+                }
+              
+                
+                <DropdownItem textValue={"divider2"} key="divider2" isReadOnly={true}>
+                    <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
                 </DropdownItem>
-                </>
-            ) : null}
-
-          
-           
-          
-            
-
-            
-        </DropdownMenu>
+               
+    
+    
+               {((imOwner || (imAdmin && !channelMember.isAdmin)))
+                ? (
+                    <>
+                    <DropdownItem textValue={"kick"} color="danger" key="remove-user" startContent={<X size={14} />}>
+                        <p className="text-[13px] font-normal">Kick user</p>
+                    </DropdownItem>
+                    <DropdownItem textValue={"ban"} onClick={()=>{setShowBanModal(true)}} color="danger" key="ban-user" startContent={<Ban size={14} />}>
+                        <p className="text-[13px] font-normal">Ban user</p>
+                        <p className="text-xs opacity-80">Banned user can't no longer join</p>
+    
+                    </DropdownItem>
+                    </>
+                ) : null}
+    
+              
+               
+              
+                
+    
+                
+            </DropdownMenu>
             </Dropdown>
         </>
       
@@ -224,6 +262,64 @@ const BanUserModal : React.FC<BanUserModalProps> = ({open, onOpenChanged, channe
           )}
         </ModalContent>
       </Modal>
+    )
+}
+
+interface UpdateUserModalProps{
+    open: boolean
+    onOpenChanged: (change:boolean) => void;
+    channelMember: ChannelMemberResponse;
+    shouldBeAdmin?: boolean | null;
+    onUpdated: (chanelMember:ChannelMemberResponse) => void;
+}
+const UpdateUserModal : React.FC<UpdateUserModalProps> = ({open, onOpenChanged, channelMember, onUpdated, shouldBeAdmin = null}) =>{
+
+    const {updatedChannelMember, updatingChannelMember, updateChannelMember} = useUpdateChannelMember();
+    
+    
+    const fetchUpdate = async () =>{
+
+        
+        await updateChannelMember({channelMemberId: channelMember.id, shouldBeAdmin: shouldBeAdmin});
+    }
+
+
+   
+
+
+    useEffect(()=>{
+
+        if(!updatedChannelMember) return;
+        onUpdated(updatedChannelMember);
+        onOpenChanged(false);
+    },[updatedChannelMember])
+
+   
+    return(
+
+        <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
+            <ModalContent style={{zIndex: "9999999"}} className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg">
+                {(onClose) => (
+                    <>
+                        <ModalHeader className="flex flex-col gap-1">{shouldBeAdmin ? "Promote" : "Demote"} user</ModalHeader>
+                        <ModalBody>
+                            <p className="text-[13px] font-normal">
+                                You will update the role of <strong>@{channelMember.userUsername} </strong>to <strong>{shouldBeAdmin ? "promote" : "demote"}</strong> them. When {shouldBeAdmin ? "promoting you will be changing their role to admin" : "demoting you will change their role to a default one"}. Even though this can be undone, do you want to continue?
+                            </p>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button type="button" size="sm" variant="light" onPress={onClose}>
+                                Cancel
+                            </Button>
+                            <Button isDisabled={updatingChannelMember} onPress={fetchUpdate} className="bg-blue-700 text-white" size="sm" >
+                                {updatingChannelMember ? <Spinner size="sm" variant="spinner"/> : <>{shouldBeAdmin ? "Yes, promote to admin" : "Yes, demote to default"}</>}
+                            </Button>
+                        </ModalFooter>
+
+                    </>
+                )}
+            </ModalContent>
+        </Modal>
     )
 }
 

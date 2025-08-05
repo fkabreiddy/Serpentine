@@ -207,11 +207,10 @@ export default function ChannelInfoView() {
 const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   channel,
 }) => {
-  const { deleteChannel, deletingChannel, channelDeleted } = useDeleteChannel();
-  const { setChannelInfoId, setDeletedChannelId, setChannelJoined, setUpdateChannelid } = useGlobalDataStore();
+  const {  deletingChannel } = useDeleteChannel();
+  const { setChannelInfoId, setChannelJoined, setUpdateChannelid } = useGlobalDataStore();
   const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
   const {setLayout} = useLayoutStore();
-  const {playUiSound} = useUiSound();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
 
@@ -373,7 +372,7 @@ interface UserContainerProps{
 
 const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>{
 
-  const {getChannelMembersByChannelId,hasMore, channelMembers, loadingChannelMembers} = useGetChannelMembersByChannelId();
+  const {getChannelMembersByChannelId, setChannelMembers, hasMore, channelMembers, loadingChannelMembers} = useGetChannelMembersByChannelId();
   const firstRender = useRef(false);
 
    const observerRef = useRef<IntersectionObserver | null>(null);
@@ -408,6 +407,13 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
     fetchChannelMembers();
 
   },[channelId])
+  
+  function handleUserUpdated(channelMember: ChannelMemberResponse){
+
+    setChannelMembers(prev =>
+        prev.map(cm => cm.id === channelMember.id ? channelMember : cm)
+    );
+  }
 
   
  
@@ -426,7 +432,7 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
                     return(
 
                       <div  ref={isLast ? observeLastElement : null} className="w-full flex flex-col gap-2" key={cm.id}>
-                        <UserCard myChannelMember={myMember}  channelMember={cm} />
+                        <UserCard onUpdated={handleUserUpdated} myChannelMember={myMember}  channelMember={cm} />
 
                         <hr  className="ml-auto w-[80%] dark:border-neutral-950 border-neutral-100 border-t "/>
                         
@@ -454,10 +460,10 @@ interface DeleteChannelModalProps{
     channel: ChannelResponse
 }
 
-const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, onOpenChanged, channelName}) =>{
+const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, onOpenChanged}) =>{
 
-    const { deleteChannel, deletingChannel, channelDeleted } = useDeleteChannel();
-    const { setChannelInfoId, setDeletedChannelId, setChannelJoined } = useGlobalDataStore();
+    const { deleteChannel, channelDeleted } = useDeleteChannel();
+    const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
     const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
      const {setLayout} = useLayoutStore();
 

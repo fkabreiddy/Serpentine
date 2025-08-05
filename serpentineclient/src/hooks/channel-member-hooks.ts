@@ -117,7 +117,7 @@ export function useGetChannelMembersByChannelId() {
        
     };
 
-    return { getChannelMembersByChannelId, channelMembers, hasMore, loadingChannelMembers};
+    return { getChannelMembersByChannelId, setChannelMembers, channelMembers, hasMore, loadingChannelMembers};
 }
 
 
@@ -216,5 +216,55 @@ export function useTest(){
         test,
         setChannelMember,
         channelMember
+    }
+}
+
+export function useUpdateChannelMember(){
+
+    const [result, setResult] = useState<ApiResult<ChannelMemberResponse> | null>(null);
+    const [updatingChannelMember, setUpdatingChannelMember] = useState<boolean>(false);
+    const [updatedChannelMember, setUpdatedChannelMember] = useState<ChannelMemberResponse | null>(null);
+    const {patch} = useFetch<ChannelMemberResponse>();
+
+    useEffect(()=>{
+
+
+        if(!result)
+        {
+            setUpdatingChannelMember(false);
+            return;
+        }
+
+        if(result.data && result.isSuccess)
+        {
+            setUpdatedChannelMember(result.data);
+            showToast({description: "Membership updated"});
+        }
+
+        else{
+            handleApiErrors(result);
+        }
+
+        setResult(null);
+    },[result])
+
+    const updateChannelMember  = async (body: UpdateChannelMemberRequest) => {
+
+        setResult(null);
+        setUpdatedChannelMember(null);
+        setUpdatingChannelMember(true);
+
+        const response = await patch({endpoint: "channel-members/update", contentType: "application/json" }, body)
+        
+        setResult(response);
+
+    }
+
+    return{
+
+        
+        updateChannelMember,
+        updatedChannelMember,
+        updatingChannelMember
     }
 }
