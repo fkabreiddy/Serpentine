@@ -22,6 +22,7 @@
     <PackageReference Include="Ulid" Version="1.3.4" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Features\ChannelBan\Queries\" />
     <Folder Include="Features\GroupFeatures\Actions\" />
     <Folder Include="Services\" />
   </ItemGroup>

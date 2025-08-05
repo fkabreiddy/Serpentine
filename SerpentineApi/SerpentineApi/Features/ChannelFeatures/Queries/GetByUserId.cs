@@ -46,7 +46,7 @@ internal class GetByUserIdEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(
-                _settings.BaseUrl + "/by-userId",
+                _settings.BaseUrl,
                 async (
                     [AsParameters] GetByUserIdRequest command,
                     EndpointExecutor<GetByUserIdEndpoint> executor,

@@ -2,5 +2,5 @@
 
 public class ChannelEndpointSettings : IEndpointSettings
 {
-    public string BaseUrl { get; set; } = "api/channels";
+    public string BaseUrl { get; set; } = "api/v1/channels";
 }

@@ -196,6 +196,10 @@ internal class CreateUserRequestHandler(
         CancellationToken cancellationToken = default
     )
     {
+        var role = await context.Roles.AsNoTracking().FirstOrDefaultAsync(x => x.AccessLevel == 0 && x.Name == "User");
+
+        if (role is null)
+            return new ServerErrorApiResult("We could not make you account because we didn't find the role for your user");
         if (
             await context.Users.AnyAsync(
                 u => u.Username.Trim().ToLower() == request.Username.Trim().ToLower(),
@@ -207,6 +211,7 @@ internal class CreateUserRequestHandler(
         }
 
         User creation = User.Create(request);
+        creation.RoleId = role.Id;
         var result = await context.Users.AddAsync(creation, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 

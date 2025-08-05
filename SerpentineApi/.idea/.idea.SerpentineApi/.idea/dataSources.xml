@@ -9,5 +9,13 @@
       <jdbc-url>Server=.;Initial Catalog=SerpentineDb;Persist Security Info=False;TrustServerCertificate=true; Integrated Security=true;</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="Microsoft SQL Server LocalDB (JetBrains) [2]" uuid="ce73400f-fa1d-42d6-ae84-fa4b94c9a104">
+      <driver-ref>sqlserver.localdb.jb</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>com.jetbrains.jdbc.sqlserver.SqlServerDriver</jdbc-driver>
+      <jdbc-url>Server=.;Initial Catalog=SerpentineDb;Persist Security Info=False;TrustServerCertificate=true; Integrated Security=true;</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

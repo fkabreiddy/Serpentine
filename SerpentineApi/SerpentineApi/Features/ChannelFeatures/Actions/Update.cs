@@ -76,8 +76,8 @@ internal class UpdateChannelEndpoint : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut(
-                _settings.BaseUrl + "/update",
+        app.MapPatch(
+                _settings.BaseUrl,
                 async (
                     [FromBody] UpdateChannelRequest command,
                     EndpointExecutor<UpdateChannelEndpoint> executor,
@@ -107,14 +107,14 @@ internal class UpdateChannelEndpoint : IEndpoint
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .RequireCors()
             .WithOpenApi()
-            .WithTags(new[] { "PUT", $"{nameof(Channel)}" })
+            .WithTags(new[] { "PATCH", $"{nameof(Channel)}" })
             .Experimental()
             .Accepts<CreateChannelRequest>(false, "application/json")
             .Produces<SuccessApiResult<ChannelResponse>>(200)
             .Produces<NotFoundApiResult>(404, "application/json")
             .Produces<BadRequestApiResult>(400, "application/json")
             .WithDescription(
-                $"Updates a channel in the database. Requires a {nameof(UpdateChannelRequest)}. Returns a {nameof(ChannelResponse)}"
+                $"Updates a channel in the database. Requires Authorization. Requires CORS"
             )
             .Produces<ServerErrorApiResult>(500, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")

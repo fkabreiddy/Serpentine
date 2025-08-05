@@ -14,7 +14,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
 
     public DbSet<Message> Messages { get; set; }
     
-    
+    public DbSet<Role> Roles { get; set; }
     public DbSet<ChannelBan> ChannelBans { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,6 +25,14 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            t.Navigation(u => u.Role).IsRequired(true);
+            
+            t.HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .IsRequired(true)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
             
             t.HasMany(u => u.Bans)
                 .WithOne(a => a.User)
@@ -46,6 +54,56 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .HasForeignKey(m => m.SenderId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+        
+        modelBuilder.Entity<Role>(t =>
+        {
+           
+            
+           
+            
+            t.HasMany(u => u.Users)
+                .WithOne(a => a.Role)
+                .HasForeignKey(a => a.RoleId)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            t.HasData(new Role[]
+            {
+
+                new()
+                {
+                    Name = "User",
+                    AccessLevel = 0
+
+                },
+                new()
+                {
+                    Name = "Admin",
+                    AccessLevel = 1
+
+                },
+                new()
+                {
+                    Name = "Tester",
+                    AccessLevel = 2
+
+                },
+                new()
+                {
+                    Name = "Developer",
+                    AccessLevel = 3
+
+                }
+            });
+            
+            
+            t.HasIndex(u => u.Name).IsUnique();
+
+
+            t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
+
+            
         });
 
         modelBuilder.Entity<Channel>(t =>

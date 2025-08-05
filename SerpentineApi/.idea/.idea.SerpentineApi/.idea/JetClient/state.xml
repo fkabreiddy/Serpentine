@@ -15,7 +15,12 @@
               <option name="id" value="c3dec465-b5a9-48dd-916d-9381d2561cd1" />
               <option name="method" value="POST" />
               <option name="name" value="Draft" />
-              <option name="url" value="http://localhost:5000/api/user/authenticate" />
+              <option name="url" value="http://localhost:5000/api/user/create" />
+            </requestState>
+            <requestState>
+              <option name="id" value="5dbff46b-a78e-4af1-9adf-5abb967311d4" />
+              <option name="method" value="GET" />
+              <option name="name" value="Draft (1)" />
             </requestState>
           </list>
         </option>

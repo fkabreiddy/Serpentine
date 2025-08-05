@@ -95,8 +95,8 @@ internal class CreateChannelEndpoint : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(
-                _settings.BaseUrl + "/create",
+             app.MapPost(
+                _settings.BaseUrl,
                 async (
                     [FromForm] CreateChannelRequest command,
                     EndpointExecutor<CreateChannelEndpoint> executor,
@@ -123,20 +123,20 @@ internal class CreateChannelEndpoint : IEndpoint
                 }
             )
             .DisableAntiforgery()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .WithTags(new[] { "POST", $"{nameof(Channel)}" })
-            .Accepts<CreateChannelRequest>(false, "multipart/form-data")
+            .WithTags(new[] { nameof(ApiHttpVerbs.Post), $"{nameof(Channel)}" })
+            .Accepts<CreateChannelRequest>(false, ApiContentTypes.MultipartForm)
             .Produces<SuccessApiResult<ChannelResponse>>(200)
-            .Produces<ConflictApiResult>(409, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
+            .Produces<ConflictApiResult>(409, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
             .WithDescription(
-                $"Creates a channel in the database. Requires a {nameof(CreateChannelRequest)}. Return {nameof(ChannelResponse)}"
+                $"Creates a channel in the database. Requires Authorization. Requires CORS"
             )
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .WithName(nameof(CreateChannelEndpoint));
     }
 }

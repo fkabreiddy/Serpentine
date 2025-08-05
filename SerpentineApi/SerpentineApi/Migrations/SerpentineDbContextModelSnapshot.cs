@@ -246,6 +246,66 @@ namespace SerpentineApi.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Role", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "01K1Y24KEJ2SQ283X365D8QBJP",
+                            AccessLevel = 0,
+                            CreatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(3914),
+                            Name = "User",
+                            UpdatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(3919)
+                        },
+                        new
+                        {
+                            Id = "01K1Y24KEPDA7ZFCX6YCP3MY7M",
+                            AccessLevel = 1,
+                            CreatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(5394),
+                            Name = "Admin",
+                            UpdatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(5395)
+                        },
+                        new
+                        {
+                            Id = "01K1Y24KEPTCVKR97AKSWKHTP8",
+                            AccessLevel = 2,
+                            CreatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(5401),
+                            Name = "Tester",
+                            UpdatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(5402)
+                        },
+                        new
+                        {
+                            Id = "01K1Y24KEP473CNR8N01ZCXRV9",
+                            AccessLevel = 3,
+                            CreatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(5405),
+                            Name = "Developer",
+                            UpdatedAt = new DateTime(2025, 8, 5, 21, 27, 59, 702, DateTimeKind.Utc).AddTicks(5406)
+                        });
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -269,6 +329,10 @@ namespace SerpentineApi.Migrations
                     b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -278,6 +342,8 @@ namespace SerpentineApi.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("Username")
                         .IsUnique();
@@ -378,6 +444,17 @@ namespace SerpentineApi.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>
+                {
+                    b.HasOne("SerpentineApi.DataAccess.Models.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.Channel", b =>
                 {
                     b.Navigation("Bans");
@@ -397,6 +474,11 @@ namespace SerpentineApi.Migrations
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.Message", b =>
                 {
                     b.Navigation("Replies");
+                });
+
+            modelBuilder.Entity("SerpentineApi.DataAccess.Models.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("SerpentineApi.DataAccess.Models.User", b =>

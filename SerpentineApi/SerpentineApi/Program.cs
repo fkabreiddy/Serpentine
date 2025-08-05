@@ -44,15 +44,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi(); //REMEMBER TO ADD POLICY ON DEPLOYMENT
     app.MapScalarApiReference(options =>
     {
         // Fluent API
-        options.WithTitle("Serpentine API").WithSidebar(true);
+        options.WithTitle("Serpentine API")
+            .AddDocument(ApiConstants.DocumentName)
+            .WithSidebar(true);
+        
         // Bearer
         options.Authentication = new ScalarAuthenticationOptions
         {
             PreferredSecuritySchemes = [ApiConstants.AuthenticationScheme],
+            
+            
         }; // Security scheme name from the OpenAPI document
     });
 }
@@ -78,6 +83,7 @@ app.UseExceptionHandler(appError =>
         }
     });
 });
+
 
 app.UseAuthentication();
 app.UseRouting();

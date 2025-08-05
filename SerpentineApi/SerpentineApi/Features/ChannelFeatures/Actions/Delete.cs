@@ -42,7 +42,7 @@ public class DeleteChannelEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete(
-                _settings.BaseUrl + "/delete",
+                _settings.BaseUrl,
                 async (
                     [AsParameters] DeleteChannelRequest command,
                     EndpointExecutor<DeleteChannelEndpoint> executor,
@@ -81,14 +81,14 @@ public class DeleteChannelEndpoint : IEndpoint
                     });
                 }
             )
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
             .DisableAntiforgery()
             .WithOpenApi()
             .WithTags(new[] { "DELETE", $"{nameof(Channel)}" })
             .WithName(nameof(DeleteChannelEndpoint))
             .WithDescription(
-                $"Deletes a channel by id. Requires authorization. Requires a {nameof(DeleteChannelRequest)}. Returns a boolean value (true/false)"
+                $"Deletes a channel by id. Requires authorization. Requires CORS"
             )
             .Produces<SuccessApiResult<bool>>(200, "application/json")
             .Produces<UnauthorizedApiResult>(401, "application/json")

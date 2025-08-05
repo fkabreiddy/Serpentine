@@ -5,7 +5,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
 import { useUiSound } from "@/helpers/sound-helper";
 import { UpdateChannelRequest } from "@/models/requests/channels/update-channel-request";
-     
+const CHANNELS_ENDPOINT = "channels"
 
 export function useDeleteChannel() {
 
@@ -44,7 +44,7 @@ export function useDeleteChannel() {
         setChannelDeleted(false);
         setResult(null);
         setDeletingChannel(true);
-        const response = await deleteCh({endpoint: "channels/delete", contentType: "application/json"}, data );
+        const response = await deleteCh({endpoint: CHANNELS_ENDPOINT, contentType: "application/json"}, data );
         setResult(response);
 
     };
@@ -93,7 +93,7 @@ export function useCreateChannel() {
         setResult(null);
         setCreatingChannel(true);
         setChannel(null);
-        const response = await post({endpoint: "channels/create", contentType: "multipart/form-data"}, data );
+        const response = await post({endpoint: CHANNELS_ENDPOINT, contentType: "multipart/form-data"}, data );
         setResult(response);
 
             
@@ -156,7 +156,7 @@ export function useGetChannelsByUserId() {
 
             
             data.skip = channelCount;
-            const response = await get({endpoint: "channels/by-userId" }, data );
+            const response = await get({endpoint: CHANNELS_ENDPOINT }, data );
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
@@ -215,7 +215,7 @@ export function useGetManyChannelsByNameOrId() {
         setLoadingChannels(true);
     
 
-        const response = await get({endpoint: "channels/by-id-or-name" }, data );
+        const response = await get({endpoint: CHANNELS_ENDPOINT }, data );
         
         setResult(response);
 
@@ -261,7 +261,7 @@ export function useGetChannelById() {
         setChannel(null);
         setLoadingChannel(true);
 
-        const response = await get({endpoint: "channels/by-id" }, data );
+        const response = await get({endpoint: CHANNELS_ENDPOINT }, data );
 
         setResult(response);
     };
@@ -273,7 +273,7 @@ export function useUpdateChannel() {
     const [updatedChannel, setUpdatedChannel] = useState<ChannelResponse | null>(null);
     const [updatingChannel, setUpdatingChannel] = useState<boolean>(false);
     const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
-    const { put } = useFetch<ChannelResponse>();
+    const { patch } = useFetch<ChannelResponse>();
 
     useEffect(() => {
        
@@ -307,7 +307,7 @@ export function useUpdateChannel() {
         setResult(null);
         setUpdatingChannel(true);
         setUpdatedChannel(null);
-        const response = await put({endpoint: "channels/update", contentType: "application/json"}, data );
+        const response = await patch({endpoint: CHANNELS_ENDPOINT, contentType: "application/json"}, data );
         setResult(response);
 
             

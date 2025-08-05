@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using SerpentineApi.Helpers;
 using SerpentineApi.Identity;
 
 namespace SerpentineApi.Dependencies;
@@ -26,6 +27,58 @@ public static class JwtDependency
                 {
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
+                    policy.RequireRole(new string[]
+                    {
+                        nameof(UserRoles.User),
+                        nameof(UserRoles.Tester), 
+                        nameof(UserRoles.Developer),
+                        nameof(UserRoles.User)
+                    });
+                    
+                }
+            );
+            opts.AddPolicy(
+                    nameof(AuthorizationPolicies.AllowAllUsers),
+                policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole(new string[]
+                    {
+                        nameof(UserRoles.User),
+                        nameof(UserRoles.Tester), 
+                        nameof(UserRoles.Developer),
+                        nameof(UserRoles.User)
+                    });
+                    
+                }
+            );
+            opts.AddPolicy(
+                nameof(AuthorizationPolicies.OnlyAdmins),
+                policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole(new string[]
+                    {
+                        nameof(UserRoles.Developer),
+                        nameof(UserRoles.Admin)
+                    });
+                }
+            );
+            
+            opts.AddPolicy(
+                nameof(AuthorizationPolicies.OnlyTesters),
+                policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole(new string[]
+                    {
+                        nameof(UserRoles.Developer),
+                        nameof(UserRoles.Tester),
+
+                    });
                 }
             );
         });

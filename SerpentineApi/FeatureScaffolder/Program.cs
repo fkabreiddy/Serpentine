@@ -88,17 +88,17 @@ internal class Program
                     }}}})
                 )
                 .DisableAntiforgery()
-                .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthorization(nameof(AuthorizationPolicies.OnlyDevelopers))
                 .RequireCors()
                 .Experimental()
                 .WithOpenApi()
                 .WithDescription(""Requires Authorization. \n Requires CORS."")
                 .WithTags(new string[]{{""{httpMethod}"", ""{featureClassName}""}})
-                .Accepts<{featureClassName}Request>(false, ""multipart/form-data"")
+                .Accepts<{featureClassName}Request>(false, ""ApiContentTypes.ApplicationJson"")
                 .Produces<SuccessApiResult<{responseClassName}>>(200)
-                .Produces<BadRequestApiResult>(400, ""application/json"")
-                .Produces<ServerErrorApiResult>(500, ""application/json"")
-                .Produces<ValidationApiResult>(422, ""application/json"")
+                .Produces<BadRequestApiResult>(400, ""ApiContentTypes.ApplicationJson"")
+                .Produces<ServerErrorApiResult>(500, ""ApiContentTypes.ApplicationJson"")
+                .Produces<ValidationApiResult>(422, ""ApiContentTypes.ApplicationJson"")
                 .WithName(nameof({featureClassName}Endpoint));
             }}
         }}

@@ -32,7 +32,7 @@ public class GetChannelByIdEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(
-                _settings.BaseUrl + "/by-id",
+                _settings.BaseUrl,
                 async (
                     [AsParameters] GetChannelByIdRequest request,
                     ISender sender,

@@ -48,7 +48,7 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapGet(
-                    _settings.BaseUrl + "/by-id-or-name",
+                    _settings.BaseUrl,
                     async (
                         [AsParameters] GetManyByIdOrNameRequest request,
                         ISender sender,

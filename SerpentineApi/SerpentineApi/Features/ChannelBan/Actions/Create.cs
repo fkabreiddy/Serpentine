@@ -51,43 +51,43 @@
             private readonly ChannelBanEndpointSettings _settings = new();
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-        app.MapPost(
-            _settings.BaseUrl + "/create",
-            async (
-                [FromBody] CreateChannelBanRequest command,
-                EndpointExecutor<CreateChannelBanEndpoint> executor,
-                CancellationToken cancellationToken,
-                ISender sender,
-                HttpContext context,
-                IHubContext<ActiveChannelsHub, IActiveChannelsHub> activeUsersHub
+                app.MapPost(
+                    _settings.BaseUrl + "/create",
+                    async (
+                        [FromBody] CreateChannelBanRequest command,
+                        EndpointExecutor<CreateChannelBanEndpoint> executor,
+                        CancellationToken cancellationToken,
+                        ISender sender,
+                        HttpContext context,
+                        IHubContext<ActiveChannelsHub, IActiveChannelsHub> activeUsersHub
 
-            ) => await executor.ExecuteAsync<ChannelBanResponse>(async () =>
-            {
-                {
-
-                    command.SetCurrentUserId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
-                    var result = await sender.SendAndValidateAsync(command, cancellationToken);
-
-                    if (result.IsT1)
+                    ) => await executor.ExecuteAsync<ChannelBanResponse>(async () =>
                     {
-                        var t1 = result.AsT1;
+                        {
 
-                        return ResultsBuilder.Match(t1);
+                            command.SetCurrentUserId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
+                            var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
-                    }
+                            if (result.IsT1)
+                            {
+                                var t1 = result.AsT1;
 
-                    var t0 = result.AsT0;
-                    await activeUsersHub.Clients.User(t0.UserId.ToString())
-                        .SendUserBanned(new HubResult<ChannelBanResponse>(t0));
-                    return ResultsBuilder.Match<ChannelBanResponse>(new SuccessApiResult<ChannelBanResponse>(t0));
+                                return ResultsBuilder.Match(t1);
 
-                }
-            })
-        )
+                            }
+
+                            var t0 = result.AsT0;
+                            await activeUsersHub.Clients.User(t0.UserId.ToString())
+                                .SendUserBanned(new HubResult<ChannelBanResponse>(t0));
+                            return ResultsBuilder.Match<ChannelBanResponse>(new SuccessApiResult<ChannelBanResponse>(t0));
+
+                        }
+                    })
+                )
             .DisableAntiforgery()
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .RequireCors()
-            .Experimental()
+            .Stable()
             .WithOpenApi()
             .Accepts<CreateChannelBanRequest>(false, "application/json")
             .Produces<SuccessApiResult<bool>>(200, "application/json")
@@ -97,8 +97,9 @@
             .Produces<ConflictApiResult>(409, "application/json")
             .Produces<ValidationApiResult>(422, "application/json")
             .Produces<NotFoundApiResult>(404, "application/json")
-
-            .WithName(nameof(CreateChannelBanEndpoint));
+            .WithTags(new string[]{"POST", nameof(ChannelBan)})
+            .WithName(nameof(CreateChannelBanEndpoint))
+            .WithDescription("Ban an user from a channel. Requires Authorization. Requires CORS");
             }
         }
 
