@@ -92,6 +92,8 @@ internal class Program
                 .RequireCors()
                 .Experimental()
                 .WithOpenApi()
+                .WithDescription(""Requires Authorization. \n Requires CORS."")
+                .WithTags(new string[]{{""{httpMethod}"", ""{featureClassName}""}})
                 .Accepts<{featureClassName}Request>(false, ""multipart/form-data"")
                 .Produces<SuccessApiResult<{responseClassName}>>(200)
                 .Produces<BadRequestApiResult>(400, ""application/json"")

@@ -2,7 +2,8 @@ enum HttpVerbsEnum{
     Post,
     Put,
     Get,
-    Delete
+    Delete,
+    Patch
 }
 
 export default HttpVerbsEnum;

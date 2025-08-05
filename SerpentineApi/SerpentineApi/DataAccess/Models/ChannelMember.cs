@@ -1,5 +1,4 @@
-﻿using SerpentineApi.Features.ChannelFeatures.Actions;
-using SerpentineApi.Features.ChannelMemberFeatures.Actions;
+﻿using SerpentineApi.Features.ChannelMemberFeatures.Actions;
 
 namespace SerpentineApi.DataAccess.Models;
 

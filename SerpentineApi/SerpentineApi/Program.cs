@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using SerpentineApi;
 using SerpentineApi.Dependencies;
-using SerpentineApi.Helpers;
 using SerpentineApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);

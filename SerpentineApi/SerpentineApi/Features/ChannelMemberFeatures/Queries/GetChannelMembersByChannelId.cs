@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using SerpentineApi.Features.ChannelFeatures;
 using SerpentineApi.Helpers;
 
 namespace SerpentineApi.Features.ChannelMemberFeatures.Queries;

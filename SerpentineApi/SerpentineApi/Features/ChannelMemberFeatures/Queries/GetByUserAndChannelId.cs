@@ -2,10 +2,8 @@
         using FluentValidation;
         using Microsoft.AspNetCore.Authentication.JwtBearer;
         using Microsoft.AspNetCore.Mvc;
-        using Microsoft.AspNetCore.Mvc.ModelBinding;
         using Microsoft.EntityFrameworkCore;
         using Scalar.AspNetCore;
-        using SerpentineApi.DataAccess.Context.EntityExtensions;
         using SerpentineApi.Helpers;
     
 

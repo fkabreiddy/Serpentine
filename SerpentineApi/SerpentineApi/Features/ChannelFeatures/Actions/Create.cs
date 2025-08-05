@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
-using SerpentineApi.Features.UserFeatures.Actions;
 using SerpentineApi.Helpers;
-using SerpentineApi.Identity;
 using SerpentineApi.Services.CloudinaryStorage;
 
 namespace SerpentineApi.Features.ChannelFeatures.Actions;

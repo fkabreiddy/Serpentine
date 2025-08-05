@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using SerpentineApi.Features.ChannelFeatures.Actions;
 
 namespace SerpentineApi.DataAccess.Models;

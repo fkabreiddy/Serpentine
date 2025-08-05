@@ -1,12 +1,10 @@
-﻿using System.Data;
-using System.Runtime.InteropServices;
+﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 
@@ -14,7 +12,7 @@ namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
 
 public class CreateChannelMemberRequest : IRequest<OneOf<ChannelMemberResponse, Failure>>
 {
-    [Required, JsonPropertyName("channelId"), FromBody]
+    [Required, JsonPropertyName("channelId"), FromBody, Description("The id of the channel that user is joining")]
     public Ulid ChannelId { get; set; }
 
     [JsonIgnore, BindNever]
@@ -77,7 +75,7 @@ public class CreateChannelMemberEndpoint : IEndpoint
             )
             .WithName(nameof(CreateChannelMemberEndpoint))
             .WithDescription(
-                $"Joins an user to a channel by creating the relation. \n Requires a {nameof(CreateChannelMemberRequest)}. \n Returns a {nameof(ChannelMemberResponse)}. \n Requires Authorization."
+                $"Joins an user to a channel by creating the relation. \n Requires Authorization. \n Requires CORS"
             )
             .RequireCors()
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)

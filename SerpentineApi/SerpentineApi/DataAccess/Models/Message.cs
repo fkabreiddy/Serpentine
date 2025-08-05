@@ -1,6 +1,4 @@
-﻿using SerpentineApi.Helpers;
-
-namespace SerpentineApi.DataAccess.Models;
+﻿namespace SerpentineApi.DataAccess.Models;
 
 public class Message : BaseEntity
 {

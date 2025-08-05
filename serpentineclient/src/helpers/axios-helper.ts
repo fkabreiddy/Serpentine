@@ -86,6 +86,9 @@ export function useFetch<T>() {
         case HttpVerbsEnum.Delete:
             response = await api.delete<ApiResult<T>>(`${endpoint}?${queryString}`, config);
             break;
+        case HttpVerbsEnum.Patch:
+          response = await api.patch<ApiResult<T>>(endpoint, data, config);
+          break;
         default:
           throw new Error(`Unsupported HTTP method: ${method}`);
       }
@@ -110,6 +113,8 @@ export function useFetch<T>() {
     put: (config: RequestConfig, body: unknown) => handleRequest(config, HttpVerbsEnum.Put, body),
     get: (config: RequestConfig, data: any) => handleRequest(config, HttpVerbsEnum.Get, data),
     delete: (config: RequestConfig, data: any) => handleRequest(config, HttpVerbsEnum.Delete, data),
+    patch: (config: RequestConfig, body: unknown) => handleRequest(config, HttpVerbsEnum.Patch, body),
+
 
   };
 }

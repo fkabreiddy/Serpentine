@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
 
 namespace SerpentineApi.Features.ChannelFeatures.Queries;
