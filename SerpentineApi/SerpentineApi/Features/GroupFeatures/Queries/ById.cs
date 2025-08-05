@@ -32,48 +32,50 @@
             private readonly GroupEndpointSettings _settings = new();
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-        app.MapGet(
-            _settings.BaseUrl + "/by-id",
-            async (
-                [AsParameters] GetByIdRequest command,
-                EndpointExecutor<GetByIdEndpoint> executor,
-                CancellationToken cancellationToken,
-                ISender sender,
-                HttpContext context
-            ) => await executor.ExecuteAsync<GroupResponse>(async () =>
-            {
-                
-                     command.SetCurrentUserId(
-                            UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
-                        );
-                    var result = await sender.SendAndValidateAsync(command, cancellationToken);
-
-                    if (result.IsT1)
+                app.MapGet(
+                    _settings.BaseUrl + "/by-id",
+                    async (
+                        [AsParameters] GetByIdRequest command,
+                        EndpointExecutor<GetByIdEndpoint> executor,
+                        CancellationToken cancellationToken,
+                        ISender sender,
+                        HttpContext context
+                    ) => await executor.ExecuteAsync<GroupResponse>(async () =>
                     {
-                        var t1 = result.AsT1;
+                        
+                             command.SetCurrentUserId(
+                                    UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
+                                );
+                            var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
-                        return ResultsBuilder.Match(t1);
+                            if (result.IsT1)
+                            {
+                                var t1 = result.AsT1;
 
-                    }
+                                return ResultsBuilder.Match(t1);
 
-                    var t0 = result.AsT0;
+                            }
 
-                    return ResultsBuilder.Match<GroupResponse>(new SuccessApiResult<GroupResponse>(t0));
+                            var t0 = result.AsT0;
 
-                
-            })
-        )
-        .DisableAntiforgery()
-        .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
-        .RequireCors()
-        .Experimental()
-        .WithOpenApi()
-        .Accepts<GetByIdRequest>(false, "application/json")
-        .Produces<SuccessApiResult<GroupResponse>>(200)
-        .Produces<BadRequestApiResult>(400, "application/json")
-        .Produces<ServerErrorApiResult>(500, "application/json")
-        .Produces<ValidationApiResult>(422, "application/json")
-                .Produces<NotFoundApiResult>(404, "application/json")
+                            return ResultsBuilder.Match<GroupResponse>(new SuccessApiResult<GroupResponse>(t0));
+
+                        
+                    })
+                )
+                .DisableAntiforgery()
+                .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
+                .RequireCors()
+                .Experimental()
+                .WithOpenApi()
+                .WithTags(new []{nameof(ApiHttpVerbs.Get), nameof(Group)})
+                .Accepts<GetByIdRequest>(false, ApiContentTypes.ApplicationJson)
+                .Produces<SuccessApiResult<GroupResponse>>(200, ApiContentTypes.ApplicationJson)
+                .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+                .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+                .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+                .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+                .WithDescription("Returns a group with a certain Id. Requires Authorization. Requires CORS.")
                 .WithName(nameof(GetByIdEndpoint));
             }
         }

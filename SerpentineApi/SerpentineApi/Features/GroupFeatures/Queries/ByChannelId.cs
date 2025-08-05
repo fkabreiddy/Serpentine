@@ -83,15 +83,17 @@ internal class GetByChannelIdEndpoint : IEndpoint
                     })
             )
             .DisableAntiforgery()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .Accepts<GetByChannelIdRequest>(false, "application/json")
-            .Produces<SuccessApiResult<List<GroupResponse>>>(200)
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .WithTags(new string[]{nameof(ApiHttpVerbs.Get), nameof(Group)})
+            .Accepts<GetByChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<List<GroupResponse>>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+            .WithDescription("Returns a list of groups with a certain ChannelId. Require Authorization. Require CORS")
             .WithName(nameof(GetByChannelIdEndpoint));
     }
 }

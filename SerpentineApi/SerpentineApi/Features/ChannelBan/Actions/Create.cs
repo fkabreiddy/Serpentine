@@ -52,7 +52,7 @@
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
                 app.MapPost(
-                    _settings.BaseUrl + "/create",
+                    _settings.BaseUrl,
                     async (
                         [FromBody] CreateChannelBanRequest command,
                         EndpointExecutor<CreateChannelBanEndpoint> executor,
@@ -89,15 +89,15 @@
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .Accepts<CreateChannelBanRequest>(false, "application/json")
-            .Produces<SuccessApiResult<bool>>(200, "application/json")
-            .Produces<UnauthorizedApiResult>(400, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ConflictApiResult>(409, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
-            .Produces<NotFoundApiResult>(404, "application/json")
-            .WithTags(new string[]{"POST", nameof(ChannelBan)})
+            .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(ChannelBan)})
+            .Accepts<CreateChannelBanRequest>(false, ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<bool>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<UnauthorizedApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ConflictApiResult>(409, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
             .WithName(nameof(CreateChannelBanEndpoint))
             .WithDescription("Ban an user from a channel. Requires Authorization. Requires CORS");
             }

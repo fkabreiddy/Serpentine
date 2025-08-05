@@ -105,20 +105,20 @@ internal class CreateGroupEndpoint : IEndpoint
                 }
             )
             .DisableAntiforgery()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .WithTags(new[] { "Groups", "POST" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(Group)})
             .WithDescription(
-                $"Creates a group. Returns a {nameof(GroupResponse)}. Accepts a {nameof(CreateGroupRequest)}. Requires authorization"
+                $"Creates a group on a channel. Requires authorization. Requires CORS"
             )
-            .Accepts<CreateGroupRequest>(false, "application/json")
-            .Produces<SuccessApiResult<GroupResponse>>(200)
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
-            .Produces<ConflictApiResult>(409, "application/json")
+            .Accepts<CreateGroupRequest>(false, ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<GroupResponse>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+            .Produces<ConflictApiResult>(409, ApiContentTypes.ApplicationJson)
             .WithName(nameof(CreateGroupEndpoint));
     }
 }
