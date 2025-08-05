@@ -78,18 +78,18 @@ public class CreateChannelMemberEndpoint : IEndpoint
                 $"Joins an user to a channel by creating the relation. \n Requires Authorization. \n Requires CORS"
             )
             .RequireCors()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
-            .Experimental()
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
+            .Stable()
             .Accepts<CreateChannelMemberRequest>("application/json")
             .WithOpenApi()
-            .WithTags(new[] { "POST", $"{nameof(ChannelMember)}" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(ChannelMember) })
             .DisableAntiforgery()
-            .Produces<NotFoundApiResult>(404, "application/json")
-            .Produces<ConflictApiResult>(409, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<SuccessApiResult<ChannelResponse>>(200, "application/json")
-            .Produces<ForbiddenApiResult>(403, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json");
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+            .Produces<ConflictApiResult>(409, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<ChannelResponse>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<ForbiddenApiResult>(403, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson);
     }
 }
 

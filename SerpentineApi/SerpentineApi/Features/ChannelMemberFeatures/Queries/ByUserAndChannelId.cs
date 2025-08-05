@@ -64,14 +64,16 @@
                 .DisableAntiforgery()
                 .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
                 .RequireCors()
-                .Experimental()
+                .Stable()
                 .WithOpenApi()
-                .Accepts<GetByUserAndChannelIdRequest>(false, "multipart/form-data")
-                .Produces<SuccessApiResult<ChannelMemberResponse>>(200)
-                .Produces<BadRequestApiResult>(400, "application/json")
-                .Produces<ServerErrorApiResult>(500, "application/json")
-                .Produces<ValidationApiResult>(422, "application/json")
-                .WithName(nameof(GetByUserAndChannelIdEndpoint));
+                .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(ChannelMember)})
+                .Accepts<GetByUserAndChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
+                .Produces<SuccessApiResult<ChannelMemberResponse>>(200, ApiContentTypes.ApplicationJson)
+                .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+                .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+                .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+                .WithName(nameof(GetByUserAndChannelIdEndpoint))
+                .WithDescription("Returns a channel member with a certain ChannelId and UserId. Requires Authorization. Requires CORS.");
             }
         }
 

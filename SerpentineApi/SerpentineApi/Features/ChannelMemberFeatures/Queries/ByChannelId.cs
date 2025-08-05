@@ -73,17 +73,17 @@ internal class GetChannelMemberByChannelIdEndpoint : IEndpoint
             )
             .DisableAntiforgery()
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
-            .Experimental()
+            .Stable()
             .WithOpenApi()
-            .WithTags(new[] { "GET", $"{nameof(ChannelMember)}" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(ChannelMember)})
             .RequireCors()
-            .Accepts<GetChannelMembersByChannelIdRequest>(false, "application/json")
-            .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .Accepts<GetChannelMembersByChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<List<ChannelResponse>>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .WithDescription(
-                $"Return a list of {nameof(ChannelMemberResponse)} where the user is member of. Requires {nameof(GetChannelMembersByChannelIdRequest)}. Returns a list of {nameof(ChannelMember)}"
+                $"Return a list of channel members with a certain ChannelId. Requires Authorization. Requires CORS."
             )
             .WithName(nameof(GetChannelMemberByChannelIdEndpoint));
     }

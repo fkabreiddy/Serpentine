@@ -46,7 +46,7 @@ using SerpentineApi.Helpers;
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
                 app.MapPatch(
-                    _settings.BaseUrl + "/update",
+                    _settings.BaseUrl,
                     async(
                         [FromBody] UpdateChannelMemberRequest command,
                         EndpointExecutor<UpdateChannelMemberEndpoint> executor,
@@ -76,15 +76,15 @@ using SerpentineApi.Helpers;
                 .DisableAntiforgery()
                 .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
                 .RequireCors()
-                .Experimental()
-                .WithTags(new []{"PATCH", "ChannelMember"})
+                .Stable()
+                .WithTags(new []{nameof(ApiHttpVerbs.Patch), nameof(ChannelMember)})
                 .WithOpenApi()
-                .Accepts<UpdateChannelMemberRequest>(false, "application/json")
-                .Produces<SuccessApiResult<ChannelMemberResponse>>(200)
-                .Produces<BadRequestApiResult>(400, "application/json")
-                .Produces<ServerErrorApiResult>(500, "application/json")
-                .Produces<ValidationApiResult>(422, "application/json")
-                .Produces<NotFoundApiResult>(404, "application/json")
+                .Accepts<UpdateChannelMemberRequest>(false, ApiContentTypes.ApplicationJson)
+                .Produces<SuccessApiResult<ChannelMemberResponse>>(200, ApiContentTypes.ApplicationJson)
+                .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+                .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+                .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+                .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
                 .WithName(nameof(UpdateChannelMemberEndpoint))
                 .WithDescription("Updated a the data of the Member from a Channel. \n Requires Authorization. \n Requires CORS.");
             }

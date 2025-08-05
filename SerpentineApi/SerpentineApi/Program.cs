@@ -47,6 +47,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi(); //REMEMBER TO ADD POLICY ON DEPLOYMENT
     app.MapScalarApiReference(options =>
     {
+        options.Theme = ScalarTheme.Alternate;
         // Fluent API
         options.WithTitle("Serpentine API")
             .AddDocument(ApiConstants.DocumentName)
