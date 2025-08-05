@@ -104,20 +104,20 @@ internal class UpdateChannelEndpoint : IEndpoint
                 }
             )
             .DisableAntiforgery()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
             .WithOpenApi()
-            .WithTags(new[] { "PATCH", $"{nameof(Channel)}" })
-            .Experimental()
-            .Accepts<CreateChannelRequest>(false, "application/json")
+            .WithTags(new[] { nameof(ApiHttpVerbs.Patch), nameof(Channel) })
+            .Stable()
+            .Accepts<CreateChannelRequest>(false, ApiContentTypes.ApplicationJson)
             .Produces<SuccessApiResult<ChannelResponse>>(200)
-            .Produces<NotFoundApiResult>(404, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
             .WithDescription(
                 $"Updates a channel in the database. Requires Authorization. Requires CORS"
             )
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .WithName(nameof(UpdateChannelEndpoint));
     }
 }

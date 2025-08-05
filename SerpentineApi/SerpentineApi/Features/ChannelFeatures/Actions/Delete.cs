@@ -84,20 +84,20 @@ public class DeleteChannelEndpoint : IEndpoint
             .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
             .DisableAntiforgery()
+            .Stable()
             .WithOpenApi()
-            .WithTags(new[] { "DELETE", $"{nameof(Channel)}" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Delete), nameof(Channel) })
             .WithName(nameof(DeleteChannelEndpoint))
             .WithDescription(
                 $"Deletes a channel by id. Requires authorization. Requires CORS"
             )
-            .Produces<SuccessApiResult<bool>>(200, "application/json")
-            .Produces<UnauthorizedApiResult>(401, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
-            .Produces<NotFoundApiResult>(404, "application/json")
-            .Stable()
-            .Accepts<DeleteChannelRequest>(false, "application/json");
+            .Produces<SuccessApiResult<bool>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<UnauthorizedApiResult>(401, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+            .Accepts<DeleteChannelRequest>(false, ApiContentTypes.ApplicationJson);
     }
 }
 

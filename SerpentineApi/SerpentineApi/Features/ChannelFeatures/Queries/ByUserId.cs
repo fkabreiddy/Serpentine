@@ -77,15 +77,15 @@ internal class GetByUserIdEndpoint : IEndpoint
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .Experimental()
             .WithOpenApi()
-            .WithTags(new[] { "GET", $"{nameof(Channel)}" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(Channel) })
             .RequireCors()
-            .Accepts<GetByUserIdRequest>(false, "application/json")
+            .Accepts<GetByUserIdRequest>(false, ApiContentTypes.ApplicationJson)
             .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .WithDescription(
-                $"Return a list of {nameof(ChannelResponse)} where the user is member of. Requires {nameof(GetByUserIdRequest)}. Returns a list of {nameof(ChannelResponse)}"
+                $"Return a list of channels. Requires Authorization. Requires CORS"
             )
             .WithName(nameof(GetByUserIdEndpoint));
     }

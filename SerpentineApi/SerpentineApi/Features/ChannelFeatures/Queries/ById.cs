@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Helpers;
 
@@ -63,20 +64,21 @@ public class GetChannelByIdEndpoint : IEndpoint
                     });
                 }
             )
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
+            .Stable()
             .WithOpenApi()
-            .WithTags(new[] { "GET", $"{nameof(Channel)}" })
+            .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(Channel) })
             .DisableAntiforgery()
-            .Accepts<GetChannelByIdRequest>("application/json")
-            .Produces<SuccessApiResult<ChannelResponse>>(200, "application/json")
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<NotFoundApiResult>(404, "application/json")
-            .Produces<ValidationApiResult>(409, "application/json")
+            .Accepts<GetChannelByIdRequest>(ApiContentTypes.ApplicationJson)
+            .Produces<SuccessApiResult<ChannelResponse>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(409, ApiContentTypes.ApplicationJson)
             .WithName(nameof(GetChannelByIdEndpoint))
             .WithDescription(
-                $"Returns a {nameof(ChannelResponse)} matching the giving Id. Accepts: {nameof(GetChannelByIdRequest)}. Returns a {nameof(ChannelResponse)} or a {nameof(Failure)}"
+                $"Returns a Channel. Requires Authorization. Requires CORS"
             );
     }
 }

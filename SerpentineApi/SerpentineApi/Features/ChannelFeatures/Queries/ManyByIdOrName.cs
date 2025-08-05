@@ -83,15 +83,15 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
                 .DisableAntiforgery()
                 .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
                 .WithOpenApi()
-                .WithTags(new[] { "GET", $"{nameof(Channel)}" })
+                .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(Channel) })
                 .RequireCors()
-                .Accepts<GetManyByIdOrNameRequest>(false, "application/json")
+                .Accepts<GetManyByIdOrNameRequest>(false, ApiContentTypes.ApplicationJson)
                 .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
-                .Produces<BadRequestApiResult>(400, "application/json")
-                .Produces<ServerErrorApiResult>(500, "application/json")
-                .Produces<ValidationApiResult>(422, "application/json")
+                .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+                .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+                .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
                 .WithDescription(
-                    $"Return a list of {nameof(ChannelResponse)} by their Id or Name. Requires {nameof(GetManyByIdOrNameRequest)}. Returns a list of {nameof(ChannelResponse)}"
+                    $"Return a list of channels by name or id. Requires Authorization. Require CORS."
                 )
                 .WithName(nameof(GetManyByIdOrNameEndpoint));
         }
