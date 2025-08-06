@@ -44,6 +44,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "AspNetCore.HealthChecks.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
             "CloudinaryDotNet": {
               "target": "Package",
               "version": "[1.27.5, )"

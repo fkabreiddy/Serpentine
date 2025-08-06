@@ -23,7 +23,14 @@ public class SuccessApiResult<T> : IApiResult
         Data = data;
         Message = message;
     }
-
+    
+    public SuccessApiResult(T data, string message, bool success = true  )
+    {
+        Data = data;
+        Message = message;
+        IsSuccess = success;
+    }
+    
     public T Data { get; set; }
     public bool IsSuccess { get; private set; } = true;
     public string Message { get; set; } = "Everything went well";

@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddDbContextServices(builder.Configuration);
         services.AddJwtServices(builder.Configuration);
         services.AddEndpointsDependencies();
+        services.AddHealtCheckDependencies(builder.Configuration);
 
         return services;
     }

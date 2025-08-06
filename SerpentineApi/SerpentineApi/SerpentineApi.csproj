@@ -6,6 +6,7 @@
     <UserSecretsId>59dfed7d-2886-47d8-8f33-36253d38598c</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
     <PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />

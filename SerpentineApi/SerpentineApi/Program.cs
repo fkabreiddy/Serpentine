@@ -89,6 +89,21 @@ app.UseExceptionHandler(appError =>
 app.UseAuthentication();
 app.UseRouting();
 app.UseCors("default");
+app.MapHealthChecks("/health", new()
+{
+    Predicate = healthCheck => healthCheck.Name == nameof(SerpentineHealthCheck),
+    ResponseWriter = HealtCheckActions.WriteResponse
+    
+})
+.RequireCors("default");
+
+app.MapHealthChecks("/health-database", new()
+{
+    Predicate = healthCheck => healthCheck.Name == "serpentine-db",
+    ResponseWriter = HealtCheckActions.WriteResponse
+    
+})
+.RequireCors("default");
 
 app.UseAuthorization();
 app.MapHub<ActiveUsersHub>(
@@ -107,5 +122,7 @@ app.MapHub<ActiveChannelsHub>(
         options.CloseOnAuthenticationExpiration = true;
     }
 );
+
 app.MapEndpoints();
+
 app.Run();
