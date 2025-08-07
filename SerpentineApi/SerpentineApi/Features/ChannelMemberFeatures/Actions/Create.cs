@@ -41,7 +41,7 @@ public class CreateChannelMemberEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(
-                _settings.BaseUrl + "/create",
+                _settings.BaseUrl,
                 async (
                     [FromBody] CreateChannelMemberRequest request,
                     HttpContext context,

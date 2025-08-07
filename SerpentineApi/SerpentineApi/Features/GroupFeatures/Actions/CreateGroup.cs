@@ -73,7 +73,7 @@ internal class CreateGroupEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(
-                _settings.BaseUrl + "/create",
+                _settings.BaseUrl,
                 async (
                     [FromBody] CreateGroupRequest command,
                     EndpointExecutor<CreateGroupEndpoint> executor,

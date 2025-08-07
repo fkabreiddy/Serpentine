@@ -4,7 +4,7 @@ import ApiResult from "@/models/api-result";
 import {CreateChannelBanRequest} from "@/models/requests/channel-ban/create-channel-ban-request";
 import ChannelBanResponse from "@/models/responses/channel-ban-response";
 import { useState, useEffect } from "react";
-
+const CHANNEL_BAN_ENDPOINT = "channel-bans"
 export function useCreateBan() {
 
     const [ban, setBan] = useState<ChannelBanResponse | null>(null);
@@ -44,7 +44,7 @@ export function useCreateBan() {
         setResult(null);
         setCreatingBan(true);
         setBan(null);
-        const response = await post({endpoint: "channel-bans/create", contentType: "application/json"}, data );
+        const response = await post({endpoint: CHANNEL_BAN_ENDPOINT, contentType: "application/json"}, data );
         setResult(response);
 
             

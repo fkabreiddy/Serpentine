@@ -138,7 +138,7 @@ public class CreateUserEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(
-                _settings.BaseUrl + "/create",
+                _settings.BaseUrl,
                 async (
                     [FromForm] CreateUserRequest command,
                     EndpointExecutor<CreateUserEndpoint> executor,

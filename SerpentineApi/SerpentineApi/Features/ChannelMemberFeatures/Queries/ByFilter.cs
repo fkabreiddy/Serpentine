@@ -1,23 +1,22 @@
 ﻿using System.Text.Json.Serialization;
-        using FluentValidation;
-        using Microsoft.AspNetCore.Authentication.JwtBearer;
-        using Microsoft.AspNetCore.Mvc;
-        using Microsoft.EntityFrameworkCore;
-        using Scalar.AspNetCore;
-        using SerpentineApi.Helpers;
-    
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using SerpentineApi.Helpers;
 
-        namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
+namespace SerpentineApi.Features.ChannelMemberFeatures.Queries;
 
-        public class GetByUserAndChannelIdRequest :  RequestWithUserCredentials, IRequest<OneOf<ChannelMemberResponse, Failure>>
+        public class GetChannelMembersByFilterRequest :  RequestWithUserCredentials, IRequest<OneOf<ChannelMemberResponse, Failure>>
         {
             [FromQuery, JsonPropertyName("channelId"), Required]
             public Ulid ChannelId { get; set; }
         }
 
-        public class GetByUserAndChannelIdRequestValidator : AbstractValidator<GetByUserAndChannelIdRequest>
+        public class GetChannelMembersByFilterRequestValidator : AbstractValidator<GetChannelMembersByFilterRequest>
         {
-            public GetByUserAndChannelIdRequestValidator()
+            public GetChannelMembersByFilterRequestValidator()
             {
                   RuleFor(x => x.ChannelId)
                         .Must(channelId => UlidHelper.IsValid(channelId))
@@ -25,16 +24,16 @@
             }
         }
 
-        internal class GetByUserAndChannelIdEndpoint : IEndpoint
+        internal class GetChannelMemberByFilterEndpoint : IEndpoint
         {
             private readonly ChannelMemberEndpointSettings _settings = new();
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
                 app.MapGet(
-                    _settings.BaseUrl + "/by-user-channel-id",
+                    _settings.BaseUrl + "/by-filter",
                     async(
-                        [AsParameters] GetByUserAndChannelIdRequest command,
-                        EndpointExecutor<GetByUserAndChannelIdEndpoint> executor,
+                        [AsParameters] GetChannelMembersByFilterRequest command,
+                        EndpointExecutor<GetChannelMemberByFilterEndpoint> executor,
                         CancellationToken cancellationToken,
                         ISender sender,
                         HttpContext context
@@ -67,19 +66,19 @@
                 .Stable()
                 .WithOpenApi()
                 .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(ChannelMember)})
-                .Accepts<GetByUserAndChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
+                .Accepts<GetChannelMembersByFilterRequest>(false, ApiContentTypes.ApplicationJson)
                 .Produces<SuccessApiResult<ChannelMemberResponse>>(200, ApiContentTypes.ApplicationJson)
                 .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
                 .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
                 .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
-                .WithName(nameof(GetByUserAndChannelIdEndpoint))
+                .WithName(nameof(GetChannelMemberByFilterEndpoint))
                 .WithDescription("Returns a channel member with a certain ChannelId and UserId. Requires Authorization. Requires CORS.");
             }
         }
 
-        internal class GetByUserAndChannelIdEndpointHandler(SerpentineDbContext context) : IEndpointHandler<GetByUserAndChannelIdRequest, OneOf<ChannelMemberResponse, Failure>>
+        internal class GetChannelMembersByFilterEndpointHandler(SerpentineDbContext context) : IEndpointHandler<GetChannelMembersByFilterRequest, OneOf<ChannelMemberResponse, Failure>>
         {
-            public async Task<OneOf<ChannelMemberResponse, Failure>> HandleAsync(GetByUserAndChannelIdRequest request, CancellationToken cancellationToken = default)
+            public async Task<OneOf<ChannelMemberResponse, Failure>> HandleAsync(GetChannelMembersByFilterRequest request, CancellationToken cancellationToken = default)
             {
                 var channel = await context
                             .ChannelMembers

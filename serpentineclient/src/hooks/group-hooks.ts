@@ -5,9 +5,10 @@ import {handleApiErrors, handleApiSuccess} from "@/helpers/api-results-handler-h
 import {GroupResponse} from "@/models/responses/group-response.ts";
 import {GetGroupsByChannelIdRequest} from "@/models/requests/groups/get-by-channel-id-request.ts";
 import {CreateGroupRequest} from "@/models/requests/groups/create-group-request.ts";
+const GROUPS_ENDPOINT = "groups"
 
 
-
+//actions
 export function useCreateGroup() {
 
     const [group, setGroup] = useState<GroupResponse | null>(null);
@@ -46,7 +47,7 @@ export function useCreateGroup() {
         setResult(null);
         setCreatingGroup(true);
         setGroup(null);
-        const response = await post({endpoint: "groups/create", contentType: "application/json"}, data );
+        const response = await post({endpoint: GROUPS_ENDPOINT, contentType: "application/json"}, data );
         setResult(response);
 
 
@@ -55,6 +56,9 @@ export function useCreateGroup() {
 
     return { createGroup, group, creatingGroup};
 }
+
+
+//queries
 export function useGetGroupsByChannelId() {
 
 
@@ -106,7 +110,7 @@ export function useGetGroupsByChannelId() {
 
 
             data.skip = channelCount;
-            const response = await get({endpoint: "groups/by-channel-id" }, data );
+            const response = await get({endpoint: GROUPS_ENDPOINT + "/by-channel-id" }, data );
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
@@ -154,7 +158,7 @@ export function useGetGroupById(){
         setGroup(null);
         setSearchingGroup(true);
 
-        const response = await get({endpoint: "groups/by-id", contentType: "application/json"}, data)
+        const response = await get({endpoint: GROUPS_ENDPOINT + "/by-id", contentType: "application/json"}, data)
 
         setResult(response);
 

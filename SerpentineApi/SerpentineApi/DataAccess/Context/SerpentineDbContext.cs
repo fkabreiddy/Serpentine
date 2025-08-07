@@ -26,7 +26,9 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            t.Navigation(u => u.Role).IsRequired(true);
+            t.Navigation(u => u.Role)
+                .AutoInclude()
+                .IsRequired(true);
             
             t.HasOne(u => u.Role)
                 .WithMany(r => r.Users)

@@ -45,7 +45,7 @@ internal class GetChannelMemberByChannelIdEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(
-                _settings.BaseUrl + "/by-channelId",
+                _settings.BaseUrl + "by-channel-id",
                 async (
                     [AsParameters] GetChannelMembersByChannelIdRequest command,
                     EndpointExecutor<GetChannelMemberByChannelIdEndpoint> executor,

@@ -17,7 +17,7 @@ public enum ApiHttpVerbs
 public static class ApiContentTypes
 {
     public static readonly string ApplicationJson = "application/json";
-    public static readonly string MultipartForm = "multipart/form";
+    public static readonly string MultipartForm = "multipart/form-data";
 
     
 

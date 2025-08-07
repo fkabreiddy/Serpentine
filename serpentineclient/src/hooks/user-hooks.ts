@@ -1,25 +1,16 @@
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import { useFetch } from "@/helpers/axios-helper";
 import {LoginUserRequest} from '@/models/requests/user/login-user-request';
-import { showToast } from '@/helpers/sonner-helper';
 import ApiResult from '@/models/api-result';
 import { JWTResponse } from '@/models/responses/jwt-response';
 import { UserResponse } from '@/models/responses/user-response';
 import { GetByUsernameRequest } from '@/models/requests/user/get-by-username';
-import { useAuthStore } from '@/contexts/authentication-context';
 import { useNavigate } from 'react-router-dom';
 import { handleApiErrors, handleApiSuccess } from '@/helpers/api-results-handler-helper';
 import { useJwtHelper } from '@/helpers/jwt-helper';
+const USERS_ENDPOINT = "users";
 
 
-const initialApiState = <T>(): ApiResult<T> => ({
-    statusCode: 0,
-    message: "",
-    isSuccess: false,
-    resultTitle: "",
-    errors: [],
-    data: null
-});
 
 
 
@@ -61,7 +52,7 @@ export function useLoginUser() {
     const loginUser = async (user: LoginUserRequest) => {
         setResult(null);
         setIsLoggingIn(true);
-        const response = await post({endpoint: "user/authenticate"}, user);
+        const response = await post({endpoint: USERS_ENDPOINT + "/authenticate"}, user);
         setResult(response);
     };
 
@@ -98,7 +89,7 @@ export function useCreateUser() {
     const createUser = async (user: FormData) => {
         setResult(null);
         setIsCreatingUser(true);
-        const response = await post({endpoint:"user/create", contentType:"multipart/form-data"}, user);
+        const response = await post({endpoint:USERS_ENDPOINT, contentType:"multipart/form-data"}, user);
         setResult(response);
     };
 
@@ -108,7 +99,7 @@ export function useCreateUser() {
 export function useGetByUsername() {
    
     const [isAvailable, setIsAvailable] = useState<boolean>(false);
-    const [result, setResult] = useState<ApiResult<UserResponse> | null>(initialApiState);
+    const [result, setResult] = useState<ApiResult<UserResponse> | null>(null);
     const [isGettingByUsername, setIsGettingByUsername] = useState<boolean>(false);
     const { get } = useFetch<UserResponse>();
 
@@ -145,7 +136,7 @@ export function useGetByUsername() {
         setResult(null);
         setIsGettingByUsername(true);
         setIsAvailable(false);
-        const response = await get({endpoint: "user/by-username"}, data );
+        const response = await get({endpoint: USERS_ENDPOINT + "/by-username"}, data );
         setResult(response);
 
        
@@ -158,7 +149,6 @@ export function useGetByUsername() {
 export function useCloseSession() {
     const [loading, setLoading] = useState<boolean>(false);
     const {removeToken} = useJwtHelper();
-    const navigator = useNavigate();
     
     const closeSession = () =>{
         setLoading(true);

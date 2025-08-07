@@ -2,5 +2,5 @@
 
 public class UserEndpointSettings : IEndpointSettings
 {
-    public string BaseUrl { get; set; } = "api/user";
+    public string BaseUrl { get; set; } = "api/v1/users";
 }

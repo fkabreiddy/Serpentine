@@ -4,7 +4,160 @@ import { showToast } from "@/helpers/sonner-helper";
 import ApiResult from "@/models/api-result";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { useState, useEffect } from "react";
+const CHANNEL_MEMBERS_ENDPOINT = "channel-members";
 
+
+//actions
+
+export function useCreateChannelMember(){
+
+    const [result, setResult] = useState<ApiResult<ChannelMemberResponse> | null>(null);
+    const [joining, setJoining] = useState<boolean>(false);
+    const [channelMember, setChannelMember] = useState<ChannelMemberResponse | null>(null);
+    const {post} = useFetch<ChannelMemberResponse>();
+
+    useEffect(()=>{
+
+
+        if(!result)
+        {
+            setJoining(false);
+            return;
+        }
+
+        if(result.data && result.isSuccess)
+        {
+            setChannelMember(result.data);
+        }
+
+        else{
+            handleApiErrors(result);
+        }
+
+        setResult(null);
+    },[result])
+
+    const createChannelMember  = async (body: CreateChannelMemberRequest) => {
+
+        setResult(null);
+        setChannelMember(null);
+        setJoining(true);
+
+        const response = await post({endpoint: CHANNEL_MEMBERS_ENDPOINT, contentType: "application/json" }, body)
+
+        setResult(response);
+
+    }
+
+    return{
+
+        joining,
+        createChannelMember,
+        setChannelMember,
+        channelMember
+    }
+}
+
+export function useTest(){
+
+    const [result, setResult] = useState<ApiResult<string> | null>(null);
+    const [fetching, setFetching] = useState<boolean>(false);
+    const [channelMember, setChannelMember] = useState<string | null>(null);
+    const {delete: fetchDelete} = useFetch<string>();
+
+    useEffect(()=>{
+
+
+        if(!result)
+        {
+            return;
+        }
+
+        if(result.data && result.isSuccess)
+        {
+            setChannelMember(result.data);
+        }
+        else{
+            handleApiErrors(result);
+        }
+
+        setFetching(false);
+        setResult(null);
+    },[result])
+
+    const test  = async (data: {typeOfResponse : string}) => {
+
+        setResult(null);
+        setChannelMember(null);
+        setFetching(true);
+
+        const response = await fetchDelete({endpoint: CHANNEL_MEMBERS_ENDPOINT, contentType: "application/json" }, data)
+
+        setResult(response);
+
+    }
+
+    return{
+
+        fetching,
+        test,
+        setChannelMember,
+        channelMember
+    }
+}
+
+export function useUpdateChannelMember(){
+
+    const [result, setResult] = useState<ApiResult<ChannelMemberResponse> | null>(null);
+    const [updatingChannelMember, setUpdatingChannelMember] = useState<boolean>(false);
+    const [updatedChannelMember, setUpdatedChannelMember] = useState<ChannelMemberResponse | null>(null);
+    const {patch} = useFetch<ChannelMemberResponse>();
+
+    useEffect(()=>{
+
+
+        if(!result)
+        {
+            setUpdatingChannelMember(false);
+            return;
+        }
+
+        if(result.data && result.isSuccess)
+        {
+            setUpdatedChannelMember(result.data);
+            showToast({description: "Membership updated"});
+        }
+
+        else{
+            handleApiErrors(result);
+        }
+
+        setResult(null);
+    },[result])
+
+    const updateChannelMember  = async (body: UpdateChannelMemberRequest) => {
+
+        setResult(null);
+        setUpdatedChannelMember(null);
+        setUpdatingChannelMember(true);
+
+        const response = await patch({endpoint: CHANNEL_MEMBERS_ENDPOINT, contentType: "application/json" }, body)
+
+        setResult(response);
+
+    }
+
+    return{
+
+
+        updateChannelMember,
+        updatedChannelMember,
+        updatingChannelMember
+    }
+}
+
+
+//queries
 export function useGetChannelMemberByUserAndChannelId() {
 
     
@@ -47,7 +200,7 @@ export function useGetChannelMemberByUserAndChannelId() {
         setChannelMember(null);
         setloadingChannelMember(true);
        
-        const response = await get({endpoint: "channel-members/by-user-channel-id" }, data );
+        const response = await get({endpoint: CHANNEL_MEMBERS_ENDPOINT + "/by-filter" }, data );
         
         setResult(response);
 
@@ -110,7 +263,7 @@ export function useGetChannelMembersByChannelId() {
         setResult(null);
         setloadingChannelMembers(true);
        
-        const response = await get({endpoint: "channel-members/by-channelId" }, data );
+        const response = await get({endpoint: CHANNEL_MEMBERS_ENDPOINT + "/by-channel-id" }, data );
         
         setResult(response);
 
@@ -122,149 +275,4 @@ export function useGetChannelMembersByChannelId() {
 
 
 
-export function useCreateChannelMember(){
 
-    const [result, setResult] = useState<ApiResult<ChannelMemberResponse> | null>(null);
-    const [joining, setJoining] = useState<boolean>(false);
-    const [channelMember, setChannelMember] = useState<ChannelMemberResponse | null>(null);
-    const {post} = useFetch<ChannelMemberResponse>();
-
-    useEffect(()=>{
-
-
-        if(!result)
-        {
-            setJoining(false);
-            return;
-        }
-
-        if(result.data && result.isSuccess)
-        {
-            setChannelMember(result.data);
-        }
-        
-        else{
-            handleApiErrors(result);
-        }
-
-        setResult(null);
-    },[result])
-
-    const createChannelMember  = async (body: CreateChannelMemberRequest) => {
-
-        setResult(null);
-        setChannelMember(null);
-        setJoining(true);
-
-        const response = await post({endpoint: "channel-members/create", contentType: "application/json" }, body)
-
-        setResult(response);
-
-    }   
-
-    return{
-
-        joining,
-        createChannelMember,
-        setChannelMember,
-        channelMember
-    }
-}
-
-export function useTest(){
-
-    const [result, setResult] = useState<ApiResult<string> | null>(null);
-    const [fetching, setFetching] = useState<boolean>(false);
-    const [channelMember, setChannelMember] = useState<string | null>(null);
-    const {delete: fetchDelete} = useFetch<string>();
-
-    useEffect(()=>{
-
-
-        if(!result)
-        {
-            return;
-        }
-
-        if(result.data && result.isSuccess)
-        {
-            setChannelMember(result.data);
-        }
-        else{
-            handleApiErrors(result);
-        }
-
-        setFetching(false);
-        setResult(null);
-    },[result])
-
-    const test  = async (data: {typeOfResponse : string}) => {
-
-        setResult(null);
-        setChannelMember(null);
-        setFetching(true);
-
-        const response = await fetchDelete({endpoint: "channel-members/test", contentType: "application/json" }, data)
-
-        setResult(response);
-
-    }   
-
-    return{
-
-        fetching,
-        test,
-        setChannelMember,
-        channelMember
-    }
-}
-
-export function useUpdateChannelMember(){
-
-    const [result, setResult] = useState<ApiResult<ChannelMemberResponse> | null>(null);
-    const [updatingChannelMember, setUpdatingChannelMember] = useState<boolean>(false);
-    const [updatedChannelMember, setUpdatedChannelMember] = useState<ChannelMemberResponse | null>(null);
-    const {patch} = useFetch<ChannelMemberResponse>();
-
-    useEffect(()=>{
-
-
-        if(!result)
-        {
-            setUpdatingChannelMember(false);
-            return;
-        }
-
-        if(result.data && result.isSuccess)
-        {
-            setUpdatedChannelMember(result.data);
-            showToast({description: "Membership updated"});
-        }
-
-        else{
-            handleApiErrors(result);
-        }
-
-        setResult(null);
-    },[result])
-
-    const updateChannelMember  = async (body: UpdateChannelMemberRequest) => {
-
-        setResult(null);
-        setUpdatedChannelMember(null);
-        setUpdatingChannelMember(true);
-
-        const response = await patch({endpoint: "channel-members/update", contentType: "application/json" }, body)
-        
-        setResult(response);
-
-    }
-
-    return{
-
-        
-        updateChannelMember,
-        updatedChannelMember,
-        updatingChannelMember
-    }
-}

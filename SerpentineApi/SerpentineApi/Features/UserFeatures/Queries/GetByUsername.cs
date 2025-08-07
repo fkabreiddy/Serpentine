@@ -71,7 +71,7 @@ internal class GetUserByUsernameEndpoint : IEndpoint
                 }
             )
             .DisableAntiforgery()
-            .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
+            .AllowAnonymous()
             .RequireCors()
             .WithOpenApi()
             .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(User) })

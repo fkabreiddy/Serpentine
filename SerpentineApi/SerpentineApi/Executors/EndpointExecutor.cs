@@ -52,8 +52,7 @@ public class EndpointExecutor<T>
             {
                 _logger?.LogCritical(
 
-                    $"[{typeof(T).Name}] An exception has occurred: " +
-                    caughtException.InnerException?.Message ?? caughtException.Message
+                    $"[{typeof(T).Name}] An exception has occurred: {caughtException.InnerException?.Message ?? caughtException.Message}"
                 );
             }
         }

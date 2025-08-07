@@ -8,7 +8,7 @@ using SerpentineApi.Helpers;
 
 namespace SerpentineApi.Features.ChannelFeatures.Queries
 {
-    public class GetManyByIdOrNameRequest
+    public class GetChannelsByFilterRequest
         : RequestWithUserCredentials,
             IRequest<OneOf<List<ChannelResponse>, Failure>>
     {
@@ -24,9 +24,9 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
         public string? ChannelName { get; set; }
     }
 
-    public class GetManyByIdOrNameRequestValidator : AbstractValidator<GetManyByIdOrNameRequest>
+    public class GetChannelsByFilterRequestValidator : AbstractValidator<GetChannelsByFilterRequest>
     {
-        public GetManyByIdOrNameRequestValidator()
+        public GetChannelsByFilterRequestValidator()
         {
             RuleFor(x => x.ChannelId)
                 .Must(x => x is not null ? UlidHelper.IsValid(x ?? new()) : true)
@@ -42,19 +42,19 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
         }
     }
 
-    public class GetManyByIdOrNameEndpoint : IEndpoint
+    public class GetChannelsByFilterEndpoint : IEndpoint
     {
         private readonly ChannelEndpointSettings _settings = new();
 
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapGet(
-                    _settings.BaseUrl,
+                    _settings.BaseUrl + "/by-filter",
                     async (
-                        [AsParameters] GetManyByIdOrNameRequest request,
+                        [AsParameters] GetChannelsByFilterRequest request,
                         ISender sender,
                         CancellationToken cancellationToken,
-                        EndpointExecutor<GetManyByIdOrNameEndpoint> executor,
+                        EndpointExecutor<GetChannelsByFilterEndpoint> executor,
                         HttpContext context
                     ) =>
                     {
@@ -87,7 +87,7 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
                 .Stable()
                 .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(Channel) })
                 .RequireCors()
-                .Accepts<GetManyByIdOrNameRequest>(false, ApiContentTypes.ApplicationJson)
+                .Accepts<GetChannelsByFilterRequest>(false, ApiContentTypes.ApplicationJson)
                 .Produces<SuccessApiResult<List<ChannelResponse>>>(200)
                 .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
                 .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
@@ -95,15 +95,15 @@ namespace SerpentineApi.Features.ChannelFeatures.Queries
                 .WithDescription(
                     $"Return a list of channels by name or id. Requires Authorization. Require CORS."
                 )
-                .WithName(nameof(GetManyByIdOrNameEndpoint));
+                .WithName(nameof(GetChannelsByFilterEndpoint));
         }
     }
 
-    internal class GetManyByIdOrNameEndpointHandler(SerpentineDbContext dbContext)
-        : IEndpointHandler<GetManyByIdOrNameRequest, OneOf<List<ChannelResponse>, Failure>>
+    internal class GetChannelsByFilterEndpointHandler(SerpentineDbContext dbContext)
+        : IEndpointHandler<GetChannelsByFilterRequest, OneOf<List<ChannelResponse>, Failure>>
     {
         public async Task<OneOf<List<ChannelResponse>, Failure>> HandleAsync(
-            GetManyByIdOrNameRequest request,
+            GetChannelsByFilterRequest request,
             CancellationToken cancellationToken
         )
         {

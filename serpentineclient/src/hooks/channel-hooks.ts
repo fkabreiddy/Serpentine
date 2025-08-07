@@ -7,6 +7,8 @@ import { useUiSound } from "@/helpers/sound-helper";
 import { UpdateChannelRequest } from "@/models/requests/channels/update-channel-request";
 const CHANNELS_ENDPOINT = "channels"
 
+
+//Actions
 export function useDeleteChannel() {
 
     const [deletingChannel, setDeletingChannel] = useState<boolean>(false);
@@ -104,6 +106,59 @@ export function useCreateChannel() {
     return { createChannel, channel, creatingChannel};
 }
 
+export function useUpdateChannel() {
+
+    const [updatedChannel, setUpdatedChannel] = useState<ChannelResponse | null>(null);
+    const [updatingChannel, setUpdatingChannel] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
+    const { patch } = useFetch<ChannelResponse>();
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            setUpdatingChannel(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+            setUpdatedChannel(result.data);
+
+
+        }
+        else {
+
+            handleApiErrors(result);
+        }
+
+        setUpdatingChannel(false);
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const updateChannel = async (data: UpdateChannelRequest) => {
+
+
+        setResult(null);
+        setUpdatingChannel(true);
+        setUpdatedChannel(null);
+        const response = await patch({endpoint: CHANNELS_ENDPOINT, contentType: "application/json"}, data );
+        setResult(response);
+
+
+
+
+    };
+
+    return { updateChannel, updatedChannel,  updatingChannel};
+}
+
+
+//queries
+
 export function useGetChannelsByUserId() {
 
     
@@ -156,7 +211,7 @@ export function useGetChannelsByUserId() {
 
             
             data.skip = channelCount;
-            const response = await get({endpoint: CHANNELS_ENDPOINT }, data );
+            const response = await get({endpoint: CHANNELS_ENDPOINT + "/by-user-id" }, data );
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
@@ -184,6 +239,7 @@ export function useGetManyChannelsByNameOrId() {
 
         if(!result)
         {
+            setLoadingChannels(false);
             return;
         }
 
@@ -198,7 +254,6 @@ export function useGetManyChannelsByNameOrId() {
             handleApiErrors(result);
         }
 
-     setLoadingChannels(false);
 
         setResult(null);
 
@@ -210,12 +265,11 @@ export function useGetManyChannelsByNameOrId() {
         
 
         setChannels([]);
-        
         setResult(null);
         setLoadingChannels(true);
     
 
-        const response = await get({endpoint: CHANNELS_ENDPOINT }, data );
+        const response = await get({endpoint: CHANNELS_ENDPOINT + "/by-filter", contentType: "multipart/form-data" }, data );
         
         setResult(response);
 
@@ -261,59 +315,10 @@ export function useGetChannelById() {
         setChannel(null);
         setLoadingChannel(true);
 
-        const response = await get({endpoint: CHANNELS_ENDPOINT }, data );
+        const response = await get({endpoint: CHANNELS_ENDPOINT + "/by-id" }, data );
 
         setResult(response);
     };
 
     return { getChannelById, channel, loadingChannel, setChannel, result };
-}
-export function useUpdateChannel() {
-
-    const [updatedChannel, setUpdatedChannel] = useState<ChannelResponse | null>(null);
-    const [updatingChannel, setUpdatingChannel] = useState<boolean>(false);
-    const [result, setResult] = useState<ApiResult<ChannelResponse> | null>(null);
-    const { patch } = useFetch<ChannelResponse>();
-
-    useEffect(() => {
-       
-
-        if(!result)
-        {
-            setUpdatingChannel(false);
-            return;
-        }
-
-        if (result.data && result.statusCode === 200) {
-           setUpdatedChannel(result.data);
-            
-
-        } 
-        else {
-            
-            handleApiErrors(result);
-        }
-
-        setUpdatingChannel(false);
-        setResult(null);
-
-
-    }, [result]);
-
-   
-    const updateChannel = async (data: UpdateChannelRequest) => {
-       
-        
-        setResult(null);
-        setUpdatingChannel(true);
-        setUpdatedChannel(null);
-        const response = await patch({endpoint: CHANNELS_ENDPOINT, contentType: "application/json"}, data );
-        setResult(response);
-
-            
-        
-       
-    };
-
-    return { updateChannel, updatedChannel,  updatingChannel};
 }

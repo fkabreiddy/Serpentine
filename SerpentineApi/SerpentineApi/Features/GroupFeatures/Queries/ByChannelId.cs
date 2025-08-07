@@ -9,7 +9,7 @@ using SerpentineApi.Helpers;
 
 namespace SerpentineApi.Features.GroupFeatures.Actions;
 
-public class GetByChannelIdRequest : IRequest<OneOf<List<GroupResponse>, Failure>>
+public class GetGroupsByChannelIdRequest : IRequest<OneOf<List<GroupResponse>, Failure>>
 {
     [FromQuery, Required, JsonPropertyName("channelId")]
     public Ulid ChannelId { get; set; }
@@ -29,9 +29,9 @@ public class GetByChannelIdRequest : IRequest<OneOf<List<GroupResponse>, Failure
     }
 }
 
-public class GetByChannelIdRequestValidator : AbstractValidator<GetByChannelIdRequest>
+public class GetGroupsByChannelIdRequestValidator : AbstractValidator<GetGroupsByChannelIdRequest>
 {
-    public GetByChannelIdRequestValidator()
+    public GetGroupsByChannelIdRequestValidator()
     {
         RuleFor(x => x.Take).InclusiveBetween(1, 5).WithMessage("Take should be between 1 and 5");
 
@@ -45,7 +45,7 @@ public class GetByChannelIdRequestValidator : AbstractValidator<GetByChannelIdRe
     }
 }
 
-internal class GetByChannelIdEndpoint : IEndpoint
+internal class GetGroupsByChannelIdEndpoint : IEndpoint
 {
     private readonly GroupEndpointSettings _settings = new();
 
@@ -54,8 +54,8 @@ internal class GetByChannelIdEndpoint : IEndpoint
         app.MapGet(
                 _settings.BaseUrl + "/by-channel-id",
                 async (
-                    [AsParameters] GetByChannelIdRequest command,
-                    EndpointExecutor<GetByChannelIdEndpoint> executor,
+                    [AsParameters] GetGroupsByChannelIdRequest command,
+                    EndpointExecutor<GetGroupsByChannelIdEndpoint> executor,
                     CancellationToken cancellationToken,
                     ISender sender,
                     HttpContext context
@@ -88,21 +88,21 @@ internal class GetByChannelIdEndpoint : IEndpoint
             .Stable()
             .WithOpenApi()
             .WithTags(new string[]{nameof(ApiHttpVerbs.Get), nameof(Group)})
-            .Accepts<GetByChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
+            .Accepts<GetGroupsByChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
             .Produces<SuccessApiResult<List<GroupResponse>>>(200, ApiContentTypes.ApplicationJson)
             .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
             .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
             .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
             .WithDescription("Returns a list of groups with a certain ChannelId. Require Authorization. Require CORS")
-            .WithName(nameof(GetByChannelIdEndpoint));
+            .WithName(nameof(GetGroupsByChannelIdEndpoint));
     }
 }
 
-internal class GetByChannelIdEndpointHandler(SerpentineDbContext context)
-    : IEndpointHandler<GetByChannelIdRequest, OneOf<List<GroupResponse>, Failure>>
+internal class GetGroupsByChannelIdEndpointHandler(SerpentineDbContext context)
+    : IEndpointHandler<GetGroupsByChannelIdRequest, OneOf<List<GroupResponse>, Failure>>
 {
     public async Task<OneOf<List<GroupResponse>, Failure>> HandleAsync(
-        GetByChannelIdRequest request,
+        GetGroupsByChannelIdRequest request,
         CancellationToken cancellationToken = default
     )
     {

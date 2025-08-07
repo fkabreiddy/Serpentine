@@ -13,7 +13,10 @@ public static class HealthCheckDependency
         services.AddHealthChecks()
             .AddCheck<SerpentineHealthCheck>(nameof(SerpentineHealthCheck));
         
-        services.AddHealthChecks().AddSqlServer(configuration.GetConnectionString("MSSQL") ?? throw  new ArgumentNullException(nameof(configuration)), name: "serpentine-db", failureStatus: HealthStatus.Unhealthy);
+        services.AddHealthChecks()
+            .AddSqlServer(configuration.GetConnectionString("MSSQL") 
+                          ?? throw  new ArgumentNullException(nameof(configuration)), name: "serpentine-db", failureStatus: HealthStatus.Unhealthy
+            );
         
         
         return services;

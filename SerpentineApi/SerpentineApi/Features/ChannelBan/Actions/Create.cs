@@ -9,7 +9,7 @@
         using SerpentineApi.Helpers;
         using SerpentineApi.Hubs;
 
-        namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
+        namespace SerpentineApi.Features.ChannelBan.Actions;
 
         public class CreateChannelBanRequest : RequestWithUserCredentials, IRequest<OneOf<ChannelBanResponse, Failure>>
         {
