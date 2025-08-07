@@ -43,6 +43,7 @@ public static class JwtDependency
                 {
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
+
                     policy.RequireRole(new string[]
                     {
                         nameof(UserRoles.User),
@@ -50,7 +51,7 @@ public static class JwtDependency
                         nameof(UserRoles.Developer),
                         nameof(UserRoles.User)
                     });
-                    
+
                 }
             );
             opts.AddPolicy(

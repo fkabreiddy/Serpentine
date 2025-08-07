@@ -12,7 +12,8 @@ export interface UserIdentity{
   age: number,
   createdAt: Date,
   id: string,
-  dayOfBirth: Date
+  dayOfBirth: Date,
+  role: string
 
 }
 

@@ -103,9 +103,7 @@ export default function GroupsContainer({
 
           <div className="flex items-center gap-3  w-full justify-between">
             <div className="flex items-center gap-3">
-              {((channel.myMember?.role &&
-                channel.myMember?.role?.name == "admin") ||
-                channel.myMember?.isOwner) && (
+              {(channel.myMember?.isOwner || channel.myMember?.isAdmin) && (
                 <IconButton
                   onClick={() => setCreateGroupData(channel)}
                   placement="right"
@@ -129,8 +127,8 @@ export default function GroupsContainer({
             </div>
 
             <div className="flex items-center gap-3">
-              {channel?.myMember?.role &&
-                channel?.myMember.role.name === "admin" && (
+              {channel?.myMember?.isOwner &&
+                
                   <Tooltip
                     placement="bottom"
                     showArrow={true}
@@ -139,7 +137,7 @@ export default function GroupsContainer({
                   >
                     <KeyIcon className="size-[15px] opacity-80 cursor-pointer" />
                   </Tooltip>
-                )}
+                }
               <h2 className="text-[13px] font-normal justify-self-end">
                 {channel ? `#${channel.name}` : "Channel"}
               </h2>

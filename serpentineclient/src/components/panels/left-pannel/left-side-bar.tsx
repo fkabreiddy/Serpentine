@@ -10,8 +10,11 @@ import { Spinner } from "@heroui/spinner";
 
 import StatusBar from "./status-bar";
 import GroupsContainer from "@/components/groups/common/groups-container";
+import emptyboxPlaceholder  from "../../../../public/images/placeholders/empty-box.png"
 
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
+import {BoxIcon} from "lucide-react";
+import { motion } from "motion/react";
 interface LeftSideBarProps {}
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () => {
@@ -161,9 +164,24 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
               callbackUnreadMessagesCount={handleGroupsUnreadMessagesCount}
             />
           )}
-          {!selectedChannel && layout.sideBarExpanded && !loadingChannels && (
-            <div className="h-full w-full flex items-center justify-center">
-              <p className="text-xs text-center">
+          {channels.length <= 0 && layout.sideBarExpanded && !loadingChannels && (
+            <div className="h-full w-full flex flex-col items-center justify-center">
+              
+              <motion.div
+                  animate={{
+                    y: [0, -50, 0],        // sube, baja
+                    rotate: [0, 360, 360],  // gira solo en la parte alta
+                  }}
+                  transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",}}
+                  
+              >
+                <BoxIcon size={30} className={"opacity-30"}/>
+
+              </motion.div>
+              <p className="text-xs text-center opacity-30 font-semibold">
                 Seems you dont have any channel yet
               </p>
             </div>

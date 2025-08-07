@@ -20,6 +20,7 @@ export interface JwtPayload {
   age: number;
   createdAt: string;
   birthdate: string;
+  role: string;
   sub: string;
   picture: string;
   name: string;

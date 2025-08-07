@@ -6,6 +6,7 @@ export class UserResponse extends BaseResponse {
     username: string = '';
     profilePictureUrl: string = '';
     age: number = 0;
+    accessLevel: number = 0;
   
     constructor(init?: Partial<UserResponse>) {
       super(init); 

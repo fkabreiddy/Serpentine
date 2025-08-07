@@ -55,12 +55,13 @@ export const useJwtHelper = ()=>{
 
         setAuthenticationState(null);
         return null
-      };
+      }
 
       const user: UserIdentity = {
         username: decoded.nickname,
         fullName: decoded.name,
         age: decoded.age,
+        role: decoded.role,
         dayOfBirth: new Date(decoded.birthdate),
         createdAt: new Date(decoded.createdAt),
         profilePictureUrl: decoded.picture,

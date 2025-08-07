@@ -173,7 +173,7 @@ const AvatarDropdown = () => {
           <div className="w-full flex gap-3 items-center justify-between">
            
                 <p className="text-[13px] font-semibold">@{user?.username}</p>
-
+  
 
 
             {(() => {

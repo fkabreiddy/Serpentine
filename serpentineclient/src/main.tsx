@@ -11,7 +11,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <Provider>
-        <ToastProvider />
+        <ToastProvider placement={"top-center"} />
 
         <App />
       </Provider>

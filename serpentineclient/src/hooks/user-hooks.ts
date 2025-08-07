@@ -37,7 +37,7 @@ export function useLoginUser() {
             setToken(token);
             handleApiSuccess(result);
             setIsLoggingIn(false);
-            navigate("/home");
+            navigate("/explore");
 
         } else {
             handleApiErrors(result);

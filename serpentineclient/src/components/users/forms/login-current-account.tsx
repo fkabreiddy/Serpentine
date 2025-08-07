@@ -19,7 +19,7 @@ export default function LoginWithCurrentAccount() {
   }
 
   const accept = () => {
-    navigate("/home");
+    navigate("/explore");
   };
 
   if(!user) return <></>;

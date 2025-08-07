@@ -12,6 +12,7 @@ export const showToast = ({ title = "", description, color = "foreground" }: Toa
   addToast({
     title,
     description,
+    shouldShowTimeoutProgress: true,
     variant: "solid",
     size: "lg",
     color:color ,   
@@ -20,7 +21,7 @@ export const showToast = ({ title = "", description, color = "foreground" }: Toa
     classNames:{
       base: cn([
           
-        `shadow-md !text-[10px] border-0`
+        `shadow-md z-[-2] !text-[10px] border-0`
       ])
     }
     

@@ -29,7 +29,8 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
                     new Claim(JwtRegisteredClaimNames.Picture, user.ProfilePictureUrl),
                     new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                     new Claim("age", user.Age.ToString()),
-                    new Claim("role", nameof(user.Role)),
+                    new Claim("role",  user.Role.ToString()), //for the client
+                    new Claim(ClaimTypes.Role, user.Role.ToString()),// for the authorization pipeline
                     new Claim(JwtRegisteredClaimNames.Birthdate, user.DayOfBirth.ToString()),
                     new Claim("createdAt", user.CreatedAt.ToString())
                 ]

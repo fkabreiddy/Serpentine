@@ -175,6 +175,7 @@ export function useGetChannelsByUserId() {
 
         if(!result)
         {
+            setLoadingChannels(false);
             return;
         }
 
@@ -189,7 +190,6 @@ export function useGetChannelsByUserId() {
             handleApiErrors(result);
         }
 
-        setLoadingChannels(false);
         setResult(null);
 
 
