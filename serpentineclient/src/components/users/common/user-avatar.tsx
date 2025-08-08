@@ -15,7 +15,7 @@ export default function UserAvatar({isBlurred = false, src, size = 28, connectio
 
     return(
 
-        <div className={` ${ connectionColor &&  connectionColor  } ${connectionColor && "ring-2"} cursor-pointer flex items-center justify-center rounded-full   transition-all text-sm font-semibold`}>
+        <div className={` ${ connectionColor &&  connectionColor  } ${connectionColor && "ring-2"} cursor-pointer flex items-center justify-center rounded-full size-fit   transition-all text-sm font-semibold`}>
               {src ? (
                 <Image
                   isBlurred = {isBlurred}

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.SignalR;
 using Scalar.AspNetCore;
 using SerpentineApi;
@@ -38,7 +39,10 @@ builder.Services.AddSignalRServices();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApiServices();
-
+builder.Services.AddRequestTimeouts(options => {
+    options.DefaultPolicy =
+        new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(30) };
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

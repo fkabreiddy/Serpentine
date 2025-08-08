@@ -41,7 +41,7 @@ export function useActiveChannels() {
     setDeletedChannelId(channelId);
 
 
-    showToast({title: "Channel Deleted", description: `Channel with id.${channelId} has been deleted`})
+    showToast({title: "Channel Deleted", description: `One of the channels you belong has been deleted`})
 
     
   }

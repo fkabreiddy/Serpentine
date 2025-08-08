@@ -24,7 +24,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className }) => {
   const isDark = theme === "light";
 
   return (
-   <IconButton onClick={()=> toggleTheme()} tooltipText={theme + " mode"}>
+   <IconButton placement={"right"} onClick={()=> toggleTheme()} tooltipText={theme + " mode"}>
               <motion.div
                   key="setting-icon"
                   whileHover={{ rotate: 30 }}

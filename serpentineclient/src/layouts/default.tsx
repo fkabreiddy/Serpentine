@@ -79,9 +79,10 @@ export default function DefaultLayout({
 
   return (
     <div className="w-screen h-screen flex">
+        <AppBar />
         <LeftSideBar />
           {isMobile && 
-            <div className={`absolute top-[50%] !z-[9999999] ${layout.sideBarExpanded ? "left-[300px]" : "left-[50px]"}`}>
+            <div className={`absolute top-[50%] !z-[9999999] ${layout.sideBarExpanded ? "left-[355px]" : "left-[105px]"}`}>
                 <button onClick={changeSidebarState}  className="flex bg-default-100 cursor-pointer items-center justify-center px-1 py-2 rounded-r-xl">
                     {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
                 </button>
@@ -92,7 +93,6 @@ export default function DefaultLayout({
       
 
           <div className="flex flex-col w-full h-screen  " style={{marginLeft: !layout.sideBarExpanded ? "50px" : "0px" }}>
-              <AppBar />
 
             
               <main className="flex flex-col animate-[width] bg-white  dark:bg-black  float-left h-full overflow-auto "  >

@@ -19,6 +19,7 @@ interface LeftSideBarProps {}
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () => {
   const [filter, setFilter] = useState("");
+  const leftPanelRef = useRef<HTMLDivElement | null>(null);
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [selectedChannel, setSelectedChannel] =
     useState<ChannelResponse | null>(null);
@@ -31,7 +32,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     hasMore,
   } = useGetChannelsByUserId();
   const { user } = useAuthStore();
-  const { layout } = useLayoutStore();
+  const { layout, setLayout } = useLayoutStore();
   const {
     createdChannel,
     setCreatedChannel,
@@ -46,6 +47,12 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
 
+  useEffect(() => {
+      if(!isMounted || !leftPanelRef) return;
+      
+      setLayout({leftPanelWidth: leftPanelRef.current?.offsetWidth})
+  }, [isMounted, leftPanelRef]);
+  
   useEffect(()=>{
 
     if(channelJoined)
@@ -129,17 +136,17 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
   return (
     <>
-      <div className={`relative z-[31] max-md:z-[33]  h-screen bg-white dark:bg-black`}>
+      <div ref={leftPanelRef} style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}} className={`relative z-[31] max-md:z-[33]  bg-white dark:bg-black`}>
         <ScrollShadow
           hideScrollBar
           offset={0}
           id="side-bar"
+          
           className={`${
             layout.sideBarExpanded
               ? "!max-w-[300px] !min-w-[300px]"
               : "!max-w-[50px] !min-w-[50px]"
-          } h-full  py-4  max-md:h-full bg-white dark:bg-black animate-all flex flex-col border-r max-md:absolute border-default-100 px-2 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
-          style={{ paddingBottom: statusBarHeight }}
+          } h-full  py-4  max-md:h-full rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t max-md:absolute border-default-100 px-5 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
         >
           <div className="flex flex-col w-full items-center gap-3">
             <ChannelsContainer
@@ -164,13 +171,13 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
               callbackUnreadMessagesCount={handleGroupsUnreadMessagesCount}
             />
           )}
-          {channels.length <= 0 && layout.sideBarExpanded && !loadingChannels && (
+          {(!selectedChannel && layout.sideBarExpanded && !loadingChannels) && 
             <div className="h-full w-full flex flex-col items-center justify-center">
               
               <motion.div
                   animate={{
-                    y: [0, -50, 0],        // sube, baja
-                    rotate: [0, 360, 360],  // gira solo en la parte alta
+                    y: [0, -50, 0],        
+                    rotate: [0, 360, 360],  
                   }}
                   transition={{
                         duration: 1.5,
@@ -185,8 +192,8 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
                 Seems you dont have any channel yet
               </p>
             </div>
-          )}
-          {!selectedChannel && layout.sideBarExpanded && loadingChannels && (
+          }
+          {(!selectedChannel && layout.sideBarExpanded && loadingChannels) && (
             <Spinner
               className="absolute top-1/2 left-1/2"
               size="sm"

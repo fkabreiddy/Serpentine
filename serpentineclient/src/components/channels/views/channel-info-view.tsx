@@ -462,7 +462,7 @@ interface DeleteChannelModalProps{
 
 const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, onOpenChanged}) =>{
 
-    const { deleteChannel, channelDeleted } = useDeleteChannel();
+    const { deleteChannel, channelDeleted, deletingChannel } = useDeleteChannel();
     const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
     const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
      const {setLayout} = useLayoutStore();
@@ -514,7 +514,9 @@ const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, 
                 <Button size="sm" variant="light" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button isDisabled={channel.name !== channelNameConfirmation} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
+                <Button
+                    isLoading={deletingChannel}
+                    isDisabled={channel.name !== channelNameConfirmation || deletingChannel} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
                   Yes, delete this channel
                 </Button>
               </ModalFooter>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { motion } from "motion/react";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { Spinner } from "@heroui/spinner";
@@ -29,8 +29,11 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   
   const {} = useActiveUser();
   const navigate = useNavigate();
-  const {layout} = useLayoutStore();
+  const {layout, setLayout} = useLayoutStore();
   const {playUiSound} = useUiSound();
+  const [isMounted, setIsMounted] = useState(false);
+  const appBarRef = useRef<HTMLDivElement | null>(null);
+  
 
   const {fetching, test} = useTest();
 
@@ -39,8 +42,19 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
     await test({typeOfResponse: "validation"});
   }
 
+  useEffect(() => {
+    
+    if(!isMounted || !appBarRef) return;
+    
+    playUiSound("system/boot_up");
+    setLayout({appBarWidth: appBarRef.current?.offsetWidth});
+    
+
+  }, [isMounted, appBarRef]);
+
   useEffect(()=>{
-          playUiSound("system/boot_up")
+    
+    setIsMounted(true);
 
   },[])
 
@@ -48,18 +62,18 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
 
   return (
     <nav
+        ref={appBarRef}
       id="app-bar"
-      className=" z-[30]  bg-white dark:bg-neutral-950/50   sticky top-0 w-full    border-b border-default-100 flex items-center px-4 py-3 max-md:justify-end justify-between gap-3 h-fit transition-all"
+      style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}}
+      className=" rounded-br-lg rounded-tr-lg opacity-60 hover:opacity-100 transition-all  border-r border-default-100 relative px-3 py-5 z-[31] max-md:z-[33] flex flex-col  bg-neutral-100/30 dark:bg-neutral-950/30 items-center justify-between"
     >
-      <div className="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-opacity-70   z-[-1]" />
 
-      <CrosshatchPattern />
 
-      <div />
+      <AvatarDropdown />
 
-      <div className=" flex  items-center justify-end gap-4 ">
-        <IconButton tooltipText="Test" onClick={() => tryTest()}>
-          <TestTubeIcon size={20}/>
+      <div className=" flex flex-col  items-center justify-end gap-4 ">
+        <IconButton tooltipText="Test" placement={"right"} onClick={() => tryTest()}>
+          <TestTubeIcon size={18}/>
         </IconButton>
         <HomeIcon/>
         <ExploreIcon />
@@ -67,14 +81,13 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
 
         <NotificationsIcon />
 
-        <AvatarDropdown />
       </div>
     </nav>
   );
 };
 
 const NotificationsIcon = () => (
-  <IconButton onClick={() => {}} tooltipText="Notifications">
+  <IconButton placement={"right"} onClick={() => {}} tooltipText="Notifications">
     <motion.div
       key="notifications-icon"
       whileHover={{ rotate: 30 }}
@@ -82,7 +95,7 @@ const NotificationsIcon = () => (
       exit={{ rotate: -30 }}
       className="flex  relative"
     >
-     <Inbox size={20}/>
+     <Inbox size={18}/>
     </motion.div>
   </IconButton>
 );
@@ -91,7 +104,7 @@ const HomeIcon = () => {
 
   const navigate = useNavigate();
   return(
-    <IconButton onClick={() => {navigate("/home")}} tooltipText="Notifications">
+    <IconButton placement={"right"} onClick={() => {navigate("/home")}} tooltipText="Notifications">
       <motion.div
         key="notifications-icon"
         whileHover={{  }}
@@ -99,7 +112,7 @@ const HomeIcon = () => {
         exit={{ }}
         className="flex  relative"
       >
-      <Home size={20}/>
+      <Home size={18}/>
       </motion.div>
     </IconButton>
   )
@@ -115,6 +128,7 @@ const ExploreIcon = () => {
         navigate("/explore");
       }}
       tooltipText="Explore"
+      placement={"right"}
     >
       <motion.div
         key="compass-icon"
@@ -123,7 +137,7 @@ const ExploreIcon = () => {
         exit={{ rotate: -30 }}
         className="flex  relative"
       >
-        <Compass size={20} />
+        <Compass size={18} />
       </motion.div>
     </IconButton>
   );

@@ -20,11 +20,11 @@ export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl, isBlur
       />
     ) : (
       <Noise
-        patternSize={130}
-        patternScaleX={0}
-        patternScaleY={0}
-        patternRefreshInterval={2}
-        patternAlpha={10}
+          patternSize={250}
+          patternScaleX={0}
+          patternScaleY={0}
+          patternRefreshInterval={2}
+          patternAlpha={10}
         height="130px"
         width="100%"
       
