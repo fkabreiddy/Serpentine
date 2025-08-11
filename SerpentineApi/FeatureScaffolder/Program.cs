@@ -93,12 +93,12 @@ internal class Program
                 .Experimental()
                 .WithOpenApi()
                 .WithDescription(""Requires Authorization. \n Requires CORS."")
-                .WithTags(new string[]{{""{httpMethod}"", ""{featureClassName}""}})
-                .Accepts<{featureClassName}Request>(false, ""ApiContentTypes.ApplicationJson"")
+                .WithTags(new string[]{{nameof(ApiHttpVerbs.{httpMethod}), nameof({featureName})}})
+                .Accepts<{featureClassName}Request>(false, nameof(ApiContentTypes.ApplicationJson))
                 .Produces<SuccessApiResult<{responseClassName}>>(200)
-                .Produces<BadRequestApiResult>(400, ""ApiContentTypes.ApplicationJson"")
-                .Produces<ServerErrorApiResult>(500, ""ApiContentTypes.ApplicationJson"")
-                .Produces<ValidationApiResult>(422, ""ApiContentTypes.ApplicationJson"")
+                .Produces<BadRequestApiResult>(400, nameof(ApiContentTypes.ApplicationJson))
+                .Produces<ServerErrorApiResult>(500, nameof(ApiContentTypes.ApplicationJson))
+                .Produces<ValidationApiResult>(422, nameof(ApiContentTypes.ApplicationJson))
                 .WithName(nameof({featureClassName}Endpoint));
             }}
         }}

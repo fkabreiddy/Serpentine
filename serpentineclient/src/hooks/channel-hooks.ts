@@ -5,6 +5,8 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { handleApiErrors, handleApiSuccess } from "@/helpers/api-results-handler-helper";
 import { useUiSound } from "@/helpers/sound-helper";
 import { UpdateChannelRequest } from "@/models/requests/channels/update-channel-request";
+import { showToast } from "@/helpers/sonner-helper";
+import { UpdateChannelBannerRequest } from "@/models/requests/channels/update-banner-request";
 const CHANNELS_ENDPOINT = "channels"
 
 
@@ -155,6 +157,59 @@ export function useUpdateChannel() {
 
     return { updateChannel, updatedChannel,  updatingChannel};
 }
+
+
+export function useUpdateChannelBanner() {
+
+    const [updatedChannelBanner, setUpdatedChannelBanner] = useState<string | null>(null);
+    const [updatingChannelBanner, setUpdatingChannelBanner] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<string> | null>(null);
+    const { patch } = useFetch<string>();
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            setUpdatingChannelBanner(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+            setUpdatedChannelBanner(result.data);
+            showToast({description: "The channel banner has been updated. Changes will be available for everyone soon"})
+
+
+        }
+        else {
+
+            handleApiErrors(result);
+        }
+
+        setUpdatingChannelBanner(false);
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const updateChannelBanner = async (data: UpdateChannelBannerRequest) => {
+
+
+        setResult(null);
+        setUpdatingChannelBanner(true);
+        setUpdatedChannelBanner(null);
+        const response = await patch({endpoint: CHANNELS_ENDPOINT + "/banner", contentType: "multipart/form-data"}, data );
+        setResult(response);
+
+
+
+
+    };
+
+    return { updateChannelBanner, updatedChannelBanner,  updatingChannelBanner};
+}
+
 
 
 //queries

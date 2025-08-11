@@ -36,14 +36,14 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     [
         FromForm,
         JsonPropertyName("bannerPictureFile"),
-        FileExtensions(Extensions = "jpg, png, webp, img, jpge")
+        FileExtensions(Extensions = "jpg, png, webp, img, jpeg")
     ]
     public IFormFile? BannerPictureFile { get; set; }
 
     [
         FromForm,
         JsonPropertyName("coverPictureFile"),
-        FileExtensions(Extensions = "jpg, png, webp, img, jpge")
+        FileExtensions(Extensions = "jpg, png, webp, img, jpeg")
     ]
     public IFormFile? CoverPictureFile { get; set; }
     
@@ -86,6 +86,25 @@ public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequ
             .WithMessage("Description cannot exceed 500 characters.");
 
         RuleFor(x => x.AdultContent).NotNull().WithMessage("Adult content flag must be specified.");
+        RuleFor(x => x.BannerPictureFile)
+            .Must(file =>
+            {
+                if (file == null) return true;
+                var allowedExtensions = new[] { ".jpg", ".png", ".webp", ".img", ".jpeg" };
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                return allowedExtensions.Contains(ext);
+            })
+            .WithMessage("The file extension is not valid. Use jpg, png, webp, img o jpeg.");
+             RuleFor(x => x.CoverPictureFile)
+                    .Must(file =>
+                    {
+                        if (file == null) return true;
+                        var allowedExtensions = new[] { ".jpg", ".png", ".webp", ".img", ".jpeg" };
+                        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                        return allowedExtensions.Contains(ext);
+                    })
+                    .WithMessage("The file extension is not valid. Use jpg, png, webp, img o jpeg.");
+        
     }
 }
 

@@ -123,9 +123,9 @@ public class CloudinaryService
         );
     }
 
-    public async Task<bool> DeleteImageAsync(string publicId, string folderName)
+    public async Task<InternalResult<bool>> DeleteImageAsync(string fileName, string folderName)
     {
-        var deleteParams = new DeletionParams($"{folderName}/{publicId}")
+        var deleteParams = new DeletionParams($"{folderName}/{fileName}")
         {
             ResourceType = ResourceType.Image,
         };
@@ -134,9 +134,9 @@ public class CloudinaryService
 
         if (result.StatusCode == HttpStatusCode.OK)
         {
-            return true;
+            return new InternalResult<bool>(true, true);
         }
 
-        return false;
+        return new InternalResult<bool>(false, false, result.Error.Message, [result.Error.Message]);
     }
 }

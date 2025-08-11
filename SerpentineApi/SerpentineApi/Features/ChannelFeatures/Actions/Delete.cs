@@ -31,7 +31,7 @@ public class DeleteChannelRequestValidator : AbstractValidator<DeleteChannelRequ
     {
         RuleFor(x => x.ChannelId)
             .Must(x => UlidHelper.IsValid(x))
-            .WithMessage("Channel Id should be equal of greater than 0");
+            .WithMessage("Channel Id should be a valid Ulid");
     }
 }
 

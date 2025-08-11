@@ -51,7 +51,7 @@ export default function EditChannelForm(){
     useEffect(()=>{
 
         if(!channel) return;
-        if(!channel.myMember || (channel.myMember && (!channel.myMember.isOwner || channel.myMember.isAdmin))){
+        if(!channel.myMember || (channel.myMember && (!channel.myMember.isOwner || !channel.myMember.isAdmin))){
  
             showToast({ description: "You dont have permisson to do this action", color: "danger"})
             setUpdateChannelid(null);

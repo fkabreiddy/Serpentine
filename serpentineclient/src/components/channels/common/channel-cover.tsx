@@ -1,7 +1,7 @@
 import { Image } from "@heroui/image";
 import Avatar from "boring-avatars";
 import { Badge } from "@heroui/badge";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   ArrowLeft,
   CopyIcon,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import {ChannelResponse} from "@/models/responses/channel-response.ts";
-import {useDeleteChannel} from "@/hooks/channel-hooks.ts";
+import {useDeleteChannel, useUpdateChannelBanner} from "@/hooks/channel-hooks.ts";
 import {useGlobalDataStore} from "@/contexts/global-data-context.ts";
 import {useCreateChannelMember} from "@/hooks/channel-member-hooks.ts";
 import {useLayoutStore} from "@/contexts/layout-context.ts";
@@ -22,6 +22,7 @@ import {showToast} from "@/helpers/sonner-helper.ts";
 import {Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger} from "@heroui/react";
 import IconButton from "@/components/common/icon-button.tsx";
 import {Spinner} from "@heroui/spinner";
+import { UpdateChannelBannerRequest } from "@/models/requests/channels/update-banner-request";
 
 export interface ChannelCoverProps {
   pictureUrl: string | null;
@@ -29,7 +30,7 @@ export interface ChannelCoverProps {
   isSmall: boolean;
   absolute: boolean;
   unreadMessages?: number;
-  isEditable: boolean;
+  isEditable?: boolean;
   channel?: ChannelResponse | null
 }
 
@@ -91,56 +92,88 @@ export const ChannelCover: React.FC<ChannelCoverProps> = ({
     )
 };
 
+type FileType =  File;
 
 const EditCoverDropdown: React.FC<{ channel: ChannelResponse }> = ({
    channel,
  }) => {
-  const {  deletingChannel } = useDeleteChannel();
-  const { setChannelInfoId, setChannelJoined, setUpdateChannelid } = useGlobalDataStore();
-  const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
-  const {setLayout} = useLayoutStore();
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const {updatedChannelBanner, updatingChannelBanner, updateChannelBanner } = useUpdateChannelBanner();
+  const channelBannerInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleBannerFileChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      const image = proccessImage(file);
+      fetchUpdateBanner({channelId: channel.id, bannerPictureFile: image})
+  };
+
+  function proccessImage( file: File | undefined) : File | null {
+      if (file) {
+        const allowedExtensions = ["jpg", "png", "webp", "img", "jpeg"];
+        const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+  
+        const fileExtension = file.name.split(".").pop()?.toLowerCase();
+  
+        if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+          showToast({
+            title: "Invalid file type",
+            description: "Please select a valid image file (jpg, png, jpeg, webp).",
+          });
+          return null;
+        }
+        if (file.size > maxSizeInBytes) {
+          showToast({
+            title: "Image too large",
+            description: "Please select an image smaller than 5MB.",
+          });
+          return null;
+        }
+  
+        return file;
+      }
+
+      return null
+  };
+    
+
+   const fetchUpdateBanner = async (data: UpdateChannelBannerRequest) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value instanceof File || value === null) {
+          if (value) formData.append(key, value);
+        } else {
+          formData.append(key, value as string);
+        }
+      });
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      await updateChannelBanner(formData as any);
+    };
+  
+
+ 
+
+   const handleUpdateBannerInputClicked = () => {
+    channelBannerInputRef.current?.click();
+  };
 
 
 
 
-  function showUpdateChannelForm()
-  {
-    setUpdateChannelid(channel.id);
-    setLayout({currentRightPanelView: RightPanelView.UpdateChannelFormView})
-  }
-  const join = async () =>{
 
-
-    await createChannelMember({channelId: channel.id});
-  }
-
-  useEffect(()=>{
-
-    if(channelMember)
-    {
-      channel.myMember = channelMember;
-      setChannelJoined(channel);
-      showToast({title: `Channel joined`, description: `You've joined "${channel.name}'s" channel`})
-      setChannelMember(null);
-      setLayout({currentRightPanelView: RightPanelView.DefaultView});
-      setChannelInfoId(null);
-    }
-
-  },[channelMember])
-
-
-
-  async function copyIdToClipboard()
-  {
-    await navigator.clipboard.writeText(channel.id);
-    showToast({ description: "Channel Id copied to clipboard!"})
-
-  }
 
 
   return (
       <>
+       <input
+            onChange={handleBannerFileChanged}
+            type="file"
+            ref={channelBannerInputRef}
+            accept="image/png, image/jpeg, image/webp, image/jpg"
+            multiple={false}
+            max={1}
+            className="hidden"
+        />
         <Dropdown  placement="bottom-end" offset={25} showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
           <DropdownTrigger className={"border-0 outlined-none"}>
             <Edit3Icon size={24} />
@@ -150,13 +183,13 @@ const EditCoverDropdown: React.FC<{ channel: ChannelResponse }> = ({
               variant="flat"
           >
             <DropdownSection  showDivider={false} title={"Cover Actions"}>
-              <DropdownItem    key="editCover"  >
+              <DropdownItem   key="editCover"  >
                 <p className="font-normal text-[13px]">Edit Cover</p>
               </DropdownItem>
 
               <>
                 {channel.coverPicture !== "" && channel.coverPicture &&
-                    <DropdownItem    key="editBanner"  color={"danger"} >
+                    <DropdownItem    key="removeCover"  color={"danger"} >
                       <p className="font-normal text-[13px]">Remove Cover</p>
                     </DropdownItem>
                 }
@@ -166,13 +199,13 @@ const EditCoverDropdown: React.FC<{ channel: ChannelResponse }> = ({
             </DropdownSection>
               <DropdownSection showDivider={false} title={"Banner Actions"}>
                 <>
-                      <DropdownItem    key="removeCover" >
+                      <DropdownItem endContent={updatingChannelBanner && <Spinner size={"sm"} variant={"spinner"}/>} onClick={handleUpdateBannerInputClicked}   key="updateBanner" >
                         <p className="font-normal text-[13px]">Edit Banner</p>
                       </DropdownItem>
                   
 
                   {channel.bannerPicture !== "" && channel.bannerPicture &&
-                      <DropdownItem  key="removeBanner"  color={"danger"} >
+                      <DropdownItem onClick={() =>  fetchUpdateBanner({channelId: channel.id, bannerPictureFile: null})} key="removeBanner"  color={"danger"} >
                         <p className="font-normal text-[13px]">Remove Banner</p>
                       </DropdownItem>
                   }
