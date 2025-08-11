@@ -68,9 +68,7 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({
         formData.append(key, value as string);
       }
     });
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
+    
     await createChannel(formData as any);
   };
 

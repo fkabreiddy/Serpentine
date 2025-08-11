@@ -160,6 +160,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
           {layout.sideBarExpanded && (
             <SearchBar
+            searchButton={true}
               placeholder={"Search on your things..."}
               width="100%"
               onSearch={setFilter}

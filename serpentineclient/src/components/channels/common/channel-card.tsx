@@ -28,7 +28,6 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0, scale: 1 }}
         transition={{ duration: 0.2, delay: index ? index * 0.1 : 0 }}
-        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <div

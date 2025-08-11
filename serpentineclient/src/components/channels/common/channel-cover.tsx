@@ -34,6 +34,8 @@ export interface ChannelCoverProps {
   channel?: ChannelResponse | null
 }
 
+const sizeMd = "!size-[60px] min-w-[60px] min-h-[60px] max-w-[60px] max-h-[60px]"
+const sizeSm = "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"
 export const ChannelCover: React.FC<ChannelCoverProps> = ({
   pictureUrl,
   channelName,
@@ -62,12 +64,12 @@ export const ChannelCover: React.FC<ChannelCoverProps> = ({
 
                     src={pictureUrl}
                     style={{objectFit: "cover"}}
-                    className={`shrink-0    ${absolute && "absolute  -bottom-[2px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${!isSmall ? "!size-[60px] min-w-[60px] min-h-[60px] max-w-[60px] max-h-[60px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
+                    className={`shrink-0    ${absolute && "absolute  -bottom-[2px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${isSmall ? sizeSm : sizeMd}  rounded-full `}
                 />
             ) : (
                 <Avatar
                     size={!isSmall ? 50 : 28}
-                    className={`shrink-0 rounded-full ${absolute && "absolute -bottom-[10px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${!isSmall ? "!size-[50px] min-w-[50px] min-h-[50px] max-w-[50px] max-h-[50px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}`}
+                    className={`shrink-0 rounded-full ${absolute && "absolute -bottom-[10px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${isSmall ? sizeSm : sizeMd}`}
                     variant="marble"
                     name={channelName ?? "serpentine"}
                 />
@@ -144,9 +146,7 @@ const EditCoverDropdown: React.FC<{ channel: ChannelResponse }> = ({
           formData.append(key, value as string);
         }
       });
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
+     
       await updateChannelBanner(formData as any);
     };
   

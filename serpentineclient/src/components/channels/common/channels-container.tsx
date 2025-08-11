@@ -37,11 +37,11 @@ export default function ChannelsContainer({
     return (
       <ScrollShadow
         orientation="horizontal"
-        className={` ${layout.sideBarExpanded ? "w-full flex-row items-start" : "w-fit flex-col items-center"} flex  gap-4  overflow-auto scrollbar-hide py-2  `}
+        className={` ${layout.sideBarExpanded ? "w-full flex-row items-start" : "w-fit flex-col items-center"} flex  gap-7  overflow-auto scrollbar-hide py-2  `}
       >
         <Tooltip content={"Create a channel"} showArrow={true} size={"sm"} placement={"right"}>
           <button
-              className={` cursor-pointer shrink-0 ${layout.sideBarExpanded ? "size-[50px]" : "size-[28px]"} shrink-0 rounded-full bg-neutral-100 dark:bg-neutral-900 items-center justify-center flex hover:text-white hover:bg-blue-500 dark:hover:bg-blue-700 transition-all`}
+              className={` cursor-pointer shrink-0 ${layout.sideBarExpanded ? "size-[60px]" : "size-[28px]"} shrink-0 rounded-full bg-neutral-100 dark:bg-neutral-900 items-center justify-center flex hover:text-white hover:bg-blue-500 dark:hover:bg-blue-700 transition-all`}
               onClick={() =>
                   setLayout({
                     currentRightPanelView: RightPanelView.CreateChannelFormView,
