@@ -320,5 +320,5 @@ export function useGetChannelById() {
         setResult(response);
     };
 
-    return { getChannelById, channel, loadingChannel, setChannel, result };
+    return { getChannelById,  channel, loadingChannel, setChannel, result };
 }

@@ -1,14 +1,14 @@
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { showToast } from "@/helpers/sonner-helper";
-import { useGetChannelById, useUpdateChannel } from "@/hooks/channel-hooks";
+import {useDeleteChannel, useGetChannelById, useUpdateChannel} from "@/hooks/channel-hooks";
 import { UpdateChannelRequest, updateChannelSchema } from "@/models/requests/channels/update-channel-request";
 import { RightPanelView } from "@/models/right-panel-view";
 import { Button } from "@heroui/button";
 import { Input, Textarea } from "@heroui/input";
-import { Checkbox, Spinner } from "@heroui/react";
+import {Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner} from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import { useForm } from "react-hook-form";
 
 
@@ -176,3 +176,4 @@ export default function EditChannelForm(){
       
     )
 }
+

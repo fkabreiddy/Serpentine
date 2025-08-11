@@ -46,14 +46,14 @@ export default function ChatroomPage(){
             
             if(group?.public)
             {
-                setHasPermisson(channelMember !== null)
+                setHasPermisson(true)
             }
             else{
 
-                if(!channelMember.role)
+                if(!channelMember.isAdmin || !channelMember.isOwner)
                     setHasPermisson(false);
                     
-                setHasPermisson(channelMember.isOwner || channelMember.role?.name === "admin");
+                setHasPermisson(channelMember.isOwner || channelMember.isAdmin);
             }
         }
     },[channelMember])

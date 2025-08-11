@@ -11,11 +11,9 @@ export interface ChannelBannerProps {
 export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl, isBlurred = false }) => (
   <>
     {pictureUrl ? (
-      <Image
-       isBlurred={isBlurred}
-       width={"100%"}
-       height={130}
-        className="rounded-lg   object-cover  z-[0]"
+      <img
+       
+        className="rounded-sm w-full h-[100px]  object-cover  z-[0]"
         src={pictureUrl}
       />
     ) : (
@@ -25,7 +23,8 @@ export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl, isBlur
           patternScaleY={0}
           patternRefreshInterval={2}
           patternAlpha={10}
-        height="130px"
+        height="100px"
+          
         width="100%"
       
       />

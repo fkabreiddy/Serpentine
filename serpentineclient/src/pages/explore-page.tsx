@@ -170,7 +170,7 @@ const Background = () => {
         style={{width: layout.sideBarExpanded
               ? "calc(100% - 300px)"
               : "calc(100% - 50px)", 
-            height: "calc(100% - 55px)"}}
+            height: "100vh"}}
         className=" absolute overflow-hidden flex items-center justify-center">
           <p
             style={{ fontSize: "1700px", lineHeight: 1,  }}

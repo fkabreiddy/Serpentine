@@ -2,10 +2,10 @@ import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import * as signalR from "@microsoft/signalr";
 import { HubResult } from "@/models/hub-result";
 import { useEffect, useRef, useState } from "react";
-import { showToast } from "./sonner-helper";
+import { showToast } from "@/helpers/sonner-helper";
 import { HubConnectionState } from '@microsoft/signalr';
 import { set } from "zod";
-import { useJwtHelper } from "./jwt-helper";
+import { useJwtHelper } from "@/helpers/jwt-helper";
 
 export function useActiveUsersActions(){
 

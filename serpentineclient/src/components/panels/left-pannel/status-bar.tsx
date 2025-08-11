@@ -6,7 +6,7 @@ import { useLayoutStore } from "@/contexts/layout-context";
 import {
   useActiveChannels,
   useActiveChannelsHubActions,
-} from "@/helpers/active-channels-hub";
+} from "@/client-hubs/active-channels-hub.ts"
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { Spinner } from "@heroui/spinner";
 import { HubConnectionState } from "@microsoft/signalr";
@@ -14,9 +14,10 @@ import {useEffect, useRef, useState} from "react";
 
 interface StatusBarProps {
   channels: ChannelResponse[];
+  isReady: boolean;
 }
 
-export default function StatusBar({ channels }: StatusBarProps) {
+export default function StatusBar({ channels, isReady = false }: StatusBarProps) {
   const {
     activeChannels,
     activeChannelsHub,
@@ -62,10 +63,10 @@ export default function StatusBar({ channels }: StatusBarProps) {
   }, [deletedChannelId]);
 
   useEffect(() => {
-    if (activeChannelsHubsState === HubConnectionState.Connected) {
+    if (activeChannelsHubsState === HubConnectionState.Connected && isReady) {
       listenToChannels(channels);
     }
-  }, [activeChannelsHubsState, channels]);
+  }, [activeChannelsHubsState, channels, isReady]);
 
 
   return (
@@ -75,7 +76,7 @@ export default function StatusBar({ channels }: StatusBarProps) {
           id="status-bar"
        
           
-          className="fixed left-0 max-md:z-[999999]  bottom-0 z-10 backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-default-100 "
+          className="fixed left-0 max-md:z-[31]  bottom-0 z-10 backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-default-100 "
           style={{
             width: "355px",
               minWidth:"355px",

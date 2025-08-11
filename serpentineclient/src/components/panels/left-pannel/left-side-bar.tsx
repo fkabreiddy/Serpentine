@@ -15,6 +15,7 @@ import emptyboxPlaceholder  from "../../../../public/images/placeholders/empty-b
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
 import {BoxIcon} from "lucide-react";
 import { motion } from "motion/react";
+import { Skeleton } from "@heroui/react";
 interface LeftSideBarProps {}
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () => {
@@ -144,9 +145,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
           
           className={`${
             layout.sideBarExpanded
-              ? "!max-w-[300px] !min-w-[300px]"
-              : "!max-w-[50px] !min-w-[50px]"
-          } h-full  py-4  max-md:h-full rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t max-md:absolute border-default-100 px-5 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
+              ? "w-[300px]"
+              : "w-[50px]"
+          } h-full  py-4  max-md:h-full rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t max-md:absolute border-default-100 px-3 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
         >
           <div className="flex flex-col w-full items-center gap-3">
             <ChannelsContainer
@@ -201,10 +202,10 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
             />
           )}
         </ScrollShadow>
-
-        {!hasMore && !loadingChannels && !isBusy && (
-          <StatusBar channels={channels} />
-        )}
+        
+        <StatusBar isReady={(!hasMore && !loadingChannels && !isBusy)} channels={channels} /> 
+            
+        
       </div>
     </>
   );

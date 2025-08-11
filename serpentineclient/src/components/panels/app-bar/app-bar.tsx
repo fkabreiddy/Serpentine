@@ -17,7 +17,7 @@ import {
 import CrosshatchPattern from "@/components/common/crosshatch-pattern";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "@/components/users/common/user-avatar";
-import { useActiveUser, useActiveUsersActions } from "@/helpers/active-user-hub";
+import { useActiveUser, useActiveUsersActions } from "@/client-hubs/active-user-hub";
 import { useTest } from "@/hooks/channel-member-hooks";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useUiSound } from "@/helpers/sound-helper";
@@ -65,7 +65,7 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
         ref={appBarRef}
       id="app-bar"
       style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}}
-      className=" rounded-br-lg rounded-tr-lg opacity-60 hover:opacity-100 transition-all  border-r border-default-100 relative px-3 py-5 z-[31] max-md:z-[33] flex flex-col  bg-neutral-100/30 dark:bg-neutral-950/30 items-center justify-between"
+      className=" w-[60px] rounded-br-lg rounded-tr-lg opacity-60 hover:opacity-100 transition-all  border-r border-default-100 relative px-3 py-5 z-[31] max-md:z-[33] flex flex-col  bg-neutral-100/30 dark:bg-neutral-950/30 items-center justify-between"
     >
 
 

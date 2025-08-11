@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
-import { ChannelResponse } from "@/models/responses/channel-response";
 import { HubResult } from "@/models/hub-result";
-import { a } from "motion/react-client";
-import { useLayoutStore } from "@/contexts/layout-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { HubConnectionState } from "@microsoft/signalr";
-import { clear } from "console";
-import { showToast } from "./sonner-helper";
-import { useJwtHelper } from "./jwt-helper";
+import {showToast} from "@/helpers/sonner-helper.ts"
+import { useJwtHelper } from "@/helpers/jwt-helper";
 import ChannelBanResponse from "@/models/responses/channel-ban-response";
 
 export function useActiveChannels() {

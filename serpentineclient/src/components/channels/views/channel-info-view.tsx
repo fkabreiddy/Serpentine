@@ -33,7 +33,7 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
-  ModalHeader,
+  ModalHeader, DropdownSection,
 } from "@heroui/react";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { useLayoutStore } from "@/contexts/layout-context";
@@ -119,20 +119,22 @@ export default function ChannelInfoView() {
         <div className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
           <div className="">
             <h2 className="text-md font-semibold max-md:text-center">
-              Manage your channel
+              About this channel
             </h2>
             <p className="text-xs opacity-45 max-md:text-center">
-              Manage channels you own or you administer
+              Information and details about #{channel.name}
             </p>
           </div>
 
           <div className="flex flex-col w-full gap-2 relative mt-2 ">
             <ChannelBanner pictureUrl={channel?.bannerPicture} />
             <ChannelCover
-              absolute={true}
-              isSmall={false}
-              pictureUrl={channel.coverPicture}
-              channelName={channel.name}
+                channel={channel}    
+                isEditable={true}
+                absolute={true}
+                isSmall={false}
+                pictureUrl={channel.coverPicture}
+                channelName={channel.name}
             />
           </div>
 
@@ -140,7 +142,7 @@ export default function ChannelInfoView() {
             <div className="flex flex-col max-w-[70%]">
               <p
                 className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
-                style={{ fontSize: "18px" }}
+                style={{ fontSize: "16px" }}
               >
                 #{channel?.name}
               </p>
@@ -267,41 +269,42 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
         aria-label="Channel Actions"
         variant="flat"
       >
-        <DropdownItem
-          key="channelInf"
-          startContent={<InfoIcon size={16} />}
-          className="h-14 gap-2"
-        >
-          <p className="font-semibold text-xs">#{channel.name}</p>
-          <p className="font-normal text-xs opacity-60">{channel.id}</p>
-        </DropdownItem>
-        <DropdownItem key="divider" isReadOnly={true}>
-          <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
-        </DropdownItem>
-        <>
-          {(channel.myMember?.isAdmin ||
-            channel.myMember?.isOwner) && (
-            <>
-              <DropdownItem onClick={showUpdateChannelForm} key="edit" endContent={<Edit3Icon size={16} />}>
-                <p className="font-normal text-[13px]">Edit this channel</p>
-              </DropdownItem>
-            </>
-          )}
-        </>
-       
-        <DropdownItem
-          key="report"
-          endContent={<MessageCircleWarningIcon size={16} />}
-        >
-          <p className="font-normal text-[13px]">Report an issue</p>
-        </DropdownItem>
-        <DropdownItem key="copy_id" onClick={async ()=>{await copyIdToClipboard()}} endContent={<CopyIcon size={16} />}>
-                <p className="font-normal text-[13px]">Copy Id</p>
-        </DropdownItem>
-        <>
-          <DropdownItem key="divider2" isReadOnly={true}>
-            <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
+        <DropdownSection showDivider={true} title={"About this channel"}>
+          <DropdownItem
+              key="channelInf"
+              startContent={<InfoIcon size={16} />}
+              className="h-14 gap-2"
+          >
+            <p className="font-semibold text-xs">#{channel.name}</p>
+            <p className="font-normal text-xs opacity-60">{channel.id}</p>
           </DropdownItem>
+        </DropdownSection>
+       
+       <DropdownSection showDivider={true} title={"Actions"}>
+         <>
+           {(channel.myMember?.isAdmin ||
+               channel.myMember?.isOwner) && (
+               <>
+                 <DropdownItem onClick={showUpdateChannelForm} key="edit" endContent={<Edit3Icon size={16} />}>
+                   <p className="font-normal text-[13px]">Edit this channel</p>
+                 </DropdownItem>
+               </>
+           )}
+         </>
+
+         <DropdownItem
+             key="report"
+             endContent={<MessageCircleWarningIcon size={16} />}
+         >
+           <p className="font-normal text-[13px]">Report an issue</p>
+         </DropdownItem>
+         <DropdownItem key="copy_id" onClick={async ()=>{await copyIdToClipboard()}} endContent={<CopyIcon size={16} />}>
+           <p className="font-normal text-[13px]">Copy Id</p>
+         </DropdownItem>
+       </DropdownSection>
+        
+        <DropdownSection title={"Danger zone"}>
+       
           {channel.myMember  ?
           
             <>
@@ -355,7 +358,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
            
            
           }
-        </>
+        </DropdownSection>
       </DropdownMenu>
     </Dropdown>
     </>
@@ -525,4 +528,72 @@ const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, 
         </ModalContent>
       </Modal>
     )
+}
+
+
+const EditCoverModal : React.FC<DeleteChannelModalProps> = ({open, channel, onOpenChanged}) =>{
+
+  const { deleteChannel, channelDeleted, deletingChannel } = useDeleteChannel();
+  const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
+  const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
+  const {setLayout} = useLayoutStore();
+
+
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setChannelNameConfirmation(value);
+  };
+
+  const fetchDeleteChannel = async () => {
+    await deleteChannel({ channelId: channel.id });
+  };
+
+  useEffect(() => {
+    if (channelDeleted) {
+      setChannelInfoId(null);
+      setDeletedChannelId(channel.id);
+      setLayout({ currentRightPanelView: RightPanelView.DefaultView });
+    }
+  }, [channelDeleted]);
+  return(
+
+      <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
+        <ModalContent style={{zIndex: "9999999"}} className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg">
+          {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">Delete Channel</ModalHeader>
+                <ModalBody>
+                  <p className="text-[13px] font-normal">
+                    Deleting the channel <strong>@{channel.name}</strong> ALL groups and messages will be deleted PERMANENTLY, do you wanna procceed?
+                  </p>
+                  <Input
+                      label="Channel name"
+                      type="text"
+                      placeholder="Write the name of the channel to delete"
+                      minLength={3}
+                      maxLength={100}
+                      value={channelNameConfirmation}
+                      labelPlacement="outside"
+                      isRequired={true}
+                      onChange={handleInputChange}
+                      errorMessage={"Input the channel name to confirm"}
+                      isInvalid={channel.name !== channelNameConfirmation}
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button size="sm" variant="light" onPress={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                      isLoading={deletingChannel}
+                      isDisabled={channel.name !== channelNameConfirmation || deletingChannel} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
+                    Yes, delete this channel
+                  </Button>
+                </ModalFooter>
+              </>
+          )}
+        </ModalContent>
+      </Modal>
+  )
 }

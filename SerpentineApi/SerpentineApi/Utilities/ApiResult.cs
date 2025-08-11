@@ -8,7 +8,6 @@ public interface IApiResult
 
     public List<string> Errors { get; set; }
 
-    public string ResultTitle { get; set; }
 }
 
 public class SuccessApiResult<T> : IApiResult
@@ -37,7 +36,6 @@ public class SuccessApiResult<T> : IApiResult
     public int StatusCode { get; private set; } = 200;
     public List<string> Errors { get; set; } = new();
 
-    public string ResultTitle { get; set; } = "Operation Complete Successfully";
 }
 
 public abstract class Failure : IApiResult
@@ -49,7 +47,6 @@ public abstract class Failure : IApiResult
 
     public List<string> Errors { get; set; } = [];
 
-    public string ResultTitle { get; set; } = "Failure";
 
     public void Build(string message, int statusCode, List<string>? messages = null)
     {
@@ -72,7 +69,7 @@ public class NotFoundApiResult : Failure
 
 public class ForbiddenApiResult : Failure
 {
-    public ForbiddenApiResult(string message = "The requested resource is forbbiden." , List<string>? messages = null)
+    public ForbiddenApiResult(string message = "The requested resource is forbidden." , List<string>? messages = null)
     {
         Build(message, 403, messages);
     }
