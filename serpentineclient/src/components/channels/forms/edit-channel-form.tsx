@@ -165,9 +165,8 @@ export default function EditChannelForm(){
           isDisabled={!isValid || updatingChannel}
           type="submit"
           isLoading={updatingChannel}
-          className={`w-full backdrop-blur-xl bg-default-100/80  max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
+          className={`w-full backdrop-blur-xl bg-blue-600 text-white  max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
         >
-          <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
           Update Channel
         </Button>
       </form>

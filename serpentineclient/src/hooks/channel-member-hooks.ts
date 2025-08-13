@@ -2,6 +2,7 @@ import { handleApiErrors } from "@/helpers/api-results-handler-helper";
 import { useFetch } from "@/helpers/axios-helper";
 import { showToast } from "@/helpers/sonner-helper";
 import ApiResult from "@/models/api-result";
+import { DeleteChannelMemberRequest } from "@/models/requests/channel-members/delete-channel-member-request";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { useState, useEffect } from "react";
 const CHANNEL_MEMBERS_ENDPOINT = "channel-members";
@@ -153,6 +154,55 @@ export function useUpdateChannelMember(){
         updateChannelMember,
         updatedChannelMember,
         updatingChannelMember
+    }
+}
+
+export function useDeleteChannelMember(){
+
+    const [result, setResult] = useState<ApiResult<boolean> | null>(null);
+    const [deletingChannelMember, setDeletingChannelMember] = useState<boolean>(false);
+    const [channelMemberDeleted, setChannelMemberDeleted] = useState<boolean>(false);
+    const {delete: apiDelete} = useFetch<boolean>();
+
+    useEffect(()=>{
+
+
+        if(!result)
+        {
+            setDeletingChannelMember(false);
+            return;
+        }
+
+        if(result.data && result.isSuccess)
+        {
+            setChannelMemberDeleted(result.data);
+
+        }
+
+        else{
+            handleApiErrors(result);
+        }
+
+        setResult(null);
+    },[result])
+
+    const deleteChannelMember  = async (body: DeleteChannelMemberRequest) => {
+
+        setResult(null);
+        setDeletingChannelMember(true);
+
+        const response = await apiDelete({endpoint: CHANNEL_MEMBERS_ENDPOINT, contentType: "application/json" }, body)
+
+        setResult(response);
+
+    }
+
+    return{
+
+
+        deleteChannelMember,
+        channelMemberDeleted,
+        deletingChannelMember,
     }
 }
 

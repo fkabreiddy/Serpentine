@@ -18,16 +18,30 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
   ...rest
 }) => {
   const { layout } = useLayoutStore();
+  function centerElement() {
 
+    var element = document.getElementById(channel.id);
+
+    if(!element) return;
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      inline: "center", // centra en scroll horizontal
+      block: "nearest"  // mantiene la posición vertical
+    });
+  }
   return (
     <>
       {/* Main Node */}
       <motion.div
+
+        id={channel.id.toString()}
         key={channel.id.toString() + "-motion"}
         className="flex items-center gap-3 flex-col w-[50px] "
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0, scale: 1 }}
         transition={{ duration: 0.2, delay: index ? index * 0.1 : 0 }}
+        whileHover={{scale: 1.05}}
         whileTap={{ scale: 0.95 }}
       >
         <div
@@ -41,7 +55,7 @@ const ChannelCard: React.FC<ChannelCardProps> = ({
             placement="right"
             isDisabled={layout.sideBarExpanded}
           >
-            <div>
+            <div  onClick={centerElement}>
               <ChannelCover
                 unreadMessages={channel.unreadMessages}
                 absolute={false}

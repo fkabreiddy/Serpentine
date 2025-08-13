@@ -53,14 +53,7 @@ export default function ChannelsContainer({
         </Tooltip>
        
 
-        {!layout.sideBarExpanded && (
-          <>
-            <IconButton tooltipText="Archived channels">
-              <ArchiveIcon className="size-[16px]" />
-            </IconButton>
-            <hr className="w-full max-md:w-[80%] border-neutral-100 border rounded-full my-3 dark:border-neutral-900" />
-          </>
-        )}
+       
         {channels &&
           channels
             .filter((ch) =>

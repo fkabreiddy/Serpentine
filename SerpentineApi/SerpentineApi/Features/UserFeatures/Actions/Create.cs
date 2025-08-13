@@ -212,7 +212,7 @@ internal class CreateUserRequestHandler(
 
         User creation = User.Create(request);
         creation.RoleId = role.Id;
-        var result = await context.Users.AddAsync(creation, cancellationToken);
+        var insertion = await context.Users.AddAsync(creation, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         if (request.ImageFile is not null)
@@ -221,13 +221,13 @@ internal class CreateUserRequestHandler(
                 await cloudinaryService.UploadImage(
                     request.ImageFile,
                     CloudinaryFolders.ProfilePictures.ToString(),
-                    result.Entity.Id.ToString()
+                    insertion.Entity.Id.ToString()
                 )
                     is var imageUpload
                 && imageUpload.TaskSucceded()
             )
             {
-                result.Entity.ProfilePictureUrl = imageUpload.Data;
+                insertion.Entity.ProfilePictureUrl = imageUpload.Data;
             }
             else
             {
@@ -237,6 +237,12 @@ internal class CreateUserRequestHandler(
 
         await context.SaveChangesAsync(cancellationToken);
         context.ChangeTracker.Clear();
-        return result.Entity.ToResponse();
+
+        var response = await context.Users.FirstOrDefaultAsync(u => u.Id == creation.Id, cancellationToken);
+
+        if (response is null)
+            return new NotFoundApiResult("We could not find your account");
+
+        return response.ToResponse();
     }
 }

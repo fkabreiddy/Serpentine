@@ -67,6 +67,7 @@ export default function DefaultLayout({
        setLayout({sideBarExpanded: true})
 
     
+    
   }),[isMobile]
 
   

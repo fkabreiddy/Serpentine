@@ -17,12 +17,11 @@ export default function UserAvatar({isBlurred = false, src, size = 28, connectio
 
         <div className={` ${ connectionColor &&  connectionColor  } ${connectionColor && "ring-2"} cursor-pointer flex items-center justify-center rounded-full size-fit   transition-all text-sm font-semibold`}>
               {src ? (
-                <Image
-                  isBlurred = {isBlurred}
+                <img
                   src={src}
-                  width={size}
-                  height={size}
-                  className="shrink-0 rounded-full"
+                
+                  style={{objectFit: "cover", width: size.toString() + "px", height: size.toString() + "px"}}
+                  className={`shrink-0 rounded-full  `}
                 />
               ) : (
                 <Avatar size={size} variant="beam" name={userNameFallback ?? "adam"} />

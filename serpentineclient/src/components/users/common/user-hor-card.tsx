@@ -26,17 +26,19 @@ import { CreateChannelBanRequest, createChannelBanSchema } from "@/models/reques
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useAuthStore } from "@/contexts/authentication-context"
-import {useUpdateChannelMember} from "@/hooks/channel-member-hooks.ts";
+import {useDeleteChannelMember, useUpdateChannelMember} from "@/hooks/channel-member-hooks.ts";
+import { useLayoutStore } from "@/contexts/layout-context"
 
 interface UserCardProps{
 
     channelMember : ChannelMemberResponse
     myChannelMember? : ChannelMemberResponse | null
     onUpdated:(channelMember: ChannelMemberResponse) => void
+    onKickedOut: (channelMemberId: string) => void;
 }
 
 
-const UserCard:React.FC<UserCardProps> = ({channelMember, onUpdated, myChannelMember} )=>{
+const UserCard:React.FC<UserCardProps> = ({channelMember, onKickedOut, onUpdated, myChannelMember} )=>{
 
     function handleChannelMemberUpdated(channelMember: ChannelMemberResponse){
         onUpdated(channelMember)
@@ -52,7 +54,7 @@ const UserCard:React.FC<UserCardProps> = ({channelMember, onUpdated, myChannelMe
             </div>
 
             {channelMember.id === myChannelMember?.id ||  
-                <UserCardDropdown onMemberUpdated={handleChannelMemberUpdated} imAdmin={myChannelMember?.isAdmin} imOwner={myChannelMember?.isOwner} channelMember={channelMember}/>
+                <UserCardDropdown onMemberKickedOut={onKickedOut} onMemberUpdated={handleChannelMemberUpdated} imAdmin={myChannelMember?.isAdmin} imOwner={myChannelMember?.isOwner} channelMember={channelMember}/>
             }
         </div>
     )
@@ -64,12 +66,15 @@ interface UserCardDropdownProps{
     imOwner? : boolean,
     channelMember: ChannelMemberResponse 
     onMemberUpdated: (channelMember:ChannelMemberResponse) => void 
+    onMemberKickedOut: (channelMemberId: string) => void;
 }
 
-const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false, onMemberUpdated, imOwner = false, channelMember}) =>{
+const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false,onMemberKickedOut, onMemberUpdated, imOwner = false, channelMember}) =>{
 
     const [showBanModal, setShowBanModal] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showKickOutModal, setShowKickOutModal] = useState(false);
+
     
     function handleMemberUpdated(channelMember : ChannelMemberResponse){
         onMemberUpdated(channelMember)
@@ -81,6 +86,7 @@ const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false, on
    
     return(
         <>
+        <KickOutUserModal open={showKickOutModal} onOpenChanged={setShowKickOutModal} onKickedOut={onMemberKickedOut} channelMember={channelMember}/>
             <UpdateUserModal onUpdated={handleMemberUpdated} shouldBeAdmin={!channelMember.isAdmin} channelMember={channelMember} open={showUpdateModal} onOpenChanged={setShowUpdateModal}/>
             <BanUserModal  open={showBanModal} onOpenChanged={setShowBanModal} channelMember={channelMember}/>
             <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
@@ -137,7 +143,7 @@ const UserCardDropdown : React.FC<UserCardDropdownProps> = ({imAdmin = false, on
                {((imOwner || (imAdmin && !channelMember.isAdmin)))
                 ? (
                     <>
-                    <DropdownItem textValue={"kick"} color="danger" key="remove-user" startContent={<X size={14} />}>
+                    <DropdownItem onClick={() => setShowKickOutModal(true)} textValue={"kick"} color="danger" key="remove-user" startContent={<X size={14} />}>
                         <p className="text-[13px] font-normal">Kick user</p>
                     </DropdownItem>
                     <DropdownItem textValue={"ban"} onClick={()=>{setShowBanModal(true)}} color="danger" key="ban-user" startContent={<Ban size={14} />}>
@@ -321,6 +327,61 @@ const UpdateUserModal : React.FC<UpdateUserModalProps> = ({open, onOpenChanged, 
             </ModalContent>
         </Modal>
     )
+}
+
+
+interface KickOutUserModalProps{
+    open: boolean
+    onOpenChanged?: (change:boolean) => void;
+    channelMember: ChannelMemberResponse,
+    onKickedOut: (channelMemberId: string) => void;
+}
+
+const KickOutUserModal : React.FC<KickOutUserModalProps> = ({open, channelMember, onKickedOut, onOpenChanged}) =>{
+
+  const { deleteChannelMember, deletingChannelMember, channelMemberDeleted } = useDeleteChannelMember();
+  const {setLayout} = useLayoutStore();
+
+
+
+ 
+  const fetchDeleteChannel = async () => {
+    await deleteChannelMember({ channelMemberId: channelMember.id });
+  };
+
+  useEffect(() => {
+    if (channelMemberDeleted) {
+      onKickedOut(channelMember.id);
+    }
+  }, [channelMemberDeleted]);
+  return(
+
+      <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
+        <ModalContent style={{zIndex: "9999999"}} className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg">
+          {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">Delete Channel</ModalHeader>
+                <ModalBody>
+                  <p className="text-[13px] font-normal">
+                    Are you sure you wanna kick out <strong>@{channelMember.userUsername}</strong> from this channel?
+                  </p>
+                  
+                </ModalBody>
+                <ModalFooter>
+                  <Button size="sm" variant="light" onPress={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                      isLoading={deletingChannelMember}
+                      isDisabled={ deletingChannelMember} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
+                    Yes, kick out this user
+                  </Button>
+                </ModalFooter>
+              </>
+          )}
+        </ModalContent>
+      </Modal>
+  )
 }
 
 export default UserCard

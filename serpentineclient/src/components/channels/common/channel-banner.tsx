@@ -17,15 +17,9 @@ export const ChannelBanner: React.FC<ChannelBannerProps> = ({ pictureUrl, isBlur
         src={pictureUrl}
       />
     ) : (
-      <Noise
-          patternSize={250}
-          patternScaleX={0}
-          patternScaleY={0}
-          patternRefreshInterval={2}
-          patternAlpha={10}
-        height="100px"
-          
-        width="100%"
+      <Skeleton
+        isLoaded={false}
+          className="h-[100px] w-full  rounded-sm"
       
       />
     )}

@@ -7,6 +7,9 @@ import { HubConnectionState } from "@microsoft/signalr";
 import {showToast} from "@/helpers/sonner-helper.ts"
 import { useJwtHelper } from "@/helpers/jwt-helper";
 import ChannelBanResponse from "@/models/responses/channel-ban-response";
+import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
+import { ChannelResponse } from "@/models/responses/channel-response";
+import { color } from "framer-motion";
 
 export function useActiveChannels() {
   const {
@@ -30,7 +33,7 @@ export function useActiveChannels() {
     
   }
 
-  function handelSendChannelRemoved(channelId: string | null){
+  function handleSendChannelRemoved(channelId: string | null){
 
     if(!channelId) return;
     
@@ -38,6 +41,15 @@ export function useActiveChannels() {
 
 
     showToast({title: "Channel Deleted", description: `One of the channels you belong has been deleted`})
+
+    
+  }
+
+  function handleSendChannelMemberKickedOut(channel: ChannelResponse | null){
+
+    if(!channel) return;
+    setDeletedChannelId(channel.id);
+    showToast({title: "Membership Removed", description: `You've been kickedout from the channel ${channel.name}`, color: "danger"});
 
     
   }
@@ -75,7 +87,8 @@ export function useActiveChannels() {
     if (!activeChannelsHub) return;
 
     activeChannelsHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
-    activeChannelsHub.on("SendChannelRemoved", (result: HubResult<string>)=> handelSendChannelRemoved(result.data))
+    activeChannelsHub.on("SendChannelRemoved", (result: HubResult<string>)=> handleSendChannelRemoved(result.data))
+    activeChannelsHub.on("SendUserKickedOut", (result: HubResult<ChannelResponse>)=> handleSendChannelMemberKickedOut(result.data))
 
 
   };
@@ -84,6 +97,8 @@ export function useActiveChannels() {
     if (!activeChannelsHub) return;
     activeChannelsHub.off("SendUserBanned")
     activeChannelsHub.off("SendChannelRemoved")
+    activeChannelsHub.off("SendUserKickedOut")
+
   };
 
   const handleDisconnect = () => {
@@ -127,7 +142,8 @@ export function useActiveChannels() {
 
       unregisterHandlers();
       newHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
-      newHub.on("SendChannelRemoved", (result: HubResult<string>)=> handelSendChannelRemoved(result.data))
+      newHub.on("SendChannelRemoved", (result: HubResult<string>)=> handleSendChannelRemoved(result.data))
+      newHub.on("SendUserKickedOut", (result: HubResult<ChannelResponse>)=> handleSendChannelMemberKickedOut(result.data))
 
 
 

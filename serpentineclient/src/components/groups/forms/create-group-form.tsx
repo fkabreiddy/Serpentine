@@ -131,11 +131,11 @@ export default function CreateGroupForm({ onCreate }: CreateGroupFormProps) {
             <Button
               isDisabled={!isValid || creatingGroup}
               type="submit"
+              
               isLoading={creatingGroup}
-              className={`w-full backdrop-blur-xl bg-default-100/80  max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
+              className={`w-full backdrop-blur-xl bg-blue-600 text-white  max-h-9 border border-default-100/20 transition-all text-sm font-semibold`}
             >
-              <div className="grain w-4 h-4 absolute inset-0 opacity-50" />
-              Create Channel
+              Create Group
             </Button>
           </form>
         </motion.div>

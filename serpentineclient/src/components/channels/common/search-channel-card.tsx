@@ -5,7 +5,7 @@ import { Badge, Button, Chip, Popover, PopoverContent, PopoverTrigger, Spinner, 
 import { Info, KeyIcon, LockIcon, PlusIcon, User2Icon, UserCheck, UserCheck2, UserIcon, UserLock, UserPlus2 } from "lucide-react";
 import IconButton from "@/components/common/icon-button";
 import { useCreateChannelMember } from "@/hooks/channel-member-hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { showToast } from "@/helpers/sonner-helper";
 
 interface SearchChannelCardProps {
@@ -24,14 +24,11 @@ export default function SearchChannelCard({
 
 
   const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
-  const [hovered, setHovered] = useState(false);
-  const [canJoin, setCanJoin] = useState(false);
+  const canJoin = channel.myMember === null;
 
-  const join = async () =>{
-
-  
-    await createChannelMember({channelId: channel.id});
-  }
+  const join = useCallback(async () => {
+    await createChannelMember({ channelId: channel.id });
+  }, [channel.id, createChannelMember]);
 
   useEffect(()=>{
 
@@ -46,15 +43,11 @@ export default function SearchChannelCard({
 
   },[channelMember])
 
-  useEffect(()=>{
-
-      setCanJoin(channel.myMember === null)
-  },[channel])
 
   return (
 
 
-    <div   className="flex relative  px-2 rounded-lg   flex-col gap-2 w-full max-w-full ">
+    <div  key={channel.id}  className="flex relative  px-2 rounded-lg   flex-col gap-2 w-full max-w-full ">
         <div className="flex flex-col w-full gap-2 relative  mb-2">
          
           <ChannelBanner  isBlurred={false} pictureUrl={channel?.bannerPicture ?? ""} />

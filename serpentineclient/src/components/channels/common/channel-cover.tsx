@@ -70,7 +70,7 @@ export const ChannelCover: React.FC<ChannelCoverProps> = ({
                 <Avatar
                     size={!isSmall ? 50 : 28}
                     className={`shrink-0 rounded-full ${absolute && "absolute -bottom-[10px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${isSmall ? sizeSm : sizeMd}`}
-                    variant="marble"
+                    variant="pixel"
                     name={channelName ?? "serpentine"}
                 />
             )}

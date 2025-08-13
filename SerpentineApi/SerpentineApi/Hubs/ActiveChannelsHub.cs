@@ -95,5 +95,7 @@ public interface IActiveChannelsHub
     public Task SendUserBanned(HubResult<ChannelBanResponse> channelBan);
     public Task SendChannelRemoved(HubResult<string> channelId);
 
+    public Task SendUserKickedOut(HubResult<ChannelResponse> channel);
+
 
 }

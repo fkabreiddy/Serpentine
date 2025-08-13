@@ -39,7 +39,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { RightPanelView } from "@/models/right-panel-view";
 import { showToast } from "@/helpers/sonner-helper";
-import { useCreateChannelMember, useGetChannelMembersByChannelId } from "@/hooks/channel-member-hooks";
+import { useCreateChannelMember, useDeleteChannelMember, useGetChannelMembersByChannelId } from "@/hooks/channel-member-hooks";
 import { useUiSound } from "@/helpers/sound-helper";
 import UserCard from "@/components/users/common/user-hor-card";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
@@ -87,6 +87,8 @@ export default function ChannelInfoView() {
     if (diffMin > 0) return `${diffMin} minute${diffMin > 1 ? "s" : ""} ago`;
     return "just now";
   }
+
+ 
 
   useEffect(() => {
     fetchChannel();
@@ -199,7 +201,7 @@ export default function ChannelInfoView() {
             </div>
           </div>
           <hr className="w-full border-t border-neutral-200 dark:border-neutral-800" />
-          <UsersContainer myMember={channel.myMember} channelId={channel.id}/>
+          <UsersContainer  myMember={channel.myMember} channelId={channel.id}/>
         </div>
       </>
     );
@@ -371,6 +373,7 @@ interface UserContainerProps{
 
   myMember: ChannelMemberResponse | null,
   channelId: string
+
 }
 
 const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>{
@@ -380,11 +383,17 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
 
    const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
+
  const fetchChannelMembers = async () =>{
 
    
     await getChannelMembersByChannelId({channelId: channelId, skip:  channelMembers.length, take: 5})
 
+  }
+
+  function handleOnUserKickedOut(channelMemberId: string){
+
+    setChannelMembers((prev)=> (channelMembers.filter(cm => cm.id !== channelMemberId )));
   }
   const observeLastElement = useCallback((node: HTMLDivElement | null) => {
     if (loadingChannelMembers) return;
@@ -435,7 +444,7 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
                     return(
 
                       <div  ref={isLast ? observeLastElement : null} className="w-full flex flex-col gap-2" key={cm.id}>
-                        <UserCard onUpdated={handleUserUpdated} myChannelMember={myMember}  channelMember={cm} />
+                        <UserCard onKickedOut={handleOnUserKickedOut} onUpdated={handleUserUpdated} myChannelMember={myMember}  channelMember={cm} />
 
                         <hr  className="ml-auto w-[80%] dark:border-neutral-950 border-neutral-100 border-t "/>
                         
@@ -530,70 +539,3 @@ const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, 
     )
 }
 
-
-const EditCoverModal : React.FC<DeleteChannelModalProps> = ({open, channel, onOpenChanged}) =>{
-
-  const { deleteChannel, channelDeleted, deletingChannel } = useDeleteChannel();
-  const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
-  const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
-  const {setLayout} = useLayoutStore();
-
-
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setChannelNameConfirmation(value);
-  };
-
-  const fetchDeleteChannel = async () => {
-    await deleteChannel({ channelId: channel.id });
-  };
-
-  useEffect(() => {
-    if (channelDeleted) {
-      setChannelInfoId(null);
-      setDeletedChannelId(channel.id);
-      setLayout({ currentRightPanelView: RightPanelView.DefaultView });
-    }
-  }, [channelDeleted]);
-  return(
-
-      <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
-        <ModalContent style={{zIndex: "9999999"}} className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg">
-          {(onClose) => (
-              <>
-                <ModalHeader className="flex flex-col gap-1">Delete Channel</ModalHeader>
-                <ModalBody>
-                  <p className="text-[13px] font-normal">
-                    Deleting the channel <strong>@{channel.name}</strong> ALL groups and messages will be deleted PERMANENTLY, do you wanna procceed?
-                  </p>
-                  <Input
-                      label="Channel name"
-                      type="text"
-                      placeholder="Write the name of the channel to delete"
-                      minLength={3}
-                      maxLength={100}
-                      value={channelNameConfirmation}
-                      labelPlacement="outside"
-                      isRequired={true}
-                      onChange={handleInputChange}
-                      errorMessage={"Input the channel name to confirm"}
-                      isInvalid={channel.name !== channelNameConfirmation}
-                  />
-                </ModalBody>
-                <ModalFooter>
-                  <Button size="sm" variant="light" onPress={onClose}>
-                    Cancel
-                  </Button>
-                  <Button
-                      isLoading={deletingChannel}
-                      isDisabled={channel.name !== channelNameConfirmation || deletingChannel} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
-                    Yes, delete this channel
-                  </Button>
-                </ModalFooter>
-              </>
-          )}
-        </ModalContent>
-      </Modal>
-  )
-}

@@ -46,7 +46,6 @@ export default function ExplorePage() {
 
                   <div className="flex w-full  gap-2 mt-5 justify-center items-center">
 
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                           <Input
                               value={filter}
                               labelPlacement="outside"
@@ -56,7 +55,6 @@ export default function ExplorePage() {
                               className={`w-[270px] max-md:w-full !text-[12px] `}
                               onChange={handleFilterChange}
                           />
-                      </motion.div>
 
 
 
@@ -129,7 +127,7 @@ const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
 
 if(loadingChannels) return <div className="flex   w-full justify-center"> <Spinner size="sm" variant="spinner"/></div>;
   return (
-    <motion.div className="flex w-full h-auto items-center justify-center">
+    <div className="flex w-full h-auto items-center justify-center">
         {channels.length === 0  ? <div className="flex  w-full justify-center"><p className="text-xs">No channels found</p> </div>:
         
             <div className="w-full h-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -141,7 +139,6 @@ if(loadingChannels) return <div className="flex   w-full justify-center"> <Spinn
                       userIsOverage={user !== null && user?.age >= 18} 
                       onJoin={handleChannelJoined} 
                       infoClicked={handleOnInfoClicked} 
-                      key={channel.id} 
                       channel={channel} 
                     />
 
@@ -155,7 +152,7 @@ if(loadingChannels) return <div className="flex   w-full justify-center"> <Spinn
             
         }
         
-    </motion.div>
+    </div>
   );
 };
 

@@ -1,14 +1,22 @@
-﻿using FluentValidation;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
+using SerpentineApi.Hubs;
 
 namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
 
-public class DeleteChannelMemberRequest : IRequest<OneOf<ChannelMemberResponse, Failure>>
+public class DeleteChannelMemberRequest : RequestWithUserCredentials, IRequest<OneOf<bool, Failure>>
 {
-    [Required]
-    public string TypeOfResponse { get; set; }
+    [JsonPropertyName("channelMemberId"), FromQuery(Name = "channelMemberId"), Description("The id of the membership to kick out")]
+    public Ulid? ChannelMemberId { get; set; }
+
+    
 }
 
 public class DeleteChannelMemberRequestValidator : AbstractValidator<DeleteChannelMemberRequest>
@@ -26,7 +34,7 @@ internal class DeleteChannelMemberEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete(
-                _settings.BaseUrl + "/test",
+                _settings.BaseUrl ,
                 async(
                     [AsParameters] DeleteChannelMemberRequest command,
                     EndpointExecutor < DeleteChannelMemberEndpoint > executor,
@@ -35,62 +43,100 @@ internal class DeleteChannelMemberEndpoint : IEndpoint
                     ISender sender,
                     HttpContext context
                 ) =>
-                    await executor.ExecuteAsync<string>(async () =>
+                    await executor.ExecuteAsync<bool>(async () =>
                     {
-                        await Task.CompletedTask;
-                        IApiResult result;
-                        switch (command.TypeOfResponse)
+                         command.SetCurrentUserId(
+                            UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
+                        );
+
+                        var result = await sender.SendAndValidateAsync(command, cancellationToken);
+
+                        if (result.IsT1)
                         {
-                            case "ok":
-                                result = new SuccessApiResult<string>("Ok");
-                                break;
+                            var failure = result.AsT1;
 
-                            case "not found":
-                                result = new NotFoundApiResult();
-                                break;
+                            return ResultsBuilder.Match(failure);
+                        }
 
-                            case "bad request":
-                                result = new BadRequestApiResult();
-                                break;
+                        var success = result.AsT0;
 
-                            case "conflict":
-                                result = new ConflictApiResult();
-                                break;
-
-                            case "validation":
-                                result = new ValidationApiResult();
-                                break;
-
-                            default:
-                                result = new BadRequestApiResult();
-                                break;                        }
-                        logger.LogError($"Fetch to {typeof(DeleteChannelMemberEndpoint).Name } endpoint failed. Reason: " + result.Message);
-                        return ResultsBuilder.Match<string>(result);
+                        return ResultsBuilder.Match<bool>(
+                            new SuccessApiResult<bool>(success)
+                        );
                     })
             )
-            .DisableAntiforgery()
-            .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
+             .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
             .RequireCors()
-            .Experimental()
+            .DisableAntiforgery()
+            .Stable()
             .WithOpenApi()
-            .Accepts<DeleteChannelMemberRequest>(false, "application/json")
-            .Produces<SuccessApiResult<ChannelMemberResponse>>(200)
-            .Produces<BadRequestApiResult>(400, "application/json")
-            .Produces<ServerErrorApiResult>(500, "application/json")
-            .Produces<ValidationApiResult>(422, "application/json")
-            .WithName(nameof(DeleteChannelMemberEndpoint));
+            .WithTags(new[] { nameof(ApiHttpVerbs.Delete), nameof(ChannelMember) })
+            .WithName(nameof(DeleteChannelMemberEndpoint))
+            .WithDescription(
+                $"Deletes a membership from a channel with a certain id. Requires authorization. Requires CORS"
+            )
+            .Produces<SuccessApiResult<bool>>(200, ApiContentTypes.ApplicationJson)
+            .Produces<UnauthorizedApiResult>(401, ApiContentTypes.ApplicationJson)
+            .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+            .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+            .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+            .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+            .Accepts<DeleteChannelMemberEndpoint>(false, ApiContentTypes.ApplicationJson);
     }
 }
 
-internal class DeleteChannelMemberEndpointHandler
-    : IEndpointHandler<DeleteChannelMemberRequest, OneOf<ChannelMemberResponse, Failure>>
+internal class DeleteChannelMemberEndpointHandler(
+
+    SerpentineDbContext context,
+    IHubContext<ActiveChannelsHub, IActiveChannelsHub> channelsHub
+
+)
+    : IEndpointHandler<DeleteChannelMemberRequest, OneOf<bool, Failure>>
 {
-    public async Task<OneOf<ChannelMemberResponse, Failure>> HandleAsync(
+    public async Task<OneOf<bool, Failure>> HandleAsync(
         DeleteChannelMemberRequest request,
         CancellationToken cancellationToken = default
     )
     {
-        await Task.CompletedTask;
-        return new NotFoundApiResult();
+        if (await context.ChannelMembers.AsNoTracking().FirstOrDefaultAsync(m => m.Id == request.ChannelMemberId) is var membership && membership is null)
+        {
+            return new NotFoundApiResult("Membership not found");
+        }
+
+        if (membership.IsOwner)
+        {
+            return new ForbiddenApiResult("The owner of the channel cannot be leave the channel");
+        }
+
+        var imOwnerOrAdmin = await context.ChannelMembers.AnyAsync(cm => cm.UserId == request.CurrentUserId && cm.ChannelId == membership.ChannelId && (cm.IsOwner || cm.IsAdmin));
+
+        if (!imOwnerOrAdmin && membership.UserId != request.CurrentUserId)
+        {
+            return new ForbiddenApiResult("You dont have permisson to remove this membership");
+        }
+
+        var deletedRows = await context.ChannelMembers.Where(cm => cm.Id == request.ChannelMemberId).ExecuteDeleteAsync(cancellationToken);
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        if (deletedRows >= 1 && imOwnerOrAdmin && membership.UserId != request.CurrentUserId)
+        {
+            var channels = await context.Channels.AsNoTracking().Where(ch => ch.Id == membership.ChannelId).Select(ch => new Channel()
+            {
+                Id = ch.Id,
+                Name = ch.Name
+
+
+            }).ToListAsync(cancellationToken);
+
+            if (channels.FirstOrDefault() is var channel && channel is not null)
+            {
+                await channelsHub.Clients.User(membership.UserId.ToString()).SendUserKickedOut(new HubResult<ChannelResponse>(channel.ToResponse()));
+            }
+        }
+
+        return deletedRows >= 1;
+
+
     }
 }
