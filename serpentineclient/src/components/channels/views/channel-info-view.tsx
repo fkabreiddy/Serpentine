@@ -213,9 +213,11 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
 }) => {
   const {  deletingChannel } = useDeleteChannel();
   const { setChannelInfoId, setChannelJoined, setUpdateChannelid } = useGlobalDataStore();
+  
   const {createChannelMember, joining,  setChannelMember, channelMember} = useCreateChannelMember();
   const {setLayout} = useLayoutStore();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [openLeaveChannelModal, setOpenLeaveChannelModal] = useState(false);
 
 
  
@@ -257,6 +259,10 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   
   return (
     <>
+
+      {channel.myMember && 
+       <LeaveChannelModal channelMember={channel.myMember}  open={openLeaveChannelModal} onOpenChanged={setOpenLeaveChannelModal}/>
+      }
       <DeleteChannelModal channel={channel}  open={openDeleteModal} onOpenChanged={setOpenDeleteModal}/>
       <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
       <DropdownTrigger>
@@ -328,6 +334,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
                 </DropdownItem> 
                 :
                 <DropdownItem
+                  onClick={() => setOpenLeaveChannelModal(true)}
                   color="danger"
                   key="leave"
                   endContent={
@@ -530,6 +537,68 @@ const DeleteChannelModal : React.FC<DeleteChannelModalProps> = ({open, channel, 
                     isLoading={deletingChannel}
                     isDisabled={channel.name !== channelNameConfirmation || deletingChannel} className="bg-red-700 text-white" size="sm" onPress={fetchDeleteChannel}>
                   Yes, delete this channel
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    )
+}
+
+
+interface LeaveChannelModalProps{
+    open: boolean
+    onOpenChanged?: (change:boolean) => void;
+    channelMember: ChannelMemberResponse
+}
+
+const LeaveChannelModal : React.FC<LeaveChannelModalProps> = ({open, channelMember, onOpenChanged}) =>{
+
+    const { deleteChannelMember, deletingChannelMember, channelMemberDeleted } = useDeleteChannelMember();
+    const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
+    const [channelNameConfirmation, setChannelNameConfirmation] = useState<string>("");
+     const {setLayout} = useLayoutStore();
+
+
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setChannelNameConfirmation(value);
+    };
+
+    const fetchLeaveChannel = async () => {
+      await deleteChannelMember({ channelMemberId: channelMember.id });
+    };
+
+    useEffect(() => {
+      if (channelMemberDeleted) {
+        setChannelInfoId(null);
+        setDeletedChannelId(channelMember.channelId);
+        setLayout({ currentRightPanelView: RightPanelView.DefaultView });
+      }
+    }, [channelMemberDeleted]);
+    return(
+
+        <Modal style={{zIndex: "9999999"}} isOpen={open} onOpenChange={onOpenChanged}>
+        <ModalContent style={{zIndex: "9999999"}} className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg">
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Delete Channel</ModalHeader>
+              <ModalBody>
+                <p className="text-[13px] font-normal">
+                 Are you sure that you wanna leave the this channel?
+                </p>
+                
+              </ModalBody>
+              <ModalFooter>
+                <Button size="sm" variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                    isLoading={deletingChannelMember}
+                    isDisabled={deletingChannelMember} className="bg-red-700 text-white" size="sm" onPress={fetchLeaveChannel}>
+                  Yes, leave this channel
                 </Button>
               </ModalFooter>
             </>
