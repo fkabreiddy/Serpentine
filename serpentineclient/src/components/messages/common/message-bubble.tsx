@@ -3,17 +3,20 @@ import UserAvatar from "@/components/users/common/user-avatar";
 import { useDateHelper } from "@/helpers/relative-date-helper";
 import { MessageResponse } from "@/models/responses/message-response";
 import { motion } from "framer-motion";
-import { EditIcon, InfoIcon, ReplyIcon, TrashIcon } from "lucide-react";
+import { BellIcon, EditIcon, InfoIcon, MessageCircleIcon, ReplyIcon, TrashIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Stack from "./message-image-stack";
 
-interface MessageBubbleProps
+type MessageBubbleProps =
 {
     message: MessageResponse
     withImage?: boolean
+    isAdmin: boolean;
+    isOwner: boolean;
+    userId: string;
 }
 
-export default function MessageBubble({message, withImage}:MessageBubbleProps)
+export default function MessageBubble({message, isAdmin = false, isOwner = false, userId = "", withImage}:MessageBubbleProps)
 {
 
     const {getRelativeDate} = useDateHelper();
@@ -50,10 +53,19 @@ export default function MessageBubble({message, withImage}:MessageBubbleProps)
         onContextMenu={(e)=>{ e.stopPropagation(); e.preventDefault(); setClicked(true) } }
         className={`w-full transition-all flex gap-3 items-start group  ${clicked ? "bg-neutral-100 dark:bg-neutral-950" : "hover:bg-neutral-100/50 hover:dark:bg-neutral-950/50"} p-3 rounded-lg`}
         >
+            {message.isNotification ? 
+            <div className="size-[28px] shrink-0 bg-yellow-500 text-white  rounded-full flex justify-center items-center">
+                <MessageCircleIcon className="size-[16px] fill-white"/>
+            </div>  :            
             <UserAvatar  src={message?.senderProfilePictureUrl ?? "" } userNameFallback={message?.senderUsername ?? "fka.breiddy"} />
+}
             <div className="w-full flex flex-col gap-1">
                 <div className={"w-full flex gap-3 items-start opacity-50"}>
-                    <strong className="text-[13px] font-normal ">@{message?.senderUsername}</strong>
+                    {!message.isNotification ?
+                     <strong className="text-[13px] font-normal ">@{message?.senderUsername}</strong>
+                     :
+                     <div className="dark:bg-neutral-900 bg-neutral-200 rounded-md px-2 text-[12px]">Notification</div>
+                    }   
                     <label className="text-[13px] font-normal ">{(() => {
                         const date = new Date(message.createdAt);
                         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} (${getRelativeDate(date)})`;
@@ -88,13 +100,16 @@ export default function MessageBubble({message, withImage}:MessageBubbleProps)
                 )}
 
                 {
-                    clicked &&
+                    clicked && !message.isNotification &&
                 
                     <div  className=" mt-3 w-full  gap-2 flex">
-                    <RemoveButton />
-                    <ReplyButton/>
-                    <EditButton/>
-                    <ReportButton/>
+                        {(isOwner || isAdmin || message.senderId === userId) &&    <RemoveButton />}
+                      
+                        <ReplyButton/>
+
+                        {message.senderId === userId &&   <EditButton/>}
+                    
+                        <ReportButton/>
                     </div>
                 }
 

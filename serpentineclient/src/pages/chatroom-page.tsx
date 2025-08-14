@@ -81,8 +81,8 @@ export default function ChatroomPage(){
                    <CurrentGroupChatroomInfo group={group}/>
                 }
 
-                {group && 
-                    <MessagesContainer groupId={group.id}/>
+                {(group && channelMember) &&
+                    <MessagesContainer channelMember={channelMember} groupId={group.id}/>
                 }
 
                 <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>

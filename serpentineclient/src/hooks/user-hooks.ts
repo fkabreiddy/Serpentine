@@ -113,11 +113,11 @@ export function useGetByUsername() {
         }
 
         if (result.data && result.isSuccess) {
-            handleApiErrors({data: null, message: "Another user with this username is already in use", resultTitle: "Conflict",  statusCode: 409, isSuccess: false, errors: ["This username is already in use"]});
+            handleApiErrors({data: null, message: "Another user with this username is already in use",  statusCode: 409, isSuccess: false, errors: ["This username is already in use"]});
             
         } else if (result.statusCode === 404) {
             setIsAvailable(true);
-            handleApiSuccess({data: null, message: "Your username is available", resultTitle: "Got it", statusCode: 200, isSuccess: true, errors: []})
+            handleApiSuccess({data: null, message: "Your username is available", statusCode: 200, isSuccess: true, errors: []})
         }
         else
         {

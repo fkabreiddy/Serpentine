@@ -6,6 +6,7 @@ import {handleApiErrors, handleApiSuccess} from "@/helpers/api-results-handler-h
 import {CreateGroupRequest} from "@/models/requests/groups/create-group-request.ts";
 import {MessageResponse} from "@/models/responses/message-response.ts";
 import {CreateMessageRequest} from "@/models/requests/messages/create-message-request.ts";
+import { getCiphers } from "node:crypto";
 
 const MESSAGES_ENDPOINT = "messages"
 
@@ -55,4 +56,60 @@ export function useCreateMessage() {
     };
 
     return { createMessage, message, creatingMessage};
+}
+
+//queries
+export function useGetMessagesByGroupId() {
+
+    const [messages, setMessages] = useState<MessageResponse[]>([]);
+    const [fetchingMessages, setFetchingMessages] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<MessageResponse[]> | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const { get } = useFetch<MessageResponse[]>();
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            setFetchingMessages(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+            setMessages((prev)=>[...prev, ...(result.data ?? [])]);
+
+            if(result.data.length <= 14)
+            {
+                setHasMore(false);
+            }
+
+
+        }
+        else {
+
+            handleApiErrors(result);
+            setHasMore(false);
+        }
+
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const getMessagesByGroupId = async (data: GetMessagesByGroupIdRequest) => {
+
+        console.log(data);
+        setResult(null);
+        setFetchingMessages(true);
+    
+        const response = await get({endpoint: MESSAGES_ENDPOINT + "/by-group-id", contentType: "application/json"}, data );
+        setResult(response);
+
+
+
+    };
+
+    return { getMessagesByGroupId, hasMore, messages, fetchingMessages, setMessages};
 }

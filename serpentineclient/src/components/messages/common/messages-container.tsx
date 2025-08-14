@@ -1,57 +1,126 @@
 import { motion } from "motion/react";
 import MessageBubble from "./message-bubble";
-import { ScrollShadow } from "@heroui/react";
-import {useActiveChannelsHubStore} from "@/contexts/active-channels-hub-context.ts";
-import {useEffect, useRef, useState} from "react";
-import {MessageResponse} from "@/models/responses/message-response.ts";
+import { ScrollShadow, spinner, Spinner } from "@heroui/react";
+import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context.ts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MessageResponse } from "@/models/responses/message-response.ts";
 import { HubResult } from "@/models/hub-result";
+import { useGetMessagesByGroupId } from "@/hooks/message-hooks";
+import { useAuthStore } from "@/contexts/authentication-context";
+import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
+import { channel } from "diagnostics_channel";
 
 interface MessagesContainerProps {
-    
-    groupId: string;
+  groupId: string;
+  channelMember: ChannelMemberResponse;
 }
-export default function MessagesContainer({groupId}:MessagesContainerProps)
-{
+export default function MessagesContainer({ groupId, channelMember }: MessagesContainerProps) {
+  const {
+    messages,
+    setMessages,
+    hasMore,
+    fetchingMessages,
+    getMessagesByGroupId,
+  } = useGetMessagesByGroupId();
+
+  const {user} = useAuthStore();
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const { activeChannelsHub } = useActiveChannelsHubStore();
+  const firstRender = useRef(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchMessages = async () => {
+    if (!groupId) return;
+
+    await getMessagesByGroupId({
+      groupId: groupId,
+      take: 15,
+      skip: messages?.length,
+    });
+  };
+
+  useEffect(()=>{
+
+    if(!groupId) return;
     
-    const [messages, setMessages]= useState<MessageResponse[]>([])
+    setIsMounted(true);
 
-    const {activeChannelsHub} = useActiveChannelsHubStore();
-    const firstRender = useRef(false);
+  },[groupId])
 
-    useEffect(() => {
 
-        if (!activeChannelsHub) return;
+  useEffect(()=>{
 
-        const handleMessageRecieved = (result : HubResult<MessageResponse>) =>
-        {
-            if(!result.data ) return;
+    if(firstRender.current || !isMounted ) return;
 
-            if(result.data.groupId !== groupId) return;
-            
-            setMessages((prev) => [...prev, result.data as MessageResponse]);
-            
-            
+    firstRender.current = true;
+    fetchMessages();
+  },[isMounted])
+
+
+
+  const observeLastElement = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (fetchingMessages) return;
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchMessages();
         }
+      });
 
-        activeChannelsHub.on("SendMessage",  handleMessageRecieved );
+      if (node) observerRef.current.observe(node);
+      lastElementRef.current = node;
+    },
+    [fetchingMessages, hasMore, fetchMessages]
+  );
 
-        return () => {
-            activeChannelsHub.off("SendMessage",  handleMessageRecieved );
-        };
-    }, []);
+  useEffect(() => {
+    if (!activeChannelsHub) return;
 
-    return(
-        <motion.div className="flex justify-center pt-[60px]  pb-[140px] w-full  h-full ">
-               
-               <ScrollShadow className="w-[70%]  max-md:w-[90%] overflow-scroll  ">
+    const handleMessageRecieved = (result: HubResult<MessageResponse>) => {
+      if (!result.data) return;
 
-                   {messages.map((message, _)=>(
-                       
-                       <MessageBubble message={message} key={message.id.toString()}/>
-                   ))}
+      if (result.data.groupId !== groupId) return;
 
+      setMessages((prev) => [ result.data as MessageResponse, ...prev]);
+    };
 
-               </ScrollShadow>
-        </motion.div>
-    )
+    activeChannelsHub.on("SendMessage", handleMessageRecieved);
+
+    return () => {
+      activeChannelsHub.off("SendMessage", handleMessageRecieved);
+    };
+  }, []);
+
+  return (
+    <motion.div className="flex justify-center pt-[60px]  pb-[120px] w-full  h-full ">
+
+        {!isMounted ? 
+            <Spinner size="sm" variant="spinner"/> :
+            <ScrollShadow className="w-[70%] flex-col-reverse flex pb-[10px] max-md:w-[90%] overflow-scroll  ">
+                {messages.map((message, idx) => {
+                    const isLast = idx === messages.length - 1;
+
+                    return (
+                        <div
+                        ref={isLast ? observeLastElement : null}
+                        className="w-full"
+                        key={message.id.toString()}
+                        >
+                            <MessageBubble userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
+                        </div>
+                    );
+                })}
+
+                <>
+                  {fetchingMessages && <Spinner size="sm" variant="spinner"/>}
+                    {!fetchingMessages && messages.length <= 0 && <label>Start the conversation</label>}
+                </>
+              
+            </ScrollShadow>
+        }
+    </motion.div>
+  );
 }

@@ -60,55 +60,57 @@ using System.Text.Json.Serialization;
             private readonly MessageEndpointSettings _settings = new();
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapPost(
-                    _settings.BaseUrl ,
-                    async(
-                        [FromForm] CreateMessageRequest command,
-                        EndpointExecutor<CreateEndpoint> executor,
-                        CancellationToken cancellationToken,
-                        ISender sender,
-                        HttpContext context,
-                        IHubContext<ActiveChannelsHub, IActiveChannelsHub> channelsHub
-                    ) => await executor.ExecuteAsync<MessageResponse>(async () =>
-                    {
-                        
-                        command.SetCurrentUserId(
-                            UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
-                        );
-                        var result = await sender.SendAndValidateAsync(command, cancellationToken);
+        app.MapPost(
+            _settings.BaseUrl,
+            async (
+                [FromForm] CreateMessageRequest command,
+                EndpointExecutor<CreateEndpoint> executor,
+                CancellationToken cancellationToken,
+                ISender sender,
+                HttpContext context,
+                IHubContext<ActiveChannelsHub, IActiveChannelsHub> channelsHub
+            ) => await executor.ExecuteAsync<MessageResponse>(async () =>
+            {
 
-                        if (result.IsT1)
-                        {
-                            var t1 = result.AsT1;
+                command.SetCurrentUserId(
+                    UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
+                );
+                var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
-                            return ResultsBuilder.Match(t1);
+                if (result.IsT1)
+                {
+                    var t1 = result.AsT1;
 
-                        }
+                    return ResultsBuilder.Match(t1);
 
-                        var t0 = result.AsT0;
+                }
 
-                        if (t0.ChannelId is not null)
-                        { 
-                            await channelsHub.Clients.Group(t0.ChannelId.ToString() ?? string.Empty).SendMessage(new HubResult<MessageResponse>(t0));
+                var t0 = result.AsT0;
 
-                        }
-                        
-                        return ResultsBuilder.Match<MessageResponse>(new SuccessApiResult<MessageResponse>(t0));
+                if (t0.ChannelId is not null)
+                {
+                    await channelsHub.Clients.Group(t0.ChannelId.ToString() ?? string.Empty).SendMessage(new HubResult<MessageResponse>(t0));
 
-                    })
-                )
-                .DisableAntiforgery()
-                .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
-                .RequireCors()
-                .Experimental()
-                .WithOpenApi()
-                .WithDescription("Requires Authorization. \n Requires CORS.")
-                .WithTags(new string[]{nameof(ApiHttpVerbs.Put), nameof(Message)})
-                .Accepts<CreateMessageRequest>(false, ApiContentTypes.MultipartForm)
-                .Produces<SuccessApiResult<MessageResponse>>(200, ApiContentTypes.ApplicationJson)
-                .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
-                .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
-                .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+                }
+
+                return ResultsBuilder.Match<MessageResponse>(new SuccessApiResult<MessageResponse>(t0));
+
+            })
+        )
+        .DisableAntiforgery()
+        .RequireAuthorization(nameof(AuthorizationPolicies.AllowAllUsers))
+        .RequireCors()
+        .Stable()
+        .WithOpenApi()
+        .WithDescription("Creates a message ina  group and send it through signalr. Requires Authorization. \n Requires CORS.")
+        .WithTags(new string[] { nameof(ApiHttpVerbs.Put), nameof(Message) })
+        .Accepts<CreateMessageRequest>(false, ApiContentTypes.MultipartForm)
+        .Produces<SuccessApiResult<MessageResponse>>(200, ApiContentTypes.ApplicationJson)
+        .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
+        .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
+        .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
+                .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
+                .Produces<ForbiddenApiResult>(403, ApiContentTypes.ApplicationJson)
                 .WithName(nameof(CreateEndpoint));
             }
         }

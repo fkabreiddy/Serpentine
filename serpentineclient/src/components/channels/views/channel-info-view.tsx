@@ -378,7 +378,7 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
   const {getChannelMembersByChannelId, setChannelMembers, hasMore, channelMembers, loadingChannelMembers} = useGetChannelMembersByChannelId();
   const firstRender = useRef(false);
 
-   const observerRef = useRef<IntersectionObserver | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
 
  const fetchChannelMembers = async () =>{
@@ -436,7 +436,6 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
                 channelMembers.map((cm, idx)=>
 
                   {
-                    const isLast = idx === channelMembers.length - 1;
 
                     return(
 

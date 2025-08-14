@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { ChannelResponse } from "@/models/responses/channel-response.ts";
 import { GroupResponse } from "@/models/responses/group-response.ts";
+import { MessageResponse } from "@/models/responses/message-response";
 
 interface GlobalData {
   createChannelGroupData: { channelId: string; channelName: string } | null;
@@ -21,6 +22,8 @@ interface GlobalData {
   setUpdateChannelid: (channelId : string | null) => void;
   updatedChannel: ChannelResponse | null;
   setUpdatedChannel: (channelId: ChannelResponse | null) => void;
+  newUnreadMessage: MessageResponse | null;
+  setNewUnreadMessage: (message: MessageResponse | null) => void;
   clearGlobalData: ()=>void
 }
 
@@ -33,6 +36,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   channelJoined: null,
   updateChannelId: null,
   updatedChannel: null, 
+  newUnreadMessage: null,
 
   setDeletedChannelId: (id: string | null) => {
     set((state) => ({
@@ -86,6 +90,13 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     set((state) => ({
       ...state,
       updatedChannel: channel,
+    }));
+  },
+
+     setNewUnreadMessage: (message: MessageResponse | null) => {
+    set((state) => ({
+      ...state,
+      newUnreadMessage: message,
     }));
   },
 

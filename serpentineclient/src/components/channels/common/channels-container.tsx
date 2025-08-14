@@ -37,7 +37,7 @@ export default function ChannelsContainer({
     return (
       <ScrollShadow
         orientation="horizontal"
-        className={` ${layout.sideBarExpanded ? "w-full flex-row items-start" : "w-fit flex-col items-center"} flex  gap-7  overflow-auto scrollbar-hide py-2  `}
+        className={` ${layout.sideBarExpanded ? "w-full flex-row items-start gap-7 " : "w-fit flex-col items-center gap-2"} flex   overflow-auto scrollbar-hide py-2  `}
       >
         <Tooltip content={"Create a channel"} showArrow={true} size={"sm"} placement={"right"}>
           <button
