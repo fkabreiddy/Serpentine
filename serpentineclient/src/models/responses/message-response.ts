@@ -2,14 +2,19 @@
 import {UserResponse} from "@/models/responses/user-response.ts";
 
 export class MessageResponse extends BaseResponse {
-   
-    content: string  = "";
-    senderId: string | null = "" ;
-    sender: UserResponse | null = null;
-    groupId: string = "";
-    parent: MessageResponse | null = null;
-    parentId: string | null = "";
+
+    content: string = "";
+    senderId?: string= ""; 
+    groupId: string= "";   
+    parentId?: string= ""; 
     isNotification: boolean = false;
+    senderName?: string = "";
+    senderProfilePictureUrl?: string = "";
+    senderUsername?: string = "";
+    parentContent?: string = "";
+    groupName?: string = "";
+    channelName?: string = "";
+    channelId?: string = "";
     
     constructor(init?: Partial<MessageResponse>) {
         super(init);

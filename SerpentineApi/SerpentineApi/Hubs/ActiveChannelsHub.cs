@@ -97,5 +97,7 @@ public interface IActiveChannelsHub
 
     public Task SendUserKickedOut(HubResult<ChannelResponse> channel);
 
+    public Task SendMessage(HubResult<MessageResponse> message);
+
 
 }

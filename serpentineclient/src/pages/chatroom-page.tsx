@@ -9,6 +9,8 @@ import { useGetGroupById } from "@/hooks/group-hooks";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {useActiveChannelsHubStore} from "@/contexts/active-channels-hub-context.ts";
+import { MessageCircleIcon } from "lucide-react";
 
 export default function ChatroomPage(){
 
@@ -16,8 +18,10 @@ export default function ChatroomPage(){
     const {groupId} = useParams();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
-    const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
     
+    const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
+
+  
     
     const fetchGroup = async(id: string)=>{
 
@@ -67,6 +71,8 @@ export default function ChatroomPage(){
             fetchPermisson(group.channelId);
         }
     },[group])
+    
+    
     return(
         <>
             <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
@@ -74,7 +80,10 @@ export default function ChatroomPage(){
                 {group && 
                    <CurrentGroupChatroomInfo group={group}/>
                 }
-                <MessagesContainer/>
+
+                {group && 
+                    <MessagesContainer groupId={group.id}/>
+                }
 
                 <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
             </ScrollShadow>
@@ -83,3 +92,8 @@ export default function ChatroomPage(){
       
     )
 } 
+
+export const MessageBubbleIcon = () =>(
+    
+    <MessageCircleIcon size={16}/>
+);

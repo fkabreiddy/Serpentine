@@ -1,4 +1,7 @@
-﻿namespace SerpentineApi.DataAccess.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using SerpentineApi.Features.MessageFeatures.Actions;
+
+namespace SerpentineApi.DataAccess.Models;
 
 public class Message : BaseEntity
 {
@@ -13,16 +16,52 @@ public class Message : BaseEntity
 
     public bool IsNotification { get; set; } = false;
     public List<Message> Replies { get; set; } = new();
+    
+    [NotMapped]
+    public string? SenderName { get; set; }
+    
+    [NotMapped]
+    public string? SenderProfilePictureUrl { get; set; }
+    
+    [NotMapped]
+    public string? SenderUsername { get; set; }
+    
+    [NotMapped]
+    public IEnumerable<char>? ParentContent { get; set; }
+    
+    [NotMapped]
+    public Ulid? ChannelId { get; set; }
+    
+    [NotMapped]
+    public string? GroupName { get; set; }
+    
+    [NotMapped]
+    public string? ChannelName {get; set;}
 
+
+
+    public static Message Create(CreateMessageRequest request) => new()
+    {
+        Content = request.Content,
+        ParentId = request.ParentId,
+        SenderId = request.IsNotification ? null : request.CurrentUserId,
+        GroupId = request.GroupId,
+        IsNotification = request.IsNotification
+    };
     public MessageResponse ToResponse() => new()
     {
-        Sender = Sender?.ToResponse() ?? null,
-        Parent = Parent?.ToResponse() ?? null,
+        SenderName = SenderName ?? null,
+        SenderUsername = SenderUsername ?? null,
+        SenderProfilePictureUrl = SenderProfilePictureUrl ?? null,
+        ParentContent = ParentContent is not null ? new string(ParentContent.ToArray()) : null,
         Content = Content,
         GroupId = GroupId,
         IsNotification = IsNotification,
         SenderId = SenderId,
         ParentId = ParentId,
+        ChannelId = ChannelId,
+        GroupName = GroupName,
+        ChannelName = ChannelName,
         Id = Id,
         CreatedAt = CreatedAt,
         UpdatedAt = UpdatedAt

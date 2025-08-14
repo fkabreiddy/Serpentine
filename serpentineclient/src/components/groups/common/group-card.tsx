@@ -37,8 +37,8 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index }) => {
               {group.lastMessage ? (
                 <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
                   <strong>
-                    {group.lastMessage.sender !== null &&
-                      group.lastMessage.sender.username}{" "}
+                    {
+                      group.lastMessage.senderUsername}{" "}
                   </strong>
                   {group.lastMessage && group.lastMessage.content}
                 </span>

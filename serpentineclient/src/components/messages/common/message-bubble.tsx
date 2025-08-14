@@ -9,7 +9,7 @@ import Stack from "./message-image-stack";
 
 interface MessageBubbleProps
 {
-    message?: MessageResponse
+    message: MessageResponse
     withImage?: boolean
 }
 
@@ -26,7 +26,6 @@ export default function MessageBubble({message, withImage}:MessageBubbleProps)
     ]);
 
   const [showMoreContent, setShowMoreContent] = useState(false);
-    const content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget dolor sapien. Integer diam dolor, consequat quis massa ac, commodo consectetur metus. Duis sem massa, consectetur eget sodales ac, pellentesque luctus erat. Sed pretium accumsan odio sit amet commodo. Quisque tempor cursus vulputate. Etiam ornare consectetur ex. Etiam sapien nibh, vestibulum eget libero et, posuere rhoncus ipsum. Ut et justo vitae dolor tincidunt consequat. Vestibulum vitae viverra ligula, ac gravida ex. Suspendisse semper ex libero. Nullam at feugiat nisi, vitae laoreet urna. Aenean posuere eros vitae feugiat lobortis. Sed feugiat iaculis elit eu cursus. Donec hendrerit enim sed congue tempor.";
     const messageBubbleDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,11 +50,15 @@ export default function MessageBubble({message, withImage}:MessageBubbleProps)
         onContextMenu={(e)=>{ e.stopPropagation(); e.preventDefault(); setClicked(true) } }
         className={`w-full transition-all flex gap-3 items-start group  ${clicked ? "bg-neutral-100 dark:bg-neutral-950" : "hover:bg-neutral-100/50 hover:dark:bg-neutral-950/50"} p-3 rounded-lg`}
         >
-            <UserAvatar  src={message?.sender?.profilePictureUrl ?? "" } userNameFallback={message?.sender?.username ?? "fka.breiddy"} />
+            <UserAvatar  src={message?.senderProfilePictureUrl ?? "" } userNameFallback={message?.senderUsername ?? "fka.breiddy"} />
             <div className="w-full flex flex-col gap-1">
                 <div className={"w-full flex gap-3 items-start opacity-50"}>
-                    <strong className="text-[13px] font-normal ">@fka.breiddy</strong>
-                    <label className="text-[13px] font-normal ">(8 hrs ago)</label>
+                    <strong className="text-[13px] font-normal ">@{message?.senderUsername}</strong>
+                    <label className="text-[13px] font-normal ">{(() => {
+                        const date = new Date(message.createdAt);
+                        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} (${getRelativeDate(date)})`;
+                    })()}
+                    </label>
 
                 </div>
 
@@ -72,10 +75,10 @@ export default function MessageBubble({message, withImage}:MessageBubbleProps)
                 <p
                 className={`w-full font-normal opacity-80 text-[13px] whitespace-pre-line  text-ellipsis overflow-hidden ${showMoreContent ? "" : "line-clamp-3"}`}
                 >
-                  {content}
+                  {message.content}
                 </p>
 
-                {content.length >= 100 && (
+                {message.content.length >= 100 && (
                     <a
                     className="text-blue-500 text-xs cursor-pointer"
                     onClick={(e) => {e.stopPropagation(); setShowMoreContent(!showMoreContent);}}

@@ -7,11 +7,14 @@ import { HubConnectionState } from "@microsoft/signalr";
 import { ArrowRight, FilePlusIcon, ImagePlus } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import {useCreateMessage} from "@/hooks/message-hooks.ts";
+import { CreateMessageRequest } from "@/models/requests/messages/create-message-request";
 
 interface SendMessageBarProps {
   group: GroupResponse | null;
   loading: boolean;
   hasPermisson?: boolean;
+  
 }
 export default function SendMessageBar({
   group,
@@ -20,9 +23,48 @@ export default function SendMessageBar({
 }: SendMessageBarProps) {
   const textArea = useRef<HTMLTextAreaElement | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [createMessageRequest, setCreateMessageRequest] = useState<CreateMessageRequest>({
+    
+    content: "",
+    isNotification: false,
+    groupId: group?.id ?? ""
+  })
   const { activeChannels, activeChannelsHubsState } =
     useActiveChannelsHubStore();
+  
+  const {createMessage, creatingMessage} = useCreateMessage();
 
+  useEffect(()=>{
+    
+    if(!group) return;
+
+    setCreateMessageRequest((prev)=>({...prev, groupId: group.id}));
+
+  },[group])
+  async function fetchCreateMessage(){
+
+    const formData = new FormData();
+    Object.entries(createMessageRequest).forEach(([key, value]) => {
+      if (value instanceof File || value === null) {
+        if (value) formData.append(key, value);
+      } else {
+        formData.append(key, value as string);
+      }
+    });
+    
+    console.log(formData);
+
+    await createMessage(formData);
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCreateMessageRequest((prev)=>({...prev, content: e.target.value}));
+  };
+  
+  
+  
+
+    
  
 
   useEffect(() => {
@@ -37,6 +79,8 @@ export default function SendMessageBar({
         className={`w-[70%]   backdrop-blur-xl backdrop-opacity-70  h-fit max-h-[400px] dark:bg-neutral-900/20 bg-neutral-300/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900 border-neutral-100 `}
       >
         <textarea
+            value={createMessageRequest.content}
+            onChange={handleChange}
           ref={textArea}
           disabled={loading || !group || !hasPermisson}
           className=" w-full p-3 border-0 !outline-none !bg-transparent resize-none"
@@ -67,10 +111,10 @@ export default function SendMessageBar({
               <ImagePlus className="size-[16px] " />
             </IconButton>
 
-            {loading ? (
+            {loading || creatingMessage ? (
               <Spinner size="sm" variant="spinner" />
             ) : (
-              <IconButton disabled={true} onClick={() => {}} tooltipText="Send">
+              <IconButton  disabled={(createMessageRequest.content.length < 1 && createMessageRequest.content.length > 1000) || creatingMessage } onClick={() => {fetchCreateMessage()}} tooltipText="Send">
                 <motion.div
                   key="send-icon"
                   whileHover={{ rotate: -40 }}

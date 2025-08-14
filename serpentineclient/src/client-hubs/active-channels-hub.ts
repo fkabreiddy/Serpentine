@@ -10,6 +10,10 @@ import ChannelBanResponse from "@/models/responses/channel-ban-response";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { color } from "framer-motion";
+import {MessageResponse} from "@/models/responses/message-response.ts";
+import { useParams } from "react-router-dom";
+import { showMessageNotification } from "../helpers/sonner-helper";
+import { LucideToggleRight } from "lucide-react";
 
 export function useActiveChannels() {
   const {
@@ -22,6 +26,7 @@ export function useActiveChannels() {
   } = useActiveChannelsHubStore();
   const { setDeletedChannelId} = useGlobalDataStore();
   const {getToken} = useJwtHelper();
+  const {groupId}=useParams();
 
 
   function handleSendUserBanned(ban: ChannelBanResponse | null){
@@ -32,6 +37,21 @@ export function useActiveChannels() {
 
     
   }
+
+  function handleSendMessage(message: MessageResponse | null){
+
+        console.log(message);
+
+    if(!message) return;
+    console.log("notification");
+    
+    showMessageNotification({title: `${message.channelName} > ${message.groupName}`, description: `  @${message.senderUsername}: ${message.content.substring(0, 50)}`});
+
+
+  }
+
+
+
 
   function handleSendChannelRemoved(channelId: string | null){
 
@@ -89,7 +109,7 @@ export function useActiveChannels() {
     activeChannelsHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
     activeChannelsHub.on("SendChannelRemoved", (result: HubResult<string>)=> handleSendChannelRemoved(result.data))
     activeChannelsHub.on("SendUserKickedOut", (result: HubResult<ChannelResponse>)=> handleSendChannelMemberKickedOut(result.data))
-
+    activeChannelsHub.on("SendMessage", (result: HubResult<MessageResponse>) => handleSendMessage(result.data));
 
   };
 
@@ -98,6 +118,8 @@ export function useActiveChannels() {
     activeChannelsHub.off("SendUserBanned")
     activeChannelsHub.off("SendChannelRemoved")
     activeChannelsHub.off("SendUserKickedOut")
+    activeChannelsHub.off("SendMessage");
+
 
   };
 
@@ -144,7 +166,7 @@ export function useActiveChannels() {
       newHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
       newHub.on("SendChannelRemoved", (result: HubResult<string>)=> handleSendChannelRemoved(result.data))
       newHub.on("SendUserKickedOut", (result: HubResult<ChannelResponse>)=> handleSendChannelMemberKickedOut(result.data))
-
+      newHub.on("SendMessage", ( result: HubResult<MessageResponse>)=> handleSendMessage(result.data) );
 
 
       await newHub.start();
