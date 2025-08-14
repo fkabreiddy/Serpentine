@@ -23,9 +23,7 @@ export default function SendMessageBar({
   const { activeChannels, activeChannelsHubsState } =
     useActiveChannelsHubStore();
 
-  function autoGrow(element: HTMLTextAreaElement | null) {
-    if (element) element.style.height = element.scrollHeight + "px";
-  }
+ 
 
   useEffect(() => {
     setIsListening(!!activeChannels.find((ch) => ch === group?.channelId));
@@ -45,7 +43,6 @@ export default function SendMessageBar({
           maxLength={1000}
           style={{ backgroundColor: "transparent !important", border: "0" }}
           autoCorrect="false"
-          onInput={() => autoGrow(textArea.current)}
           minLength={1}
           required={true}
         />

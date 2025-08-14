@@ -2,6 +2,7 @@ import DotsPatter from "@/components/common/dots-pattern";
 import WarmBeigeBg from "@/components/common/warm-beige-bg";
 import CurrentGroupChatroomInfo from "@/components/groups/common/current-group-chatroom-info";
 import SendMessageBar from "@/components/groups/common/send-message-bar";
+import MessagesContainer from "@/components/messages/common/messages-container";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useGetChannelMemberByUserAndChannelId } from "@/hooks/channel-member-hooks";
 import { useGetGroupById } from "@/hooks/group-hooks";
@@ -73,6 +74,7 @@ export default function ChatroomPage(){
                 {group && 
                    <CurrentGroupChatroomInfo group={group}/>
                 }
+                <MessagesContainer/>
 
                 <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
             </ScrollShadow>

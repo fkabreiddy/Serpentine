@@ -5,6 +5,7 @@ type IconButtonProps = {
   children: React.ReactNode;
   tooltipText: string;
   placement?: "top" | "bottom" | "left" | "right";
+  withGrainyTexture?: boolean
 } & React.ButtonHTMLAttributes<HTMLDivElement>;
 
 export default function IconButton({
@@ -12,6 +13,7 @@ export default function IconButton({
   onClick,
   placement = "bottom",
   tooltipText: tootltipText,
+  withGrainyTexture = true,
   ...rest
 }: IconButtonProps) {
   return (
@@ -25,7 +27,10 @@ export default function IconButton({
           className={`!max-w-fit p-[5px]   backdrop-blur-xl  rounded-full dark:bg-neutral-900/50 bg-neutral-200/50 !text-neutral-600 dark:!text-neutral-300 cursor-pointer max-h-9 border border-neutral-300 dark:border-neutral-800 transition-all text-sm font-semibold`}
           
         >
-          <div className="grain w-4 h-4 absolute inset-0 opacity-50 rounded-lg" />
+
+          {withGrainyTexture && 
+            <div className="grain w-4 h-4 absolute inset-0 opacity-50 rounded-lg" />
+          }
           {children}
         </div>
       </Tooltip>

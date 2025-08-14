@@ -25,6 +25,7 @@ input, select, textarea {
 
 input, textarea {
     font-size: 13px !important;
+    field-sizing: content;
 }
 
 label {
