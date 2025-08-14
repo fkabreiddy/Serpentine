@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {useActiveChannelsHubStore} from "@/contexts/active-channels-hub-context.ts";
 import { MessageCircleIcon } from "lucide-react";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 
 export default function ChatroomPage(){
 
@@ -18,10 +19,28 @@ export default function ChatroomPage(){
     const {groupId} = useParams();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
+    const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage} = useGlobalDataStore();
     
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
 
   
+    useEffect(()=>{
+
+    
+        if(groupId)
+        {
+            console.log(groupId);
+            setCurrentGroupIdAtChatroomPage(groupId);
+        }
+
+        return()=>{
+
+            setCurrentGroupIdAtChatroomPage(null);
+        }
+
+      
+    },[groupId])
+    
     
     const fetchGroup = async(id: string)=>{
 
@@ -95,5 +114,5 @@ export default function ChatroomPage(){
 
 export const MessageBubbleIcon = () =>(
     
-    <MessageCircleIcon size={16}/>
+    <MessageCircleIcon size={28}/>
 );

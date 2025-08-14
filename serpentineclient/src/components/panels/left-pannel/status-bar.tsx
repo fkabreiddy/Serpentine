@@ -4,7 +4,7 @@ import { useAuthStore } from "@/contexts/authentication-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
 import {
-  useActiveChannels,
+  useActiveChannelsHubConnection,
   useActiveChannelsHubActions,
 } from "@/client-hubs/active-channels-hub.ts"
 import { ChannelResponse } from "@/models/responses/channel-response";
@@ -32,7 +32,7 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
   const { deletedChannelId } = useGlobalDataStore();
   const { listenToChannel, stopListeningToChannel } =useActiveChannelsHubActions();
 
- useActiveChannels();
+ useActiveChannelsHubConnection();
   
  
 
@@ -66,7 +66,7 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
     if (activeChannelsHubsState === HubConnectionState.Connected && isReady) {
       listenToChannels(channels);
     }
-  }, [activeChannelsHubsState, channels, isReady]);
+  }, [activeChannelsHubsState, channels.length, isReady]);
 
 
   return (

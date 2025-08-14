@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { HubResult } from "@/models/hub-result";
@@ -14,106 +14,103 @@ import {MessageResponse} from "@/models/responses/message-response.ts";
 import { useParams } from "react-router-dom";
 import { showMessageNotification } from "../helpers/sonner-helper";
 import { LucideToggleRight } from "lucide-react";
+import { user } from "@heroui/theme";
+import { channel } from "diagnostics_channel";
 
-export function useActiveChannels() {
-  const {
-    setConnection,
-    quitConnection,
-    clearChannels,
-    setActiveChannelsHubConnectionState,
-    removeChannel,
-    activeChannelsHub,
-  } = useActiveChannelsHubStore();
-  const { setDeletedChannelId} = useGlobalDataStore();
+
+
+export function useActiveChannelsHubConnection(){
+
   const {getToken} = useJwtHelper();
-  const {groupId}=useParams();
+  const {activeChannelsHub, setConnection, setActiveChannelsHubConnectionState, clearChannels, quitConnection} = useActiveChannelsHubStore();
+  const firstRender = useRef<boolean>(true);
+  const {setDeletedChannelId, setNewUnreadMessage, currentGroupIdAtChatroomPage} = useGlobalDataStore()
+  const [isMounted, setIsMounted]=useState<boolean>(false);
+  const currentGroupIdRef = useRef(currentGroupIdAtChatroomPage);
+  useEffect(() => {
+    currentGroupIdRef.current = currentGroupIdAtChatroomPage;
+  }, [currentGroupIdAtChatroomPage]);
 
-
-  function handleSendUserBanned(ban: ChannelBanResponse | null){
-
+  const handleSendUserBanned = useCallback((result: HubResult<ChannelBanResponse | null>) => {
+   
+    const ban = result.data;
+   
     if(!ban) return;
     setDeletedChannelId(ban.channelId);
-    showToast({title: "Banned from channel!", description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`, color: "danger"})
+    showToast({
+      title: "Banned from channel!", 
+      description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`, 
+      color: "danger"
+    });
+  }, []); // Sin dependencias - solo usa setters y funciones
 
+
+  const handleSendChannelRemoved = useCallback((result: HubResult<string | null>) => {
+    const channelId = result.data;
     
-  }
-
-  function handleSendMessage(message: MessageResponse | null){
-
-        console.log(message);
-
-    if(!message) return;
-    console.log("notification");
-    
-    showMessageNotification({title: `${message.channelName} > ${message.groupName}`, description: `  @${message.senderUsername}: ${message.content.substring(0, 50)}`});
-
-
-  }
-
-
-
-
-  function handleSendChannelRemoved(channelId: string | null){
-
     if(!channelId) return;
     
     setDeletedChannelId(channelId);
+    showToast({
+      title: "Channel Deleted", 
+      description: `One of the channels you belong has been deleted`
+    });
+  }, []); // Sin dependencias
 
-
-    showToast({title: "Channel Deleted", description: `One of the channels you belong has been deleted`})
-
+  const handleSendChannelMemberKickedOut = useCallback((result: HubResult<ChannelResponse | null>) => {
+    const channel = result.data;
     
-  }
-
-  function handleSendChannelMemberKickedOut(channel: ChannelResponse | null){
-
     if(!channel) return;
     setDeletedChannelId(channel.id);
-    showToast({title: "Membership Removed", description: `You've been kickedout from the channel ${channel.name}`, color: "danger"});
+    showToast({
+      title: "Membership Removed", 
+      description: `You've been kickedout from the channel ${channel.name}`, 
+      color: "danger"
+    });
+  }, []); // Sin dependencias
 
-    
-  }
+  const handleSendMessage = useCallback((result: HubResult<MessageResponse | null>)=>{
+
+      console.log("Send Message hit");
+
+      const message = result.data;
+
+      if(!message) return;
 
 
 
 
-  const alreadyRendered = useRef<boolean>(false);
-  const connectionRef = useRef<signalR.HubConnection | null>(null);
+      setNewUnreadMessage(message);
 
-  useEffect(()=>{
 
-    return () =>{
+      if(currentGroupIdRef.current === message.groupId) return;
+      console.log(currentGroupIdRef.current);
 
-      setActiveChannelsHubConnectionState(HubConnectionState.Disconnected);
-      clearChannels();
-      quitConnection();
-      connectionRef.current?.stop();
+      showMessageNotification({
+        title: `${message.channelName} > ${message.groupName}`, 
+        description: `@${message.senderUsername}: ${message.content.substring(0, 50)}`
+      });
 
-    }
+    },[]);
 
-  },[])
+  
+  
 
-  useEffect(() => {
-    const connect = async () => {
-      await connectToActiveChannelsHub();
-    };
-    if (!alreadyRendered.current) {
-      connect();
-      alreadyRendered.current = true;
-    }
-  }, []);
 
-  const registerHandlers = () => {
-    if (!activeChannelsHub) return;
+  const registerHandlers = useCallback(() => {
 
-    activeChannelsHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
-    activeChannelsHub.on("SendChannelRemoved", (result: HubResult<string>)=> handleSendChannelRemoved(result.data))
-    activeChannelsHub.on("SendUserKickedOut", (result: HubResult<ChannelResponse>)=> handleSendChannelMemberKickedOut(result.data))
-    activeChannelsHub.on("SendMessage", (result: HubResult<MessageResponse>) => handleSendMessage(result.data));
+    if(!activeChannelsHub) return;
 
-  };
+    activeChannelsHub.on("SendUserBanned",  handleSendUserBanned);
+    activeChannelsHub.on("SendChannelRemoved",  handleSendChannelRemoved);
+    activeChannelsHub.on("SendUserKickedOut",  handleSendChannelMemberKickedOut);
+    activeChannelsHub.on("SendMessage", handleSendMessage);
 
-  const unregisterHandlers = () => {
+   
+
+  }, [activeChannelsHub, handleSendMessage]);
+
+  const unregisterHandlers  = useCallback(() => {
     if (!activeChannelsHub) return;
     activeChannelsHub.off("SendUserBanned")
     activeChannelsHub.off("SendChannelRemoved")
@@ -121,28 +118,41 @@ export function useActiveChannels() {
     activeChannelsHub.off("SendMessage");
 
 
-  };
+  }, [activeChannelsHub]);
 
-  const handleDisconnect = () => {
+  const handleDisconnect = useCallback(() => {
     setActiveChannelsHubConnectionState(HubConnectionState.Disconnected);
     clearChannels();
     quitConnection();
-  };
+  },[]);
 
-  const handleReconnecting = () => {
+  const handleReconnecting = useCallback(() => {
     setActiveChannelsHubConnectionState(HubConnectionState.Reconnecting);
     clearChannels();
     unregisterHandlers();
-  };
+  },[]);
 
-  const handleReconnected = () => {
+  const handleReconnected = useCallback(() => {
     setActiveChannelsHubConnectionState(HubConnectionState.Connected);
     registerHandlers();
-  };
+  },[]);
 
-  const connectToActiveChannelsHub = async () => {
-    try {
-      const token = await getToken();
+
+
+  useEffect(()=>{
+
+    setIsMounted(true);
+
+  },[])
+
+  
+
+  useEffect(()=>{
+
+    if(!firstRender.current) return;
+    firstRender.current = false;
+
+      const token = getToken();
       const newHub = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5000/hub/active-channels", {
           accessTokenFactory: () => token ?? "",
@@ -162,24 +172,37 @@ export function useActiveChannels() {
         handleReconnected(); 
       });
 
+    newHub.start().then(()=>{setConnection(newHub);})
+
+    
+
+
+
+  },[isMounted])
+
+
+ 
+ 
+
+  useEffect(()=>{
+
+    if(!activeChannelsHub) return;
+
+    setActiveChannelsHubConnectionState(activeChannelsHub.state);
+    registerHandlers();
+
+
+    return()=>{
+
       unregisterHandlers();
-      newHub.on("SendUserBanned", (result: HubResult<ChannelBanResponse>)=> handleSendUserBanned(result.data))
-      newHub.on("SendChannelRemoved", (result: HubResult<string>)=> handleSendChannelRemoved(result.data))
-      newHub.on("SendUserKickedOut", (result: HubResult<ChannelResponse>)=> handleSendChannelMemberKickedOut(result.data))
-      newHub.on("SendMessage", ( result: HubResult<MessageResponse>)=> handleSendMessage(result.data) );
-
-
-      await newHub.start();
-
-      setConnection(newHub);
-      connectionRef.current = newHub;
-      
-      setActiveChannelsHubConnectionState(newHub.state);
-    } catch (error) {
-      activeChannelsHub?.stop();
+      activeChannelsHub.stop()
+      clearChannels();
+      setConnection(null);
     }
-  };
+
+  },[activeChannelsHub])
 }
+
 
 export function useActiveChannelsHubActions() {
   const { activeChannelsHub, addChannel, removeChannel } =
@@ -234,5 +257,5 @@ export function useActiveChannelsHubActions() {
   return {
     listenToChannel,
     stopListeningToChannel,
-  };
+  }
 }

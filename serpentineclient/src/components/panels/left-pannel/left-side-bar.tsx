@@ -42,11 +42,27 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     channelJoined,
     setChannelJoined,
     setUpdatedChannel,
-    updatedChannel
+    updatedChannel,
+    setNewUnreadMessage,
+    newUnreadMessage
   } = useGlobalDataStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
+
+   useEffect(()=>{
+  
+    if(!newUnreadMessage) return;
+
+    setChannels(prev => 
+    prev.map(channel =>
+        channel.id === newUnreadMessage.channelId
+      ? { ...channel, unreadMessages: channel.unreadMessages + 1 } // Actualiza solo ese grupo
+      : channel
+    ));
+
+    setNewUnreadMessage(null);
+  },[newUnreadMessage])
 
   useEffect(() => {
       if(!isMounted || !leftPanelRef) return;

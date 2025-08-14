@@ -29,10 +29,13 @@ export default function GroupsContainer({
   const prevChannelId = useRef("");
   const {
     setCreateGroupChannelData,
+    
     createChannelGroupData,
     setChannelInfoId,
     createdGroup,
     setCreatedGroup,
+    newUnreadMessage,
+    setNewUnreadMessage
   } = useGlobalDataStore();
   const { layout, setLayout } = useLayoutStore();
 
@@ -44,6 +47,21 @@ export default function GroupsContainer({
       take: 5,
     });
   };
+
+  useEffect(()=>{
+
+    if(!newUnreadMessage) return;
+
+    setGroups(prev => 
+    prev.map(group =>
+       group.id === newUnreadMessage.groupId
+      ? { ...group, lastMessage: newUnreadMessage, unreadMessages: group.unreadMessages + 1 } // Actualiza solo ese grupo
+      : group
+    ));
+
+    setNewUnreadMessage(null);
+
+  },[newUnreadMessage])
 
   useEffect(() => {
     if (createChannelGroupData) {
@@ -66,6 +84,8 @@ export default function GroupsContainer({
 
   useEffect(() => {
     if (groups) {
+
+      console.log('groups updated');
       let counter = 0;
       groups.map((group, _) => {
         counter += group.unreadMessages;
@@ -73,7 +93,7 @@ export default function GroupsContainer({
 
       callbackUnreadMessagesCount(counter);
     }
-  }, [groups]);
+  }, [groups.length]);
 
   useEffect(() => {
     if (channel === null) return;

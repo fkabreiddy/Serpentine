@@ -76,16 +76,18 @@ export default function MessagesContainer({ groupId, channelMember }: MessagesCo
     [fetchingMessages, hasMore, fetchMessages]
   );
 
-  useEffect(() => {
-    if (!activeChannelsHub) return;
-
-    const handleMessageRecieved = (result: HubResult<MessageResponse>) => {
+   const handleMessageRecieved = useCallback((result: HubResult<MessageResponse>) => {
       if (!result.data) return;
 
       if (result.data.groupId !== groupId) return;
 
       setMessages((prev) => [ result.data as MessageResponse, ...prev]);
-    };
+    },[groupId]);
+    
+  useEffect(() => {
+    if (!activeChannelsHub) return;
+
+   
 
     activeChannelsHub.on("SendMessage", handleMessageRecieved);
 

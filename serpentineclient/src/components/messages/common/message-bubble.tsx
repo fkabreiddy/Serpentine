@@ -47,6 +47,7 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
 
         <motion.div
         ref={messageBubbleDivRef}
+        key={message.id.toString() + "-message-bubble"}
         initial={{opacity: 0, y: -10}}
         animate={{opacity: 1, y: 0}}
         onClick={(e)=>{ e.stopPropagation(); setClicked(false) } }

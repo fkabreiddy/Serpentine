@@ -38,7 +38,6 @@ export const showMessageNotification = ({ title = "", description, color = "fore
   addToast({
     title,
     description,
-    shouldShowTimeoutProgress: true,
     variant: "solid",
     icon: MessageBubbleIcon,
     size: "lg",

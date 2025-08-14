@@ -52,7 +52,6 @@ export default function SendMessageBar({
       }
     });
     
-    console.log(formData);
 
     await createMessage(formData);
   }
