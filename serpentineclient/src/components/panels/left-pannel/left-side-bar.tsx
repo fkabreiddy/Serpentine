@@ -118,7 +118,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     } else {
       setSelectedChannel(null);
     }
-  }, [channels]);
+  }, [channels.length]);
 
   const hasFetched = React.useRef(false);
 

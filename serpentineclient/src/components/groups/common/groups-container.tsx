@@ -85,7 +85,6 @@ export default function GroupsContainer({
   useEffect(() => {
     if (groups) {
 
-      console.log('groups updated');
       let counter = 0;
       groups.map((group, _) => {
         counter += group.unreadMessages;
@@ -182,6 +181,7 @@ export default function GroupsContainer({
               )
               .map((group, idx) => (
                 <GroupCard
+                  channelMember={channel.myMember}
                   index={idx}
                   group={group}
                   key={idx.toString() + channel?.name}

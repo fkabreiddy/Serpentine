@@ -100,7 +100,6 @@ export function useGetMessagesByGroupId() {
 
     const getMessagesByGroupId = async (data: GetMessagesByGroupIdRequest) => {
 
-        console.log(data);
         setResult(null);
         setFetchingMessages(true);
     

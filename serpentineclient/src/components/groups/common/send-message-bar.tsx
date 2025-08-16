@@ -32,7 +32,7 @@ export default function SendMessageBar({
   const { activeChannels, activeChannelsHubsState } =
     useActiveChannelsHubStore();
   
-  const {createMessage, creatingMessage} = useCreateMessage();
+  const {createMessage, creatingMessage, message} = useCreateMessage();
 
   useEffect(()=>{
     
@@ -41,6 +41,16 @@ export default function SendMessageBar({
     setCreateMessageRequest((prev)=>({...prev, groupId: group.id}));
 
   },[group])
+
+
+  useEffect(()=>{
+
+    if(message)
+    {
+      setCreateMessageRequest((prev)=>({...prev, content: ""}));
+
+    }
+  },[message])
   async function fetchCreateMessage(){
 
     const formData = new FormData();
@@ -54,6 +64,7 @@ export default function SendMessageBar({
     
 
     await createMessage(formData);
+
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

@@ -71,7 +71,6 @@ export function useActiveChannelsHubConnection(){
 
   const handleSendMessage = useCallback((result: HubResult<MessageResponse | null>)=>{
 
-      console.log("Send Message hit");
 
       const message = result.data;
 
@@ -84,7 +83,6 @@ export function useActiveChannelsHubConnection(){
 
 
       if(currentGroupIdRef.current === message.groupId) return;
-      console.log(currentGroupIdRef.current);
 
       showMessageNotification({
         title: `${message.channelName} > ${message.groupName}`, 
@@ -108,7 +106,7 @@ export function useActiveChannelsHubConnection(){
 
    
 
-  }, [activeChannelsHub, handleSendMessage]);
+  }, [activeChannelsHub]);
 
   const unregisterHandlers  = useCallback(() => {
     if (!activeChannelsHub) return;

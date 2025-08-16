@@ -29,23 +29,31 @@ export default function DefaultLayout({
   const [loadLayout, setLoadLayout] = useState(false);
 
  useEffect(()=>{
-  
     
-    if(!user && !isAuthenticated)
+    if(!user && !isAuthenticated && firstRender.current)
     {
+
       navigate("/");
 
     }
     
 
-  },[user, isAuthenticated])
+  },[user, isAuthenticated, firstRender])
 
+  useEffect(()=>{
+
+    if(loadLayout)
+    {
+      firstRender.current = true;
+
+    }
+
+  },[loadLayout])
   useEffect(() => {
 
 
     if(!firstRender.current)
     {
-      firstRender.current = true;
       const token = getToken();
 
       if(!token)
@@ -53,6 +61,7 @@ export default function DefaultLayout({
           navigate("/");
       }
       setLoadLayout(true);
+
     }
     setTheme("dark");
   }, []);

@@ -1,7 +1,7 @@
 export abstract class BaseResponse {
     id: string = "";
-    createdAt: Date = new Date();
-    updatedAt: Date = new Date();
+    createdAt: string = new Date().toDateString();
+    updatedAt: string = new Date().toDateString();
 
     constructor(init?: Partial<BaseResponse>) {
     Object.assign(this, init);

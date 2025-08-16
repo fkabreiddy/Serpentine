@@ -119,7 +119,7 @@ namespace SerpentineApi.Features.MessageFeatures.Actions;
             return new ForbiddenApiResult("You do not belong to this channel");
         }
 
-        if (!group.Public && (!membership.IsOwner || !membership.IsAdmin))
+        if (!group.Public && (!membership.IsOwner && !membership.IsAdmin))
         {
             return new ForbiddenApiResult("You don't have permission access this group");
 

@@ -61,7 +61,7 @@ export default function SearchChannelCard({
         <div className="flex items-center gap-3 w-full  justify-between">
           <div className="flex items-center gap-3">
             <IconButton
-              placement="right"
+              placement="bottom"
               onClick={() => {
                 infoClicked(channel.id);
               }}

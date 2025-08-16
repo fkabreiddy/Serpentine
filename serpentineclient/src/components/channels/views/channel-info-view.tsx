@@ -437,6 +437,8 @@ const UsersContainer : React.FC<UserContainerProps> = ({myMember, channelId}) =>
 
                   {
 
+                    const isLast = idx === channelMembers.length - 1;
+
                     return(
 
                       <div  ref={isLast ? observeLastElement : null} className="w-full flex flex-col gap-2" key={cm.id}>

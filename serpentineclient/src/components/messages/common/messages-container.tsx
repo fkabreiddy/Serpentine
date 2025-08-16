@@ -9,6 +9,8 @@ import { useGetMessagesByGroupId } from "@/hooks/message-hooks";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { channel } from "diagnostics_channel";
+import { useUiSound } from "@/helpers/sound-helper";
+import { MessageCircle } from "lucide-react";
 
 interface MessagesContainerProps {
   groupId: string;
@@ -29,6 +31,7 @@ export default function MessagesContainer({ groupId, channelMember }: MessagesCo
   const firstRender = useRef(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
+  const {playSubmit} = useUiSound();
 
   const fetchMessages = async () => {
     if (!groupId) return;
@@ -82,6 +85,7 @@ export default function MessagesContainer({ groupId, channelMember }: MessagesCo
       if (result.data.groupId !== groupId) return;
 
       setMessages((prev) => [ result.data as MessageResponse, ...prev]);
+      playSubmit();
     },[groupId]);
     
   useEffect(() => {
@@ -112,17 +116,45 @@ export default function MessagesContainer({ groupId, channelMember }: MessagesCo
                         key={message.id.toString()}
                         >
                             <MessageBubble userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
+                            {idx > 0 && new Date(messages[idx - 1].createdAt).getDay() !==  new Date(messages[idx].createdAt).getDay() && <MessageDateDivider date={new Date(messages[idx].createdAt)}/> }
+
                         </div>
                     );
                 })}
 
                 <>
                   {fetchingMessages && <Spinner size="sm" variant="spinner"/>}
-                    {!fetchingMessages && messages.length <= 0 && <label>Start the conversation</label>}
+                    {!fetchingMessages && messages.length <= 0 &&
+                     <div className="h-full w-full flex flex-col items-center justify-center">
+                      <MessageCircle size={30}/>
+                      <label>Start the conversation</label>
+                      </div> }
                 </>
               
             </ScrollShadow>
         }
     </motion.div>
   );
+}
+
+interface MessageDateDividerProps{
+
+  date: Date
+}
+
+function MessageDateDivider({date}:MessageDateDividerProps){
+
+  const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+  return(
+
+    <div className="flex gap-3 w-full items-center opacity-60">
+      <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
+      <p className="text-[13px] whitespace-nowrap"> {monthNames[date.getMonth()]} {date.getUTCDate()}, {date.getFullYear()}</p>
+      <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
+
+    </div>
+  )
 }

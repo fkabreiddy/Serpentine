@@ -30,10 +30,10 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   const {} = useActiveUser();
   const navigate = useNavigate();
   const {layout, setLayout} = useLayoutStore();
-  const {playUiSound} = useUiSound();
+  const {playStartUp} = useUiSound();
   const [isMounted, setIsMounted] = useState(false);
   const appBarRef = useRef<HTMLDivElement | null>(null);
-  
+  const firstRender = useRef<boolean>(true);
 
   const {fetching, test} = useTest();
 
@@ -46,7 +46,14 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
     
     if(!isMounted || !appBarRef) return;
     
-    playUiSound("system/boot_up");
+    if(firstRender.current === true)
+    {
+      playStartUp();
+      firstRender.current = false;
+
+
+    }
+
     setLayout({appBarWidth: appBarRef.current?.offsetWidth});
     
 

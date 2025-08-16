@@ -8,10 +8,11 @@ import { useGetChannelMemberByUserAndChannelId } from "@/hooks/channel-member-ho
 import { useGetGroupById } from "@/hooks/group-hooks";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {useActiveChannelsHubStore} from "@/contexts/active-channels-hub-context.ts";
 import { MessageCircleIcon } from "lucide-react";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
+import CustomDialog from "@/components/common/custom-dialog";
 
 export default function ChatroomPage(){
 
@@ -20,6 +21,8 @@ export default function ChatroomPage(){
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
     const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage} = useGlobalDataStore();
+      const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
+      const navigate = useNavigate();
     
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
 
@@ -29,7 +32,6 @@ export default function ChatroomPage(){
     
         if(groupId)
         {
-            console.log(groupId);
             setCurrentGroupIdAtChatroomPage(groupId);
         }
 
@@ -65,22 +67,21 @@ export default function ChatroomPage(){
 
     useEffect(()=>{
 
-        if(channelMember)
+        if(channelMember && group)
         {
-            
-            if(group?.public)
+            if(!channelMember) return;
+            if(!group) return;
+            if(!group.public && (!channelMember.isAdmin && !channelMember.isOwner))
             {
-                setHasPermisson(true)
-            }
-            else{
+                setShowLockedGroupDialog(true);
+                setHasPermisson(false);
+                return;
+            } 
 
-                if(!channelMember.isAdmin || !channelMember.isOwner)
-                    setHasPermisson(false);
-                    
-                setHasPermisson(channelMember.isOwner || channelMember.isAdmin);
-            }
+            setHasPermisson(true);
+            
         }
-    },[channelMember])
+    },[channelMember, group])
 
 
     useEffect(()=>{
@@ -95,6 +96,12 @@ export default function ChatroomPage(){
     return(
         <>
             <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
+                <CustomDialog onDismiss={()=>{ navigate("/home");}} onAccept={()=>{ navigate("/home");}} open={showLockedGroupDialog} showDismiss={false} acceptText="Understood" onOpenChanged={(value)=> {setShowLockedGroupDialog(value); navigate("/home")}} title="Group is private">
+                <p className="text-[13px]">
+                    This group is private you cannot acceed if you are not an admin or the owner of the group
+                </p>
+                </CustomDialog>
+               
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
                 {group && 
                    <CurrentGroupChatroomInfo group={group}/>

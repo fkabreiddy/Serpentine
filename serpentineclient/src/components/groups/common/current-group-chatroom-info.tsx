@@ -37,7 +37,7 @@ export default function CurrentGroupChatroomInfo({
               {!group.public && (
                 <Tooltip
                   placement="bottom"
-                  content={"This channel is locked"}
+                  content={"This group is just for admins and the owner"}
                   showArrow={true}
                   size="sm"
                 >

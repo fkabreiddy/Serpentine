@@ -87,11 +87,7 @@ using System.Text.Json.Serialization;
 
                 var t0 = result.AsT0;
 
-                if (t0.ChannelId is not null)
-                {
-                    await channelsHub.Clients.Group(t0.ChannelId.ToString() ?? string.Empty).SendMessage(new HubResult<MessageResponse>(t0));
-
-                }
+               
 
                 return ResultsBuilder.Match<MessageResponse>(new SuccessApiResult<MessageResponse>(t0));
 
@@ -116,7 +112,7 @@ using System.Text.Json.Serialization;
         }
 
         internal class CreateEndpointHandler(
-            
+             IHubContext<ActiveChannelsHub, IActiveChannelsHub> channelsHub,
             SerpentineDbContext context
             ) : IEndpointHandler<CreateMessageRequest, OneOf<MessageResponse, Failure>>
         {
@@ -153,6 +149,25 @@ using System.Text.Json.Serialization;
                 if (result is null)
                 {
                     return new NotFoundApiResult("We could not find the created message");
+                }
+
+                if (group.Public)
+                {
+                    await channelsHub.Clients.Group(group.ChannelId.ToString() ?? string.Empty).SendMessage(new HubResult<MessageResponse>(result.ToResponse()));
+
+                }
+                else
+                {
+                    var adminsAndOwer = await context.ChannelMembers.AsNoTracking().IgnoreAutoIncludes().Where(cm => cm.IsOwner || cm.IsAdmin).Select(cm => new ChannelMember()
+                    {
+                        UserId = cm.UserId
+
+                    }).ToListAsync();
+
+                    
+                    
+                    await channelsHub.Clients.Users(adminsAndOwer.Select(x => x.UserId.ToString())).SendMessage(new HubResult<MessageResponse>(result.ToResponse()));
+
                 }
 
 
