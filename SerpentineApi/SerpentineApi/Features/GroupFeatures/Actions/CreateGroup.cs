@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,14 +23,9 @@ public class CreateGroupRequest : IRequest<OneOf<GroupResponse, Failure>>
     ]
     public string Name { get; set; } = null!;
     
-    [
-        Required,
-        MaxLength(1000),
-        MinLength(3),
-        JsonPropertyName("rules"),
-        FromBody
-    ]
-    public string Rules { get; set; } = null!;
+    [JsonPropertyName("requiresOverage"), FromBody, Description("Tells if this group requires to be overage to access to the messages")]
+    public bool RequiresOverage { get; set; } = false;
+
     
     [JsonPropertyName("public"), Required, FromBody]
     public bool Public { get; set; } = true;
@@ -148,7 +144,7 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
                  
             }
 
-            if (!permission.IsOwner || !permission.IsAdmin)
+            if (!permission.IsOwner && !permission.IsAdmin)
             {
                 return new BadRequestApiResult("You dont have permissions to create a group in this channel");
 

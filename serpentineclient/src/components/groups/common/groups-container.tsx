@@ -35,7 +35,9 @@ export default function GroupsContainer({
     createdGroup,
     setCreatedGroup,
     newUnreadMessage,
-    setNewUnreadMessage
+    setNewUnreadMessage,
+    resetGroupUnreadMessages,
+    setResetGroupUnreadMessages
   } = useGlobalDataStore();
   const { layout, setLayout } = useLayoutStore();
 
@@ -47,6 +49,21 @@ export default function GroupsContainer({
       take: 5,
     });
   };
+
+  useEffect(()=>{
+  
+    if(!resetGroupUnreadMessages) return;
+
+    setGroups(prev => 
+      prev.map(g => 
+        g.id === resetGroupUnreadMessages 
+          ? { ...g, unreadMessages: 0 }  // creamos un nuevo objeto con unreadMessages = 0
+          : g                           // mantenemos el objeto igual si no coincide
+      )
+    );
+
+    setResetGroupUnreadMessages(null);
+  },[resetGroupUnreadMessages])
 
   useEffect(()=>{
 

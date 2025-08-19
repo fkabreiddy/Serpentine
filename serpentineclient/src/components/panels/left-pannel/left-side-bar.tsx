@@ -44,7 +44,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     setUpdatedChannel,
     updatedChannel,
     setNewUnreadMessage,
-    newUnreadMessage
+    newUnreadMessage,
+    resetGroupUnreadMessages,
+    setResetGroupUnreadMessages
   } = useGlobalDataStore();
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
@@ -63,6 +65,8 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
     setNewUnreadMessage(null);
   },[newUnreadMessage])
+
+  
 
   useEffect(() => {
       if(!isMounted || !leftPanelRef) return;

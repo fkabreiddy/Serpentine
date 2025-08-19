@@ -27,4 +27,40 @@ public static class UserIdentityRequesterHelper
 
         throw new UnauthorizedAccessException();
     }
+    
+    /// <summary>
+        /// Gets the User age from the current http request
+        /// </summary>
+        /// <param name="user">Claims principal from the current HttpContext</param>
+        /// <returns>The user age from the HttpContext</returns>
+        public static int GetUserAgeFromClaims(ClaimsPrincipal user)
+        {
+            var subClaim = user.FindFirst(JwtRegisteredClaimNames.Birthdate);
+            if (subClaim == null)
+            {
+                subClaim = user.FindFirst(ClaimTypes.DateOfBirth);
+            }
+    
+            if (subClaim != null && DateTime.Parse(subClaim.Value) is var date)
+            {
+                return GetAge(date);
+            }
+    
+            throw new UnauthorizedAccessException();
+        }
+    
+    
+    private static int GetAge(DateTime dateOfBirth)
+    {
+        DateTime hoy = DateTime.Now;
+        int edad = hoy.Year - dateOfBirth.Year;
+
+        // Si aún no ha cumplido años este año, se resta uno
+        if (dateOfBirth.Date > hoy.AddYears(-edad))
+        {
+            edad--;
+        }
+
+        return edad;
+    }
 }

@@ -1,4 +1,6 @@
-﻿namespace SerpentineApi.DataAccess.Models;
+﻿using SerpentineApi.Features.GroupAccessFeatures.Actions;
+
+namespace SerpentineApi.DataAccess.Models;
 
 public class GroupAccess : BaseEntity
 {
@@ -7,6 +9,13 @@ public class GroupAccess : BaseEntity
     public Ulid UserId { get; set; }
     public User User { get; set; } = null!;
     public DateTime LastAccess { get; set; }
+
+    public static GroupAccess Create(CreateGroupAccessRequest request) => new()
+    {
+        UserId = request.CurrentUserId,
+        GroupId = request.GroupId,
+        LastAccess = DateTime.UtcNow
+    };
 
     public GroupAccessResponse ToResponse() => new()
     {

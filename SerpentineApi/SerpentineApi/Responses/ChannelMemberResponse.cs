@@ -14,6 +14,8 @@ public class ChannelMemberResponse : BaseResponse
 
     public DateTime LastAccess { get; set; } = DateTime.Now;
 
+    public bool IsOverage { get; set; } = false;
+
     public string UserProfilePictureUrl { get; set; } = "";
 
     public string UserUsername { get; set; } = "";

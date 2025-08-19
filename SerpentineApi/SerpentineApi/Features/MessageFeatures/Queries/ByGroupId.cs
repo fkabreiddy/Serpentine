@@ -63,6 +63,7 @@ namespace SerpentineApi.Features.MessageFeatures.Actions;
                 {
 
                     command.SetCurrentUserId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
+                    command.SetCurrentUserAge(UserIdentityRequesterHelper.GetUserAgeFromClaims(context.User));
                     var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
                     if (result.IsT1)
@@ -110,6 +111,12 @@ namespace SerpentineApi.Features.MessageFeatures.Actions;
         if (group is null)
         {
             return new NotFoundApiResult("The gorup you are trying to send the message no longer exist");
+        }
+
+        if (group.RequiresOverage && request.CurrentUserAge < 18)
+        {
+            return new ForbiddenApiResult("This group requires you to be overage. You dont have permission to access this group messages");
+
         }
 
 

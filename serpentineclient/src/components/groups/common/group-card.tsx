@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { LockIcon } from "lucide-react";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import CustomDialog from "@/components/common/custom-dialog";
+import {Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 
 interface GroupCardProps {
   group: GroupResponse;
@@ -51,7 +52,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index, channelMember }) =>
           className=" flex items-center justify-between gap-1"
         >
           <div className="w-full gap-2 flex items-center   ">
-             {!group.public && <LockIcon size={14}/>}
+             
 
             <div className="flex text-ellipsis overflow-hidden   w-full flex-col gap-0">
               <div className="flex items-center gap-3 ">
@@ -88,10 +89,30 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index, channelMember }) =>
               }
             </div>
           </div>
-
-          {group.unreadMessages > 0 && (
-            <div className="w-1 h-1 bg-blue-800 rounded-full mr-4 " />
-          )}
+  
+          <div className={"flex items-center gap-2"}>
+            {(!group.public && (!channelMember?.isOwner && !channelMember?.isAdmin) || (group.requiresOverage && !channelMember?.isOverage) )
+                &&
+                <Popover showArrow={true} placement={"bottom"}>
+                  <PopoverTrigger>
+                    <LockIcon className={"text-red-500 cursor-pointer"} size={14}/>
+                  </PopoverTrigger>
+                  <PopoverContent className={"max-w-[250px]"}>
+                    <ul>
+                      {!group.public &&
+                          <li><p className={"text-[12px]"}>- This group is only for admins and the owner of the channel</p></li>
+                      }
+                      {group.requiresOverage &&
+                          <li><p className={"text-[12px]"}>- This group is only for +18 members</p></li>
+                      }
+                    </ul>
+                  </PopoverContent>
+                </Popover>}
+            {group.unreadMessages > 0 && (
+                <div className="w-1 h-1 bg-blue-800 rounded-full mr-4 " />
+            )}
+          </div>
+         
         </div>
       </div>
     </motion.div>
@@ -100,22 +121,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index, channelMember }) =>
   );
 };
 
-const HashIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.7"
-    stroke="currentColor"
-    className="size-3 "
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5"
-    />
-  </svg>
-);
+
 
 
 

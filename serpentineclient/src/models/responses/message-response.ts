@@ -16,10 +16,22 @@ export class MessageResponse extends BaseResponse {
     channelName?: string = "";
     channelId?: string = "";
     
+    
+    //front-end-only properties
+    isNewAndUnread: boolean = false;//this property is set when the message bubble gets into the viewport for the first time
+
+ 
+
+
+
     constructor(init?: Partial<MessageResponse>) {
         super(init);
         Object.assign(this, init);
+
+        
     }
+
+   
 
 
 

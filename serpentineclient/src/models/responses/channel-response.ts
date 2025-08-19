@@ -12,6 +12,10 @@ export class ChannelResponse extends BaseResponse {
   unreadMessages: number = 0;
   readonly userIsOwner: boolean = false;
 
+
+  //front-end-only properties
+  isReaded: boolean = false; //this property is set when the message bubble gets into the viewport for the first time
+
   
  constructor(init?: Partial<ChannelResponse>) {
     super(init); 

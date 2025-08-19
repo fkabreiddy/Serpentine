@@ -4,7 +4,7 @@ import { useDateHelper } from "@/helpers/relative-date-helper";
 import { MessageResponse } from "@/models/responses/message-response";
 import { motion } from "framer-motion";
 import { BellIcon, EditIcon, InfoIcon, MessageCircleIcon, ReplyIcon, TrashIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Stack from "./message-image-stack";
 
 type MessageBubbleProps =
@@ -14,9 +14,10 @@ type MessageBubbleProps =
     isAdmin: boolean;
     isOwner: boolean;
     userId: string;
+    onReaded: ( messageId: string ) => void;
 }
 
-export default function MessageBubble({message, isAdmin = false, isOwner = false, userId = "", withImage}:MessageBubbleProps)
+export default function MessageBubble({message, isAdmin = false, isOwner = false, userId = "", withImage, onReaded}:MessageBubbleProps)
 {
 
     const {getRelativeDate} = useDateHelper();
@@ -28,26 +29,51 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
         "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?q=80&w=500&auto=format" 
     ]);
 
-  const [showMoreContent, setShowMoreContent] = useState(false);
-    const messageBubbleDivRef = useRef<HTMLDivElement>(null);
+    const [showMoreContent, setShowMoreContent] = useState(false);
+    const messageBubbleDivRef = useRef<HTMLDivElement | null>(null);
+    let observerRef = useRef<IntersectionObserver | null>(null);
+    
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (messageBubbleDivRef.current && !messageBubbleDivRef.current.contains(event.target as Node)) {
-        setClicked(false); // clic fuera → cerrar
-      }
-    }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+   
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+        if (messageBubbleDivRef.current && !messageBubbleDivRef.current.contains(event.target as Node)) {
+            setClicked(false); // clic fuera → cerrar
+        }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+   const observeLastElement = useCallback(
+       (node: HTMLDivElement | null) => {
+        
+         if (!message.isNewAndUnread) return;
+         
+         if (observerRef.current) observerRef.current.disconnect();
+   
+         observerRef.current = new IntersectionObserver((entries) => {
+           if (entries[0].isIntersecting && message.isNewAndUnread) {
+             onReaded(message.id);
+           }
+         });
+   
+         if (node) observerRef.current.observe(node);
+         messageBubbleDivRef.current = node;
+       },
+       [message]
+     );
     return(
 
-        <motion.div
-        ref={messageBubbleDivRef}
+        <motion.div        
+        ref={observeLastElement}
         key={message.id.toString() + "-message-bubble"}
+        id={message.id.toString() + "-message-bubble"}
+
         initial={{opacity: 0, y: -10}}
         animate={{opacity: 1, y: 0}}
         onClick={(e)=>{ e.stopPropagation(); setClicked(false) } }
@@ -55,7 +81,7 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
         className={`w-full transition-all flex gap-3 items-start group  ${clicked ? "bg-neutral-100 dark:bg-neutral-950" : "hover:bg-neutral-100/50 hover:dark:bg-neutral-950/50"} p-3 rounded-lg`}
         >
             {message.isNotification ? 
-            <div className="size-[28px] shrink-0 bg-yellow-500 text-white  rounded-full flex justify-center items-center">
+            <div  className="size-[28px] shrink-0 bg-yellow-500 text-white  rounded-full flex justify-center items-center">
                 <MessageCircleIcon className="size-[16px] fill-white"/>
             </div>  :            
             <UserAvatar  src={message?.senderProfilePictureUrl ?? "" } userNameFallback={message?.senderUsername ?? "fka.breiddy"} />

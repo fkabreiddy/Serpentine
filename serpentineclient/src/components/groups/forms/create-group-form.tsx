@@ -40,7 +40,6 @@ export default function CreateGroupForm({ onCreate }: CreateGroupFormProps) {
     mode: "onChange",
     defaultValues: {
       name: "",
-      rules: "",
       public: true,
       channelId: "",
     },
@@ -98,23 +97,7 @@ export default function CreateGroupForm({ onCreate }: CreateGroupFormProps) {
               isInvalid={errors.name?.message !== undefined}
             />
 
-            <Textarea
-              label="Group Rules"
-              type="text"
-              placeholder="Describe the rules of you group"
-              minLength={10}
-              maxLength={1000}
-              value={watch("rules")}
-              maxRows={4}
-              labelPlacement="outside"
-              isRequired={true}
-              isClearable={true}
-              autoComplete="groupRules"
-              description="Be as clear as possible about you group and the rules."
-              {...register("rules")}
-              errorMessage={errors.rules?.message}
-              isInvalid={errors.rules?.message !== undefined}
-            />
+          
 
             <Checkbox
               isSelected={watch("public")}
@@ -127,6 +110,20 @@ export default function CreateGroupForm({ onCreate }: CreateGroupFormProps) {
             <p className="text-xs opacity-45">
               If public every member of this channel can post on it.
             </p>
+
+            <Checkbox
+                isSelected={watch("requiresOverage")}
+                {...register("requiresOverage")}
+                size="sm"
+                color="default"
+            >
+             Requires to be overage
+            </Checkbox>
+            <p className="text-xs opacity-45">
+              This will allow to only overage members can send messages through this group
+            </p>
+            
+            
 
             <Button
               isDisabled={!isValid || creatingGroup}

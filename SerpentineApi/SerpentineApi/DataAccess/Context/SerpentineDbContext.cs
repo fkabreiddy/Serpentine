@@ -75,24 +75,28 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
 
                 new()
                 {
+                    Id = Ulid.Parse("01K1Y24KEJ2SQ283X365D8QBJP"),
                     Name = "User",
                     AccessLevel = 0
 
                 },
                 new()
                 {
+                    Id = Ulid.Parse("01K1Y24KEPDA7ZFCX6YCP3MY7M"),
                     Name = "Admin",
                     AccessLevel = 1
 
                 },
                 new()
                 {
+                    Id = Ulid.Parse("01K1Y24KEPTCVKR97AKSWKHTP8"),
                     Name = "Tester",
                     AccessLevel = 2
 
                 },
                 new()
                 {
+                    Id = Ulid.Parse("01K1Y24KEP473CNR8N01ZCXRV9"),
                     Name = "Developer",
                     AccessLevel = 3
 

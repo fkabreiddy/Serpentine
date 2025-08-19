@@ -8,18 +8,20 @@ public class MessageResponse : BaseResponse
     public Ulid? ParentId { get; set; }
     public bool IsNotification { get; set; } = false;
     public string? SenderName { get; set; }
-    
+
     public string? SenderProfilePictureUrl { get; set; }
-    
+
     public string? SenderUsername { get; set; }
-    
+
     public string? ParentContent { get; set; }
-    
+
     public Ulid? ChannelId { get; set; }
-    
+
     public string? GroupName { get; set; }
+
+    public string? ChannelName { get; set; }
     
-    public string? ChannelName {get; set;}
+    public  bool IsNewAndUnread { get; private set; } = false;
     
     
 }

@@ -62,6 +62,7 @@ public class Channel : BaseEntity
             [
                 new()
                 {
+                 
                     UserId = request.CurrentUserId,
                     IsOwner = true,
                     IsAdmin = true,

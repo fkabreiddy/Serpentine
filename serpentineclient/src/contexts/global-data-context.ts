@@ -26,6 +26,8 @@ interface GlobalData {
   setNewUnreadMessage: (message: MessageResponse | null) => void;
   currentGroupIdAtChatroomPage: string | null;
   setCurrentGroupIdAtChatroomPage: (groupId: string | null) => void;
+  resetGroupUnreadMessages: string | null;
+  setResetGroupUnreadMessages: (groupId: string | null) => void;
   clearGlobalData: ()=>void
 }
 
@@ -39,6 +41,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   updateChannelId: null,
   updatedChannel: null, 
   newUnreadMessage: null,
+  resetGroupUnreadMessages: null,
   currentGroupIdAtChatroomPage: null,
 
   setDeletedChannelId: (id: string | null) => {
@@ -106,6 +109,13 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     set((state) => ({
       ...state,
       currentGroupIdAtChatroomPage: groupId,
+    }));
+  },
+
+  setResetGroupUnreadMessages: (groupId: string | null) => {
+    set((state) => ({
+      ...state,
+      resetGroupUnreadMessages: groupId,
     }));
   },
 

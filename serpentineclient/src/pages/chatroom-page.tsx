@@ -20,7 +20,7 @@ export default function ChatroomPage(){
     const {groupId} = useParams();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
-    const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage} = useGlobalDataStore();
+    const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages} = useGlobalDataStore();
       const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
       const navigate = useNavigate();
     
@@ -33,6 +33,7 @@ export default function ChatroomPage(){
         if(groupId)
         {
             setCurrentGroupIdAtChatroomPage(groupId);
+            setResetGroupUnreadMessages(groupId);
         }
 
         return()=>{
@@ -108,7 +109,7 @@ export default function ChatroomPage(){
                 }
 
                 {(group && channelMember) &&
-                    <MessagesContainer channelMember={channelMember} groupId={group.id}/>
+                    <MessagesContainer lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
                 }
 
                 <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>

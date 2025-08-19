@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Features\ChannelBan\Queries\" />
+    <Folder Include="Features\GroupAccessFeatures\Actions\" />
     <Folder Include="Features\GroupFeatures\Actions\" />
     <Folder Include="Features\MessageFeatures\Actions\" />
     <Folder Include="Features\MessageFeatures\Queries\" />

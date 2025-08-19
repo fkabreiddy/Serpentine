@@ -8,7 +8,7 @@ export class GroupResponse extends BaseResponse {
     unreadMessages: number = 0;
     channelName: string = "";
     public : boolean = true;
-    rules : string = "";
+    requiresOverage : boolean = false;
     channelId: string = "";
     myAccess: GroupAccessResponse | null = null;
     lastMessage: MessageResponse | null = null;

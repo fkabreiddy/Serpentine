@@ -75,6 +75,8 @@ using System.Text.Json.Serialization;
                 command.SetCurrentUserId(
                     UserIdentityRequesterHelper.GetUserIdFromClaims(context.User)
                 );
+                command.SetCurrentUserAge(UserIdentityRequesterHelper.GetUserAgeFromClaims(context.User));
+
                 var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
                 if (result.IsT1)
@@ -136,6 +138,12 @@ using System.Text.Json.Serialization;
                 if(!group.Public && !(membership.IsAdmin || membership.IsOwner))
                 { 
                     return new ForbiddenApiResult("This group is private. You cannot send messages to it");
+
+                }
+                
+                if (group.RequiresOverage && messageRequest.CurrentUserAge < 18)
+                {
+                    return new ForbiddenApiResult("This group requires you to be overage. You dont have permission to access this group messages");
 
                 }
 

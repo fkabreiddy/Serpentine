@@ -7,6 +7,7 @@ export class ChannelMemberResponse extends BaseResponse {
   isSilenced: boolean = false;
   isArchived: boolean = false;
   isOwner: boolean = false;
+  isOverage: boolean = false;
   lastAccess: Date = new Date();
   userProfilePictureUrl : string = "";
   userUsername : string = "";

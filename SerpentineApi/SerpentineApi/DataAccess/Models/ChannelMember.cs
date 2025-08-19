@@ -28,6 +28,7 @@ public class ChannelMember : BaseEntity
             IsSilenced = IsSilenced,
             IsArchived = IsArchived,
             UserProfilePictureUrl = User.ProfilePictureUrl ?? "",
+            IsOverage = User.GetAge(User.DayOfBirth) >= 18,
             UserName = User.FullName,
             UserUsername = User.Username,
             IsAdmin = IsAdmin
