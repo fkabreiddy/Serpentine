@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { BellIcon, EditIcon, InfoIcon, MessageCircleIcon, ReplyIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Stack from "./message-image-stack";
+import { useDeleteMessage } from "@/hooks/message-hooks";
+import CustomDialog from "@/components/common/custom-dialog";
 
 type MessageBubbleProps =
 {
@@ -14,6 +16,7 @@ type MessageBubbleProps =
     isAdmin: boolean;
     isOwner: boolean;
     userId: string;
+    index: number;
     onReaded: ( messageId: string ) => void;
 }
 
@@ -38,16 +41,18 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
    
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-        if (messageBubbleDivRef.current && !messageBubbleDivRef.current.contains(event.target as Node)) {
-            setClicked(false); // clic fuera → cerrar
-        }
+
+            const container = document.getElementById(message.id.toString() + "-message-bubble-id");
+            if (container && !container.contains(event.target as Node)) {
+                setClicked(false); // clic fuera → cerrar
+            }
         }
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
         document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, []);
+    }, [message]);
 
    const observeLastElement = useCallback(
        (node: HTMLDivElement | null) => {
@@ -59,6 +64,7 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
          observerRef.current = new IntersectionObserver((entries) => {
            if (entries[0].isIntersecting && message.isNewAndUnread) {
              onReaded(message.id);
+             
            }
          });
    
@@ -72,7 +78,7 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
         <motion.div        
         ref={observeLastElement}
         key={message.id.toString() + "-message-bubble"}
-        id={message.id.toString() + "-message-bubble"}
+        id={message.id.toString() + "-message-bubble-id"}
 
         initial={{opacity: 0, y: -10}}
         animate={{opacity: 1, y: 0}}
@@ -129,13 +135,10 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
                 {
                     clicked && !message.isNotification &&
                 
-                    <div  className=" mt-3 w-full  gap-2 flex">
-                        {(isOwner || isAdmin || message.senderId === userId) &&    <RemoveButton />}
+                    <div  className=" mt-3 w-full  gap-3 flex">
+                        {(isOwner || isAdmin || message.senderId === userId) &&    <RemoveButton messageId={message.id} />}
                       
-                        <ReplyButton/>
-
-                        {message.senderId === userId &&   <EditButton/>}
-                    
+                        <ReplyButton/>                    
                         <ReportButton/>
                     </div>
                 }
@@ -147,29 +150,46 @@ export default function MessageBubble({message, isAdmin = false, isOwner = false
     )
 }
 
+interface RemoveButtonProps{
 
-const RemoveButton =()=>{
+    messageId: string
+}
+const RemoveButton =({messageId}:RemoveButtonProps)=>{
+
+    const {deleteMessage, deletingMessage} = useDeleteMessage();
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+
+    async function fetchDelete(){
+
+        await deleteMessage({messageId: messageId});
+    }
 
     return(
+        <>
 
-        <motion.div 
-        
-        initial={{y: 10, opacity: 0}}
-        animate={{y: 0, opacity: 1}}
-        transition={{
-            duration: 0.5,
-            delay: 0.2    // cuánto espera antes de iniciar
-        }}
-        key={"delete-message-icon"}
-        >
-            <IconButton
-            onClick={(e)=>{e.stopPropagation();}}
-            withGrainyTexture={false}
-                tooltipText="Delete message"
+        <CustomDialog title="Confirm Deletion" open={showConfirmationDialog} onOpenChanged={setShowConfirmationDialog} onDismiss={() => setShowConfirmationDialog(false)} onAccept={() => { setShowConfirmationDialog(false); fetchDelete(); }}>
+          Are you sure you want to delete this message? This action cannot be undone.
+        </CustomDialog>
+        <motion.div
+
+            initial={{y: 10, opacity: 0}}
+            animate={{y: 0, opacity: 1}}
+            transition={{
+                duration: 0.5,
+                delay: 0.2    // cuánto espera antes de iniciar
+            }}
+            key={"delete-message-icon"}
             >
-                <TrashIcon size={14}/>
-            </IconButton>
-        </motion.div>
+                <IconButton
+                onClick={(e)=>{e.stopPropagation(); setShowConfirmationDialog(true);}}
+                withGrainyTexture={false}
+                    tooltipText="Delete message"
+                >
+                    <TrashIcon size={14}/>
+                </IconButton>
+            </motion.div>
+        </>
+       
     )
 }
 
@@ -225,36 +245,10 @@ const ReportButton =()=>{
     )
 }
 
-const EditButton =()=>{
-
-    return(
-
-        <motion.div
-         initial={{y: 10, opacity: 0}}
-        animate={{y: 0, opacity: 1}}
-        transition={{
-            duration: 0.5,
-            delay: 0.4    // cuánto espera antes de iniciar
-        }}
-
-        key={"edit-message-icon"}
-        >
-            <IconButton
-                        onClick={(e)=>{e.stopPropagation();}}
-
-            withGrainyTexture={false}
-                tooltipText="Edit message"
-            >
-                <EditIcon size={14}/>
-            </IconButton>
-        </motion.div>
-    )
-}
-
 
 interface MessageImageProps{
 
-    src:string
+    src: string
     lenght: number,
     index: number
 }

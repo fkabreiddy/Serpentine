@@ -16,6 +16,7 @@ export function useCreateOrUpdateGroupAccess() {
     const [groupAccess, setGroupAccess] = useState<GroupAccessResponse | null>(null);
     const [creatingOrUpdatingGroupAccess, setCreatingOrUpdatingGroupAccess] = useState<boolean>(false);
     const [result, setResult] = useState<ApiResult<GroupAccessResponse> | null>(null);
+    let isBusy = false;
     const { put } = useFetch<GroupAccessResponse>();
 
     useEffect(() => {
@@ -45,6 +46,7 @@ export function useCreateOrUpdateGroupAccess() {
 
     const createOrUpdateGroupAccess = async (data: CreateOrUpdateGroupAccessRequest) => {
 
+       
         setResult(null);
         setCreatingOrUpdatingGroupAccess(true);
         setGroupAccess(null);

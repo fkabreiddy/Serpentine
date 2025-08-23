@@ -13,6 +13,7 @@ import { useUiSound } from "@/helpers/sound-helper";
 import {ArrowDown, MessageCircle} from "lucide-react";
 import { GroupAccessResponse } from "@/models/responses/group-access-response";
 import { useCreateOrUpdateGroupAccess } from "@/hooks/group-access-hooks";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 
 interface MessagesContainerProps {
   groupId: string;
@@ -26,13 +27,18 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     hasMore,
     fetchingMessages,
     getMessagesByGroupId,
+    
   } = useGetMessagesByGroupId();
 
-  const {createOrUpdateGroupAccess} = useCreateOrUpdateGroupAccess();
+  const {createOrUpdateGroupAccess, creatingOrUpdatingGroupAccess} = useCreateOrUpdateGroupAccess();
+  const {deletedMessageId, setDeletedMessageId} = useGlobalDataStore();
   const {user} = useAuthStore();
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { activeChannelsHub } = useActiveChannelsHubStore();
   const firstRender = useRef(false);
+
+  const prevGroupId = useRef<string | null>(null);
+  const creatingOrUpdatingAccess = useRef<boolean | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
   const [accessDate, setAccessDate] = useState<Date | null>(null);
@@ -42,6 +48,8 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
   const [thereAreUnseenMessages, setThereAreUnseenMessages] = useState<boolean>(false);
 
   const {playSubmit} = useUiSound();
+
+  
   
   function scrollToLastUnreadMessage(){
 
@@ -49,7 +57,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
 
     if(message.length >= 1)
     {
-      const element = document.getElementById(message[0].id.toString() + "-message-bubble");
+      const element = document.getElementById(message[0].id.toString() + "-message-bubble-id");
 
       if(element)
       {
@@ -61,6 +69,16 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     }
   }
 
+  useEffect(() => {
+    if (!deletedMessageId) return;
+
+    setMessages((prev) =>
+      prev.filter((m) => m.id !== deletedMessageId)
+    );
+
+    setDeletedMessageId(null);
+  }, [deletedMessageId]);
+
   const fetchMessages = async () => {
     if (!groupId) return;
 
@@ -71,38 +89,54 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     });
   };
 
-    useEffect(() => {
-        if(groupId !== null)
-        {
-            setAccessDate(new Date());
-        }
-    }, [groupId]);
-
-
-    useEffect(()=>{
-
-      if(messages)
+  useEffect(() => {
+      if(groupId !== null)
       {
-        var thereIsAnUnseenMessage  = messages.filter(m => m.isNewAndUnread === true).length >= 1;
-        setThereAreUnseenMessages(thereIsAnUnseenMessage)
+          setAccessDate(new Date());
       }
-    },[messages])
-    
+  }, [groupId]);
 
-    
 
   useEffect(()=>{
 
-    if(!groupId) return;
-    
+    if(messages)
+    {
+      var thereIsAnUnseenMessage  = messages.filter(m => m.isNewAndUnread === true).length >= 1;
+      setThereAreUnseenMessages(thereIsAnUnseenMessage)
+    }
+  },[messages])
+  
+
+  useEffect(() => {
+
+    creatingOrUpdatingAccess.current = creatingOrUpdatingGroupAccess;
+  },[creatingOrUpdatingGroupAccess])
+
+  useEffect(()=>{
+
+    if(creatingOrUpdatingAccess.current) return;
+    if(prevGroupId.current === groupId && isMounted) return;
+
     createOrUpdateGroupAccess({groupId: groupId});
     setIsMounted(true);
+    prevGroupId.current = groupId;
 
     return()=>{
       createOrUpdateGroupAccess({groupId: groupId})
     }
 
-  },[groupId])
+  },[creatingOrUpdatingAccess, groupId])
+
+  useEffect(() => {
+    if (
+      prevGroupId.current !== groupId &&
+      prevGroupId.current !== null
+    ) {
+      createOrUpdateGroupAccess({ groupId: prevGroupId.current });
+    }
+  }, [prevGroupId, groupId]);
+
+  
 
 
   useEffect(()=>{
@@ -117,7 +151,17 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
    
   
 
-    
+  const scrollToBottom = useCallback(() => {
+
+    const container = document.getElementById("messages-container");
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  }, []);
+
 
 
   const observeLastElement = useCallback(
@@ -143,7 +187,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
       if (result.data.groupId !== groupId) return;
 
       result.data.isNewAndUnread = true;
-      setMessages((prev) => [ result.data as MessageResponse, ...prev]);
+      setMessages((prev) => ([ result.data as MessageResponse, ...prev]));
       
       if(isScrolleableToBottom)
       {
@@ -158,7 +202,13 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     {
       
       
-      setMessages((prev) => (prev.map(m => m.id === messageId ? {...m, isNewAndUnread: false} : m)))
+      setMessages((prev) =>
+        prev.map(m =>
+          m.id === messageId && m.isNewAndUnread
+            ? { ...m, isNewAndUnread: false }
+            : m
+        )
+      );
     }
 
     
@@ -185,14 +235,14 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
 
                 {messages.map((message, idx) => {
                     const isLast = idx === messages.length - 1;
-                     
+                   
                     return (
                         <div
                         ref={isLast ? observeLastElement : null}
                         className="w-full"
                         key={message.id.toString()}
                         >
-                            <MessageBubble onReaded={handleOnReaded}  userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
+                            <MessageBubble index={idx} onReaded={handleOnReaded}  userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
                             {idx > 0 && new Date(messages[idx - 1].createdAt).getDay() !==  new Date(messages[idx].createdAt).getDay() && <MessageDateDivider date={new Date(messages[idx].createdAt)}/> }
                         </div>
                     );
@@ -200,7 +250,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
 
                 <>
                   {fetchingMessages && <Spinner size="sm" variant="spinner"/>}
-                    {!fetchingMessages && messages.length <= 0 &&
+                    {!fetchingMessages && !hasMore && messages.length <= 0 &&
                      <div className="h-full w-full flex flex-col items-center justify-center">
                       <MessageCircle size={30}/>
                       <label>Start the conversation</label>

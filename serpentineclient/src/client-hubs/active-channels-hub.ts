@@ -24,7 +24,7 @@ export function useActiveChannelsHubConnection(){
   const {getToken} = useJwtHelper();
   const {activeChannelsHub, setConnection, setActiveChannelsHubConnectionState, clearChannels, quitConnection} = useActiveChannelsHubStore();
   const firstRender = useRef<boolean>(true);
-  const {setDeletedChannelId, setNewUnreadMessage, currentGroupIdAtChatroomPage} = useGlobalDataStore()
+  const {setDeletedChannelId, setNewUnreadMessage, currentGroupIdAtChatroomPage, setDeletedMessageId, setNewMessageRecievedOnCurrentGroup} = useGlobalDataStore()
   const [isMounted, setIsMounted]=useState<boolean>(false);
   const currentGroupIdRef = useRef(currentGroupIdAtChatroomPage);
   useEffect(() => {
@@ -69,7 +69,7 @@ export function useActiveChannelsHubConnection(){
     });
   }, []); // Sin dependencias
 
-  const handleSendMessage = useCallback((result: HubResult<MessageResponse | null>)=>{
+    const handleSendMessage = useCallback((result: HubResult<MessageResponse | null>)=>{
 
 
       const message = result.data;
@@ -79,15 +79,30 @@ export function useActiveChannelsHubConnection(){
 
 
 
+
+
+      if(currentGroupIdRef.current === message.groupId){
+        setNewMessageRecievedOnCurrentGroup(message);
+        return;
+      }
+
       setNewUnreadMessage(message);
-
-
-      if(currentGroupIdRef.current === message.groupId) return;
-
       showMessageNotification({
         title: `${message.channelName} > ${message.groupName}`, 
         description: `@${message.senderUsername}: ${message.content.substring(0, 50)}`
       });
+
+    },[]);
+
+    const handleSendMessageDeleted = useCallback((result: HubResult<string | null>)=>{
+
+
+      const messageId = result.data;
+
+      if(!messageId) return;
+
+      setDeletedMessageId(messageId);
+    
 
     },[]);
 
@@ -103,6 +118,7 @@ export function useActiveChannelsHubConnection(){
     activeChannelsHub.on("SendChannelRemoved",  handleSendChannelRemoved);
     activeChannelsHub.on("SendUserKickedOut",  handleSendChannelMemberKickedOut);
     activeChannelsHub.on("SendMessage", handleSendMessage);
+    activeChannelsHub.on("SendMessageDeleted", handleSendMessageDeleted);
 
    
 
@@ -114,6 +130,7 @@ export function useActiveChannelsHubConnection(){
     activeChannelsHub.off("SendChannelRemoved")
     activeChannelsHub.off("SendUserKickedOut")
     activeChannelsHub.off("SendMessage");
+    activeChannelsHub.off("SendMessageDeleted");
 
 
   }, [activeChannelsHub]);

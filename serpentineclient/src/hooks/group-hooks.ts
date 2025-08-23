@@ -67,6 +67,7 @@ export function useGetGroupsByChannelId() {
     const [loadingGroups, setLoadingGroups] = useState<boolean>(false);
     const [result, setResult] = useState<ApiResult<GroupResponse[]> | null>(null);
     const [isBusy, setIsBusy] = useState<boolean>(false);
+    const [channelId, setChannelId] = useState<string | null>(null);
     const { get } = useFetch<GroupResponse[]>();
 
 
@@ -82,7 +83,7 @@ export function useGetGroupsByChannelId() {
 
 
         if (result.data && result.statusCode === 200) {
-            setGroups(prev => [...prev, ...(result.data || [])]);
+            setGroups(prev => [...prev, ...(result.data?.filter(g => g.channelId === channelId) || [])]);
 
         }
         else {
@@ -94,7 +95,7 @@ export function useGetGroupsByChannelId() {
         setResult(null);
 
 
-    }, [result]);
+    }, [result, channelId]);
 
 
     const getGroupsByChannelId = async (data: GetGroupsByChannelIdRequest) => {
@@ -105,6 +106,7 @@ export function useGetGroupsByChannelId() {
         setGroups([]);
         setHasMore(true);
         setLoadingGroups(true);
+        setChannelId(data.channelId);
 
         do{
 

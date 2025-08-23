@@ -24,7 +24,7 @@ const CustomDialog : React.FC<CustomDialogProps> = ({open, acceptText = "Ok", ti
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-              <ModalBody>
+              <ModalBody className="text-[13px]">
                 {children}
                 
               </ModalBody>

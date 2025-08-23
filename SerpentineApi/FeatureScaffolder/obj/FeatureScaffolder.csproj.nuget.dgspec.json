@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\FeatureScaffolder\\FeatureScaffolder.csproj": {}
+    "C:\\Proyectos\\Serpentine-App\\serpentineapi\\featurescaffolder\\FeatureScaffolder.csproj": {}
   },
   "projects": {
-    "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\FeatureScaffolder\\FeatureScaffolder.csproj": {
+    "C:\\Proyectos\\Serpentine-App\\serpentineapi\\featurescaffolder\\FeatureScaffolder.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\FeatureScaffolder\\FeatureScaffolder.csproj",
+        "projectUniqueName": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\featurescaffolder\\FeatureScaffolder.csproj",
         "projectName": "FeatureScaffolder",
-        "projectPath": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\FeatureScaffolder\\FeatureScaffolder.csproj",
+        "projectPath": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\featurescaffolder\\FeatureScaffolder.csproj",
         "packagesPath": "C:\\Users\\breid\\.nuget\\packages\\",
-        "outputPath": "C:\\Proyectos\\Serpentine-App\\SerpentineApi\\FeatureScaffolder\\obj\\",
+        "outputPath": "C:\\Proyectos\\Serpentine-App\\serpentineapi\\featurescaffolder\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\breid\\AppData\\Roaming\\NuGet\\NuGet.Config"

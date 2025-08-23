@@ -37,11 +37,16 @@ export default function GroupsContainer({
     newUnreadMessage,
     setNewUnreadMessage,
     resetGroupUnreadMessages,
-    setResetGroupUnreadMessages
+    setResetGroupUnreadMessages,
+    deletedMessageId,
+    setDeletedMessageId,
+    newMessageRecievedOnCurrentGroup,
+    setNewMessageRecievedOnCurrentGroup,
+
   } = useGlobalDataStore();
   const { layout, setLayout } = useLayoutStore();
 
-  const fetchChannels = async () => {
+  const fetchGroups = async () => {
     if (!channel) return;
     await getGroupsByChannelId({
       channelId: channel.id,
@@ -49,6 +54,31 @@ export default function GroupsContainer({
       take: 5,
     });
   };
+
+  useEffect(()=>{
+
+    if(!newMessageRecievedOnCurrentGroup) return;
+
+    setGroups(prev => 
+      prev.map(group =>
+        group.id === newMessageRecievedOnCurrentGroup.groupId
+          ? { ...group, lastMessage: newMessageRecievedOnCurrentGroup }
+          : group
+      )
+    );
+
+  },[newMessageRecievedOnCurrentGroup])
+
+  useEffect(() => {
+    if (!deletedMessageId) return;
+
+    setGroups((prev) =>
+      prev.map((g) =>
+        g.id === deletedMessageId ? { ...g, lastMessage: null } : g
+      )
+    );
+    setDeletedMessageId(null);
+  }, [deletedMessageId]);
 
   useEffect(()=>{
   
@@ -117,7 +147,7 @@ export default function GroupsContainer({
     if (channel.id !== prevChannelId.current) {
       prevChannelId.current = channel.id;
 
-      fetchChannels();
+      fetchGroups();
     }
   }, [channel?.id]);
 

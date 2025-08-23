@@ -20,12 +20,22 @@ export default function ChatroomPage(){
     const {groupId} = useParams();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
-    const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages} = useGlobalDataStore();
-      const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
-      const navigate = useNavigate();
+    const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages, deletedChannelId} = useGlobalDataStore();
+    const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
+    const [showChannelDeletedDialog, setShowChannelDeletedDialog] = useState(false);
+
+    const navigate = useNavigate();
     
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
 
+    useEffect(()=>{
+
+        if(deletedChannelId && group?.channelId === deletedChannelId)
+        {
+            navigate("/home");
+        }
+
+    },[deletedChannelId])
   
     useEffect(()=>{
 
@@ -96,13 +106,17 @@ export default function ChatroomPage(){
     
     return(
         <>
-            <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
+
                 <CustomDialog onDismiss={()=>{ navigate("/home");}} onAccept={()=>{ navigate("/home");}} open={showLockedGroupDialog} showDismiss={false} acceptText="Understood" onOpenChanged={(value)=> {setShowLockedGroupDialog(value); navigate("/home")}} title="Group is private">
-                <p className="text-[13px]">
-                    This group is private you cannot acceed if you are not an admin or the owner of the group
-                </p>
+                        This group is private you cannot acceed if you are not an admin or the owner of the group
+                </CustomDialog>
+
+                <CustomDialog onDismiss={()=>{ navigate("/home");}} onAccept={()=>{ navigate("/home");}} open={showChannelDeletedDialog} showDismiss={false} acceptText="Understood" onOpenChanged={(value)=> {setShowChannelDeletedDialog(value); navigate("/home")}} title="Channel deleted">
+                        This channel has been deleted
                 </CustomDialog>
                
+            <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
+                
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
                 {group && 
                    <CurrentGroupChatroomInfo group={group}/>
