@@ -14,12 +14,8 @@ import {ArrowDown, MessageCircle} from "lucide-react";
 import { GroupAccessResponse } from "@/models/responses/group-access-response";
 import { useCreateOrUpdateGroupAccess } from "@/hooks/group-access-hooks";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
-import { group } from "console";
-import {
-  
-  parseDateTime,
-} from "@internationalized/date";
 import { useDateHelper } from "@/helpers/relative-date-helper";
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 
 interface MessagesContainerProps {
   groupId: string;
@@ -49,7 +45,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
   const [isScrolleableToBottom,  setIsScrolleableToBottom] = useState(false);
-  const messagesContainerRef = useRef<HTMLElement | null>(null);
+  const messagesContainerRef = useRef<VirtuosoHandle | null>(null);
 
   const {playSubmit} = useUiSound();
   const {getDate} = useDateHelper();
@@ -99,7 +95,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
   function scrollToLastUnreadMessage(){
 
     if(!lastReadMessageDate) return;
-    const message = [...messages.filter(m => m.createdAt >= lastReadMessageDate)].reverse()
+    const message = [...messages.filter(m => m.createdAt >= lastReadMessageDate)]
 
     if(message.length >= 1)
     {
@@ -128,6 +124,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
   const fetchMessages = async () => {
     if (!groupId) return;
 
+    new Promise<void>((resolve) => setTimeout(resolve, 2000));
     await getMessagesByGroupId({
       groupId: groupId,
       take: 15,
@@ -199,7 +196,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
       if (result.data.groupId !== groupId) return;
 
       console.log(result.data);
-      setMessages((prev) => ([ result.data as MessageResponse, ...prev]));
+      setMessages((prev) => ([...prev, result.data as MessageResponse ]));
       
      
       playSubmit();
@@ -222,38 +219,74 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
   }, []);
 
   return (
-    <motion.div className="flex justify-center pt-[60px]   pb-[120px] w-full  h-full ">
+    <motion.div className="flex justify-center pt-[60px]   pb-[70px] w-full  h-full ">
 
         
-            <ScrollShadow id={"messages-container"} ref={messagesContainerRef} className="w-[70%]  relative flex-col-reverse  flex pb-[10px] max-md:w-[90%] overflow-scroll  ">
-                
-                {unreadMessagesCount >= 1 && <NewUnseenMessage onClick={scrollToLastUnreadMessage} unseenMessages={unreadMessagesCount}/>}
+        <Virtuoso
+          data={messages}
+          totalCount={messages.length}
+         reversed={true}
+          initialTopMostItemIndex={messages.length - 1} // empieza desde abajo
+          followOutput={true}
+          
+          
+          style={{ height: "calc(100vh - 130px)" }}
+          id={"messages-container"} ref={messagesContainerRef} 
+          className="w-[70%] relative" // ocupa todo el alto del contenedor
+          itemContent={(idx, message) => {
+            const isLast = idx === 0;
 
-                {messages.map((message, idx) => {
-                    const isLast = idx === messages.length - 1;
-                   
-                    return (
-                        <div
-                        ref={isLast ? observeLastElement : null}
-                        className="w-full"
-                        key={message.id.toString()}
-                        >
-                            <MessageBubble lastReadMessageDate={lastReadMessageDate ?? ""} index={idx} onReaded={handleMessageRead}  userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
-                            {idx > 0 && getDate(messages[idx - 1].createdAt).day !==  getDate(messages[idx].createdAt).day && <MessageDateDivider date={messages[idx - 1].createdAt}/> }
-                        </div>
-                    );
-                })}
+            return (
+              <div
+               
+                className="w-full"
+                key={message.id.toString()}
+              >
 
-                <>
-                  {fetchingMessages && <Spinner size="sm" variant="spinner"/>}
-                    {!fetchingMessages && !hasMore && messages.length <= 0 &&
-                     <div className="h-full w-full flex flex-col items-center justify-center">
-                      <MessageCircle size={30}/>
-                      <label>Start the conversation</label>
-                      </div> }
-                </>
+                {isLast &&  <div className="mb-[40px]" ref={observeLastElement}></div>}
+               
+                <MessageBubble
+                  lastReadMessageDate={lastReadMessageDate ?? ""}
+                  index={idx}
+                  onReaded={handleMessageRead}
+                  userId={user?.id ?? ""}
+                  isOwner={channelMember.isOwner}
+                  isAdmin={channelMember.isAdmin}
+                  message={message}
+                />
+                {idx < (messages.length - 1) &&
+                  getDate(messages[idx + 1].createdAt).day !==
+                    getDate(messages[idx].createdAt).day && (
+                    <MessageDateDivider date={messages[idx + 1].createdAt} />
+                )}
+               
+              </div>
+
               
-            </ScrollShadow>
+            );
+          }}
+           components={{
+          Footer: () =>
+            unreadMessagesCount >= 1 ? (
+              <NewUnseenMessage
+                onClick={scrollToLastUnreadMessage}
+                unseenMessages={unreadMessagesCount}
+              />
+            ) : null,
+          Header: () => (
+            <>
+              {fetchingMessages && <Spinner size="sm" variant="spinner" />}
+              {!fetchingMessages && !hasMore && messages.length <= 0 && (
+                <div className="h-full w-full flex flex-col items-center justify-center">
+                  <MessageCircle size={30} />
+                  <label>Start the conversation</label>
+                </div>
+              )}
+            </>
+          ),
+        }}
+         
+        />
         
     </motion.div>
   );
@@ -275,7 +308,7 @@ function MessageDateDivider({date}:MessageDateDividerProps){
 
     <div className="flex gap-3 w-full items-center opacity-60">
       <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
-      <p className="text-[13px] whitespace-nowrap"> {monthNames[getDate(date).month]} {getDate(date).day}, {getDate(date).year}</p>
+      <p className="text-[13px] whitespace-nowrap"> {monthNames[getDate(date).month - 1] } {getDate(date).day}, {getDate(date).year}</p>
       <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
 
     </div>

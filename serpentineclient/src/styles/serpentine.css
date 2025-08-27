@@ -15,7 +15,7 @@ body,html{
     font-family: "Source Serif 4" !important;
 }
 input, select, textarea {
-    min-height: 2em;
+    min-height: 1em;
     max-height: 12em;
     scrollbar-width: none;
     outline: none !important;

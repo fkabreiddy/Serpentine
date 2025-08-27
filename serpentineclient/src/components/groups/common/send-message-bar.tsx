@@ -23,6 +23,8 @@ export default function SendMessageBar({
 }: SendMessageBarProps) {
   const textArea = useRef<HTMLTextAreaElement | null>(null);
   const [isListening, setIsListening] = useState(false);
+   const [alignEnd, setAlignEnd] = useState(false);
+
   const [createMessageRequest, setCreateMessageRequest] = useState<CreateMessageRequest>({
     
     content: "",
@@ -30,7 +32,7 @@ export default function SendMessageBar({
     groupId: group?.id ?? ""
   })
   const { activeChannels, activeChannelsHubsState } =
-    useActiveChannelsHubStore();
+  useActiveChannelsHubStore();
   
   const {createMessage, creatingMessage, message} = useCreateMessage();
 
@@ -41,6 +43,29 @@ export default function SendMessageBar({
     setCreateMessageRequest((prev)=>({...prev, groupId: group.id}));
 
   },[group])
+
+
+useEffect(() => {
+    const textarea = document.getElementById("send-message-textarea");
+    if (!textarea) return;
+
+    const checkHeight = () => {
+      const fontSize = parseFloat(getComputedStyle(textarea).fontSize); // px
+      const emToPx = 2 * fontSize; // 2em en px
+      const currentHeight = textarea.scrollHeight;
+
+      if (currentHeight >= emToPx) {
+        setAlignEnd(true);
+      } else {
+        setAlignEnd(false);
+      }
+    };
+
+    checkHeight();
+
+    textarea.addEventListener("input", checkHeight);
+    return () => textarea.removeEventListener("input", checkHeight);
+  }, []);
 
 
   useEffect(()=>{
@@ -86,58 +111,57 @@ export default function SendMessageBar({
       className={` ${(loading || !group || !hasPermisson) && "opacity-50"} w-full  pb-4 py-2 px-3  absolute left-0 bottom-0 flex flex-col items-center`}
     >
       <div
-        className={`w-[70%]   backdrop-blur-xl backdrop-opacity-70  h-fit max-h-[400px] dark:bg-neutral-900/20 bg-neutral-300/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900 border-neutral-100 `}
+      id={"send-message-containter"}
+        className={`w-[70%] flex ${alignEnd ? "items-end" : "items-center"} transition-all  backdrop-blur-xl backdrop-opacity-100  h-fit max-h-[400px] dark:bg-neutral-950/50 bg-neutral-300/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900 border-neutral-100 gap-2`}
       >
-        <textarea
+          
+
+          <textarea
             value={createMessageRequest.content}
             onChange={handleChange}
-          ref={textArea}
-          disabled={loading || !group || !hasPermisson}
-          className=" w-full p-3 border-0 !outline-none !bg-transparent resize-none"
-          maxLength={1000}
-          style={{ backgroundColor: "transparent !important", border: "0" }}
-          autoCorrect="false"
-          minLength={1}
-          required={true}
-        />
-        <div className=" w-full flex justify-between items-center gap-2 ">
-          <div className="flex items-center gap-3">
-            {isListening ? (
-              <p className="text-green-600 animate-pulse shrink-0  text-xs font-normal">
-                Listening
-              </p>
-            ) : (
-              <p className="text-red-600 text-xs shrink-0 font-normal">
-                Not Listening
-              </p>
-            )}
-          </div>
+            id={"send-message-textarea"}
+            ref={textArea}
+            disabled={loading || !group || !hasPermisson}
+            className=" w-full px-2 border-0 !outline-none !bg-transparent resize-none"
+            maxLength={1000}
+            style={{ backgroundColor: "transparent !important", border: "0" }}
+            autoCorrect="false"
+            minLength={1}
+            required={true}
+          />
 
-          <div className="flex items-center gap-3 group">
-            <IconButton onClick={() => {}} tooltipText="Attatch document">
-              <FilePlusIcon className="size-[16px] " />
-            </IconButton>
-            <IconButton onClick={() => {}} tooltipText="Attatch image">
-              <ImagePlus className="size-[16px] " />
-            </IconButton>
+          <div className="flex items-center gap-2">
+              {isListening ? (
+                <div className="bg-green-600 animate-pulse rounded-full size-[5px]">
+                  
+                </div>
+              ) : (
+                <div className="bg-red-600 rounded-full size-[5px]">
+                  
+                </div>
+              )}
 
-            {loading || creatingMessage ? (
-              <Spinner size="sm" variant="spinner" />
-            ) : (
-              <IconButton  disabled={(createMessageRequest.content.length < 1 && createMessageRequest.content.length > 1000) || creatingMessage } onClick={() => {fetchCreateMessage()}} tooltipText="Send">
-                <motion.div
-                  key="send-icon"
-                  whileHover={{ rotate: -40 }}
-                  animate={{ rotate: 0 }}
-                  exit={{ rotate: 40 }}
-                  className="flex  relative"
-                >
-                  <ArrowRight className="size-[16px] " />
-                </motion.div>
-              </IconButton>
-            )}
+              {loading || creatingMessage ? (
+                <Spinner size="sm" variant="spinner" />
+              ) : (
+                <IconButton  disabled={(createMessageRequest.content.length < 1 && createMessageRequest.content.length > 1000) || creatingMessage } onClick={() => {fetchCreateMessage()}} tooltipText="Send">
+                  <motion.div
+                    key="send-icon"
+                    whileHover={{ rotate: -40 }}
+                    animate={{ rotate: 0 }}
+                    exit={{ rotate: 40 }}
+                    className="flex  relative"
+                  >
+                    <ArrowRight className="size-[16px] " />
+                  </motion.div>
+                </IconButton>
+              )}
           </div>
-        </div>
+         
+        
+         
+         
+    
       </div>
     </div>
   );
