@@ -1,3 +1,6 @@
+import { CalendarDate } from "@heroui/react";
+import { CalendarDateTime, parseDateTime, parseZonedDateTime, ZonedDateTime } from "@internationalized/date";
+
 export const useDateHelper = () =>{
 
     const  getRelativeDate = (date: Date): string => {
@@ -14,8 +17,24 @@ export const useDateHelper = () =>{
     return "just now";
   }
 
+  const getDate = (iso:string) : CalendarDateTime | ZonedDateTime=>{
+
+    try{
+
+      if(iso.endsWith("Z"))
+      {
+        iso = iso.replace("Z", "");
+      }
+      return parseDateTime(iso);
+    }catch{
+      return  parseZonedDateTime(iso);
+    }
+  }
+
   return{
 
-    getRelativeDate
+    getRelativeDate,
+    getDate,
   }
 }
+

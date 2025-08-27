@@ -127,6 +127,7 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
         CancellationToken cancellationToken = default
     )
     {
+
         using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         try
@@ -182,7 +183,7 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
                 group.UnreadMessages = await dbContext.Messages.CountUnreadMessagesFromAGroup(
                     group.Id,
                     request.CurrentUserId,
-                    group.MyAccess.LastAccess,
+                    group.MyAccess.LastReadMessageDate,
                     cancellationToken
                 );
 

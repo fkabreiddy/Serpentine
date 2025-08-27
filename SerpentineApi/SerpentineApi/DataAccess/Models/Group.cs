@@ -59,7 +59,7 @@ public class Group : BaseEntity
             },
             Accesses = new()
             {
-                new() { UserId = request.CurrentUserId, LastAccess = DateTime.UtcNow },
+                new() { UserId = request.CurrentUserId, LastReadMessageDate = DateTime.UtcNow },
             },
         };
 }

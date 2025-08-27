@@ -5,7 +5,7 @@
 export class GroupAccessResponse extends BaseResponse {
     groupId: string = "";
     userId: string = "";
-    lastAccess: string = "";
+    lastReadMessageDate: string = "";
 
 
 

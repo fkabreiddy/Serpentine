@@ -18,6 +18,9 @@ using System.Text.Json.Serialization;
         {
             [Required, JsonPropertyName("groupId"), FromBody, Description("The id of the last acceceed group")]
             public Ulid GroupId { get; set; }
+
+            [JsonPropertyName("lastRedMessageId"), FromBody, Description("The id of the last message the user red")]
+            public DateTime LastReadMessageDate { get; set; } = DateTime.UtcNow;
         }
 
         public class CreateGroupAccessRequestValidator : AbstractValidator<CreateGroupAccessRequest>
@@ -27,6 +30,8 @@ using System.Text.Json.Serialization;
                 RuleFor(x => x.GroupId)
                     .Must(x => UlidHelper.IsValid(x))
                     .WithMessage("The id of the group must not be empty.");
+               
+                
 
               
             }
@@ -124,7 +129,7 @@ using System.Text.Json.Serialization;
                 if (existingAccess is not null)
                 {
                     await context.GroupAccesses.Where(ga => ga.Id == existingAccess.Id).ExecuteUpdateAsync(x =>
-                        x.SetProperty(y => y.LastAccess, DateTime.UtcNow),
+                        x.SetProperty(y => y.LastReadMessageDate, request.LastReadMessageDate),
                         cancellationToken
                     );
                     

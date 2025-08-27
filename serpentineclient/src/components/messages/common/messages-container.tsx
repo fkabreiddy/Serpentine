@@ -14,6 +14,12 @@ import {ArrowDown, MessageCircle} from "lucide-react";
 import { GroupAccessResponse } from "@/models/responses/group-access-response";
 import { useCreateOrUpdateGroupAccess } from "@/hooks/group-access-hooks";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
+import { group } from "console";
+import {
+  
+  parseDateTime,
+} from "@internationalized/date";
+import { useDateHelper } from "@/helpers/relative-date-helper";
 
 interface MessagesContainerProps {
   groupId: string;
@@ -31,29 +37,69 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
   } = useGetMessagesByGroupId();
 
   const {createOrUpdateGroupAccess, creatingOrUpdatingGroupAccess} = useCreateOrUpdateGroupAccess();
+  const [lastReadMessageDate, setLastReadMessageDate] = useState<string | null>(null)
   const {deletedMessageId, setDeletedMessageId} = useGlobalDataStore();
   const {user} = useAuthStore();
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { activeChannelsHub } = useActiveChannelsHubStore();
   const firstRender = useRef(false);
 
-  const prevGroupId = useRef<string | null>(null);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
   const creatingOrUpdatingAccess = useRef<boolean | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
-  const [accessDate, setAccessDate] = useState<Date | null>(null);
   const [isScrolleableToBottom,  setIsScrolleableToBottom] = useState(false);
   const messagesContainerRef = useRef<HTMLElement | null>(null);
-  const [countNewUnseenMessage, setCountNewUnseenMessage] = useState(0);
-  const [thereAreUnseenMessages, setThereAreUnseenMessages] = useState<boolean>(false);
 
   const {playSubmit} = useUiSound();
+  const {getDate} = useDateHelper();
 
-  
-  
+  async function fetchCreateOrUpdateGroupAccess() {
+
+    if(!groupId) return;
+
+    await createOrUpdateGroupAccess({
+      groupId: groupId,
+      lastReadMessageDate: lastReadMessageDate,
+    });
+  }
+
+  function handleMessageRead(message: MessageResponse){
+
+    setLastReadMessageDate(message.createdAt);
+  }
+
+  useEffect(() => {
+      if(lastAccess)
+      {
+          setLastReadMessageDate(lastAccess.lastReadMessageDate);
+          console.log("Date setted: ", new Date(lastAccess.lastReadMessageDate));
+
+      }
+
+      return()=>{
+        fetchCreateOrUpdateGroupAccess();
+      }
+  }, [lastAccess]);
+
+  useEffect(()=>{
+
+    if(lastReadMessageDate && messages)
+    {
+      console.log("From parent: ", lastReadMessageDate);
+        setUnreadMessagesCount(messages.filter(m => m.createdAt > lastReadMessageDate).length);
+    }
+  },[lastReadMessageDate, messages.length])
+
+
+
+
+
+
   function scrollToLastUnreadMessage(){
 
-    const message = [...messages.filter(m => m.isNewAndUnread === true)].reverse()
+    if(!lastReadMessageDate) return;
+    const message = [...messages.filter(m => m.createdAt >= lastReadMessageDate)].reverse()
 
     if(message.length >= 1)
     {
@@ -89,22 +135,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     });
   };
 
-  useEffect(() => {
-      if(groupId !== null)
-      {
-          setAccessDate(new Date());
-      }
-  }, [groupId]);
-
-
-  useEffect(()=>{
-
-    if(messages)
-    {
-      var thereIsAnUnseenMessage  = messages.filter(m => m.isNewAndUnread === true).length >= 1;
-      setThereAreUnseenMessages(thereIsAnUnseenMessage)
-    }
-  },[messages])
+  
   
 
   useEffect(() => {
@@ -112,29 +143,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     creatingOrUpdatingAccess.current = creatingOrUpdatingGroupAccess;
   },[creatingOrUpdatingGroupAccess])
 
-  useEffect(()=>{
-
-    if(creatingOrUpdatingAccess.current) return;
-    if(prevGroupId.current === groupId && isMounted) return;
-
-    createOrUpdateGroupAccess({groupId: groupId});
-    setIsMounted(true);
-    prevGroupId.current = groupId;
-
-    return()=>{
-      createOrUpdateGroupAccess({groupId: groupId})
-    }
-
-  },[creatingOrUpdatingAccess, groupId])
-
-  useEffect(() => {
-    if (
-      prevGroupId.current !== groupId &&
-      prevGroupId.current !== null
-    ) {
-      createOrUpdateGroupAccess({ groupId: prevGroupId.current });
-    }
-  }, [prevGroupId, groupId]);
+  
 
   
 
@@ -147,6 +156,9 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
     fetchMessages();
   },[isMounted]);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
    
   
@@ -186,30 +198,14 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
 
       if (result.data.groupId !== groupId) return;
 
-      result.data.isNewAndUnread = true;
+      console.log(result.data);
       setMessages((prev) => ([ result.data as MessageResponse, ...prev]));
       
-      if(isScrolleableToBottom)
-      {
-          setCountNewUnseenMessage(1);
-      }
-      
+     
       playSubmit();
     },[groupId]);
 
 
-    function handleOnReaded( messageId: string)
-    {
-      
-      
-      setMessages((prev) =>
-        prev.map(m =>
-          m.id === messageId && m.isNewAndUnread
-            ? { ...m, isNewAndUnread: false }
-            : m
-        )
-      );
-    }
 
     
     
@@ -231,7 +227,7 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
         
             <ScrollShadow id={"messages-container"} ref={messagesContainerRef} className="w-[70%]  relative flex-col-reverse  flex pb-[10px] max-md:w-[90%] overflow-scroll  ">
                 
-                {thereAreUnseenMessages && <NewUnseenMessage onClick={scrollToLastUnreadMessage} unseenMessages={messages.filter(m => m.isNewAndUnread === true).length}/>}
+                {unreadMessagesCount >= 1 && <NewUnseenMessage onClick={scrollToLastUnreadMessage} unseenMessages={unreadMessagesCount}/>}
 
                 {messages.map((message, idx) => {
                     const isLast = idx === messages.length - 1;
@@ -242,8 +238,8 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
                         className="w-full"
                         key={message.id.toString()}
                         >
-                            <MessageBubble index={idx} onReaded={handleOnReaded}  userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
-                            {idx > 0 && new Date(messages[idx - 1].createdAt).getDay() !==  new Date(messages[idx].createdAt).getDay() && <MessageDateDivider date={new Date(messages[idx].createdAt)}/> }
+                            <MessageBubble lastReadMessageDate={lastReadMessageDate ?? ""} index={idx} onReaded={handleMessageRead}  userId={user?.id ?? ""} isOwner={channelMember.isOwner} isAdmin={channelMember.isAdmin} message={message} />
+                            {idx > 0 && getDate(messages[idx - 1].createdAt).day !==  getDate(messages[idx].createdAt).day && <MessageDateDivider date={messages[idx - 1].createdAt}/> }
                         </div>
                     );
                 })}
@@ -265,10 +261,11 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
 
 interface MessageDateDividerProps{
 
-  date: Date
+  date: string
 }
 
 function MessageDateDivider({date}:MessageDateDividerProps){
+  const {getDate} = useDateHelper();
 
   const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -278,7 +275,7 @@ function MessageDateDivider({date}:MessageDateDividerProps){
 
     <div className="flex gap-3 w-full items-center opacity-60">
       <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
-      <p className="text-[13px] whitespace-nowrap"> {monthNames[date.getMonth()]} {date.getUTCDate()}, {date.getFullYear()}</p>
+      <p className="text-[13px] whitespace-nowrap"> {monthNames[getDate(date).month]} {getDate(date).day}, {getDate(date).year}</p>
       <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
 
     </div>

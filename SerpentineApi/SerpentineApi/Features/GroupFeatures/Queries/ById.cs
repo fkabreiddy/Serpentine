@@ -92,7 +92,7 @@
                 response.UnreadMessages = await context.Messages.CountUnreadMessagesFromAGroup(
                     response.Id,
                     request.CurrentUserId,
-                    response.MyAccess?.LastAccess ?? DateTime.Now,
+                    response.MyAccess?.LastReadMessageDate ?? response.CreatedAt,
                     cancellationToken
                 );
 

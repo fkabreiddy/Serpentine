@@ -119,7 +119,7 @@ internal class GetGroupsByChannelIdEndpointHandler(SerpentineDbContext context)
             group.UnreadMessages = await context.Messages.CountUnreadMessagesFromAGroup(
                 group.Id,
                 request.CurrentUserId,
-                group.MyAccess?.LastAccess ?? group.CreatedAt,
+                group.MyAccess?.LastReadMessageDate ?? group.CreatedAt,
                 cancellationToken
             );
 

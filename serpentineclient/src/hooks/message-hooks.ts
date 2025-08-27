@@ -128,6 +128,7 @@ export function useGetMessagesByGroupId() {
         if (result.data && result.statusCode === 200) {
             setMessages((prev)=>[...prev, ...(result.data?.filter(m => m.groupId === groupId) ?? [])]);
 
+            console.log(result.data);
             if(result.data.length <= 14)
             {
                 setHasMore(false);
