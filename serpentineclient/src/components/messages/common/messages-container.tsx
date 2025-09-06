@@ -72,6 +72,15 @@ export default function MessagesContainer({
     });
   }
 
+  useEffect(()=>{
+
+    return()=>{
+
+      fetchCreateOrUpdateGroupAccess();
+      console.log("Component unmounted");
+    }
+  },[groupId]);
+
   function handleMessageDateUpdated(date: string) {
     setLastReadMessageDate(date);
   }
