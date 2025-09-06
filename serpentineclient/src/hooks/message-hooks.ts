@@ -197,3 +197,54 @@ export function useGetMessagesByGroupId() {
 
     return { getMessagesByGroupId, getMessagesByGroupIdIsAvailable, hasMoreAfter, hasMoreBefore, messages, fetchingMessages, setMessages};
 }
+
+export function useGetCountUnreadMessages() {
+
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
+    const [fetchingUnreadMessagesCount, setFetchingUnreadMessagesCount] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<number> | null>(null);
+    const { get } = useFetch<number>();
+
+
+
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            
+            setFetchingUnreadMessagesCount(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+
+          setUnreadMessagesCount(result.data)
+
+           
+        }
+        else {
+
+            handleApiErrors(result);
+          
+        }
+
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const getCountUnreadMessages = async (data: GetUnreadMessagesCount) => {
+
+        setUnreadMessagesCount(0);
+         setFetchingUnreadMessagesCount(true);
+        setResult(null);
+        const response = await get({endpoint: MESSAGES_ENDPOINT + "/count-unread-by-group-id", contentType: "application/json"}, data );
+        setResult(response);
+      
+    };
+
+    return { getCountUnreadMessages, setUnreadMessagesCount, unreadMessagesCount, fetchingUnreadMessagesCount};
+}

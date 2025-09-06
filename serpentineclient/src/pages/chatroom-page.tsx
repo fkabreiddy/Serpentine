@@ -13,22 +13,29 @@ import {useActiveChannelsHubStore} from "@/contexts/active-channels-hub-context.
 import { MessageCircleIcon } from "lucide-react";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import CustomDialog from "@/components/common/custom-dialog";
+import { Button } from "@heroui/react";
+import { useGetCountUnreadMessages } from "@/hooks/message-hooks";
+import { MessageResponse } from "@/models/responses/message-response";
 
 export default function ChatroomPage(){
 
     const {layout} = useLayoutStore();
     const {groupId} = useParams();
-    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const {unreadMessagesCount, getCountUnreadMessages, setUnreadMessagesCount} = useGetCountUnreadMessages();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
     const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages, deletedChannelId} = useGlobalDataStore();
     const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
     const [showChannelDeletedDialog, setShowChannelDeletedDialog] = useState(false);
+    
 
     const navigate = useNavigate();
     
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
 
+    async function fecthGetUnreadMessagesCount(groupId: string){
+        await getCountUnreadMessages({groupId: groupId});
+    }
     useEffect(()=>{
 
         if(deletedChannelId && group?.channelId === deletedChannelId)
@@ -55,6 +62,13 @@ export default function ChatroomPage(){
       
     },[groupId])
     
+    useEffect(()=>{
+
+        if(group && hasPermisson)
+        {
+            fecthGetUnreadMessagesCount(group.id);
+        }
+    },[group, hasPermisson])
     
     const fetchGroup = async(id: string)=>{
 
@@ -115,19 +129,19 @@ export default function ChatroomPage(){
                 <CustomDialog onDismiss={()=>{ navigate("/home");}} onAccept={()=>{ navigate("/home");}} open={showChannelDeletedDialog} showDismiss={false} acceptText="Understood" onOpenChanged={(value)=> {setShowChannelDeletedDialog(value); navigate("/home")}} title="Channel deleted">
                         This channel has been deleted
                 </CustomDialog>
-               
             <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
                 
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
+
                 {group && 
-                   <CurrentGroupChatroomInfo newMessagesCount={unreadMessagesCount} group={group}/>
+                   <CurrentGroupChatroomInfo  group={group}/>
                 }
 
                 {(group && channelMember) &&
-                    <MessagesContainer unreadMessagesChanged={setUnreadMessagesCount} lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
+                    <MessagesContainer  unreadMessagesChanged={setUnreadMessagesCount} lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
                 }
 
-                <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
+                <SendMessageBar  unreadMessagesCount={unreadMessagesCount} group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
             </ScrollShadow>
 
         </>
@@ -139,3 +153,4 @@ export const MessageBubbleIcon = () =>(
     
     <MessageCircleIcon size={28}/>
 );
+

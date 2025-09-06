@@ -1,0 +1,4 @@
+interface GetUnreadMessagesCount{
+
+    groupId: string
+}

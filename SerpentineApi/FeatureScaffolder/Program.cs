@@ -30,16 +30,10 @@ internal class Program
 
         var content = $@"using System.Text.Json.Serialization;
         using FluentValidation;
-        using Microsoft.AspNetCore.Authentication.JwtBearer;
-        using Microsoft.AspNetCore.Mvc;
-        using Microsoft.AspNetCore.Mvc.ModelBinding;
         using Microsoft.EntityFrameworkCore;
         using Scalar.AspNetCore;
-        using SerpentineApi.DataAccess.Context.EntityExtensions;
         using SerpentineApi.Helpers;
-        using SerpentineApi.Identity;
-        using SerpentineApi.Services.CloudinaryStorage;
-        using SerpentineApi.Helpers;
+  
 
         namespace SerpentineApi.Features.{featureName}Features.Actions;
 

@@ -39,8 +39,8 @@ public class GetMessagesByGroupIdRequest : RequestWithUserCredentials, IRequest<
     public GetMessagesByGroupIdRequestValidator()
     {
         RuleFor(x => x.GroupId)
-            .NotEmpty()
-            .WithMessage("GroupId is required.");
+             .Must(x => UlidHelper.IsValid(x))
+                    .WithMessage("Group Id should be an valid Ulid.");
 
         RuleFor(x => x.Take)
             .InclusiveBetween(1, 15)
@@ -50,9 +50,7 @@ public class GetMessagesByGroupIdRequest : RequestWithUserCredentials, IRequest<
             .GreaterThanOrEqualTo(0)
             .WithMessage("Skip must be zero or greater.");
 
-        RuleFor(x => x.After)
-            .NotNull()
-            .WithMessage("After is required.");
+       
                     
                     
             }

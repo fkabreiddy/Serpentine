@@ -12,10 +12,8 @@ interface CurrentGroupChatroomInfoProps {
 
 export default function CurrentGroupChatroomInfo({
   group,
-  newMessagesCount = 0,
 }: {  
   group: GroupResponse;
-  newMessagesCount?: number;
 }) {
   const navigate = useNavigate();
   return (
@@ -49,11 +47,7 @@ export default function CurrentGroupChatroomInfo({
                 </Tooltip>
               )}
             </div>
-            {newMessagesCount > 0 && (
-              <div className=" px-2 py-1 rounded-xl bg-blue-600">
-                <p className="text-xs">{newMessagesCount} new messages</p>
-              </div>
-            )}
+            
           </div>
 
           <IconButton tooltipText="About">

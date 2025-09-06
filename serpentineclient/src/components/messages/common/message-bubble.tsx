@@ -1,25 +1,18 @@
-import IconButton from "@/components/common/icon-button";
 import UserAvatar from "@/components/users/common/user-avatar";
 import { useDateHelper } from "@/helpers/relative-date-helper";
 import { MessageResponse } from "@/models/responses/message-response";
 import { motion } from "framer-motion";
 import {
-  BellIcon,
-  EditIcon,
   InfoIcon,
   MessageCircleIcon,
   MessageCircleWarningIcon,
-  MoreVertical,
   ReplyIcon,
   TrashIcon,
 } from "lucide-react";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import Stack from "./message-image-stack";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useDeleteMessage } from "@/hooks/message-hooks";
 import CustomDialog from "@/components/common/custom-dialog";
 import { useIntersection } from "@/helpers/use-intersection-helper";
-import { parseDateTime, parseZonedDateTime } from "@internationalized/date";
-import { parse } from "path";
 import {
   Dropdown,
   DropdownItem,
@@ -27,19 +20,9 @@ import {
   DropdownSection,
   DropdownTrigger,
 } from "@heroui/dropdown";
-import { useAuthStore } from "@/contexts/authentication-context";
+import { useGlobalDataStore } from "@/contexts/global-data-context";
 
-type MessageBubbleProps = {
-  message: MessageResponse;
-  withImage?: boolean;
-  isAdmin: boolean;
-  isOwner: boolean;
-  userId: string;
-  index: number;
-  lastReadMessageDate: string;
-  onMessageSateChanged: (count: number) => void;
-  onLastMessageDateUpdated: (date: string) => void;
-};
+
 
 export default function MessageBubble({
   message,
@@ -50,8 +33,18 @@ export default function MessageBubble({
   index = 0,
   withImage,
   onMessageSateChanged,
-  onLastMessageDateUpdated,
-}: MessageBubbleProps) {
+  onLastMessageDateUpdated
+}: {
+  message: MessageResponse;
+  withImage?: boolean;
+  isAdmin: boolean;
+  isOwner: boolean;
+  userId: string;
+  index: number;
+  lastReadMessageDate: string;
+  onMessageSateChanged: (count: number) => void;
+  onLastMessageDateUpdated: (date: string) => void;
+}) {
   const [openDropdown, setOpenDropdown] = useState(false);
   function handleLastMessageDateUpdated(date: string) {
     onLastMessageDateUpdated(date);
@@ -61,6 +54,7 @@ export default function MessageBubble({
     onMessageSateChanged(count);
   }
 
+ 
   return (
     <MessageDropdown
       open={openDropdown}
@@ -84,16 +78,6 @@ export default function MessageBubble({
   );
 }
 
-type MessageBubbleCardProps = {
-  message: MessageResponse;
-  withImage?: boolean;
-  index: number;
-  openDropdown: () => void;
-  lastReadMessageDate: string;
-  onMessageReadStateChanged: (count: number) => void;
-  onUpdateLastSeenMessageDate: (date: string) => void;
-};
-
 const MessageBubbleCard = ({
   message,
   lastReadMessageDate,
@@ -101,7 +85,16 @@ const MessageBubbleCard = ({
   openDropdown,
   onUpdateLastSeenMessageDate,
   onMessageReadStateChanged,
-}: MessageBubbleCardProps) => {
+  
+}: {
+  message: MessageResponse;
+  withImage?: boolean;
+  index: number;
+  openDropdown: () => void;
+  lastReadMessageDate: string;
+  onMessageReadStateChanged: (count: number) => void;
+  onUpdateLastSeenMessageDate: (date: string) => void;
+}) => {
   const { getDate } = useDateHelper();
 
   const [clicked, setClicked] = useState(false);
@@ -142,6 +135,7 @@ const MessageBubbleCard = ({
     }
   }, [lastReadMessageDate, isVisible]);
 
+  
   return (
     <motion.div
       ref={messageBubbleRef}
@@ -200,6 +194,8 @@ const MessageBubbleCard = ({
             ))}
           </div>
         )}
+
+        {message.parentId && <ParentMessage content={message.parentContent ?? ""} senderUsername={message.senderUsername ?? ""}/>}
         <p
           className={` w-full text-start font-normal opacity-80 text-[13px] whitespace-pre-line  text-ellipsis overflow-hidden ${showMoreContent ? "" : "line-clamp-3"}`}
         >
@@ -252,6 +248,8 @@ interface MessageDropdownProps {
   userId: string;
   open: boolean;
   openChanged: (value: boolean) => void;
+
+  
 }
 
 const MessageDropdown = ({
@@ -262,13 +260,20 @@ const MessageDropdown = ({
   isAdmin,
   open,
   openChanged,
+  
 }: MessageDropdownProps) => {
   const { getDate } = useDateHelper();
   const { deleteMessage, deletingMessage } = useDeleteMessage();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const {setMessageToReplyTo}=useGlobalDataStore();
 
   async function fetchDelete() {
     await deleteMessage({ messageId: message.id });
+  }
+
+  function handleRepliedMessageChanged(message: MessageResponse | null){
+
+    setMessageToReplyTo(message)
   }
 
   return (
@@ -321,10 +326,10 @@ const MessageDropdown = ({
             </DropdownItem>
           </DropdownSection>
 
-          <DropdownSection title={"Actions"}>
+          <DropdownSection  title={"Actions"}>
             <>
               {!message.isNotification && (
-                <DropdownItem key="reply" endContent={<ReplyIcon size={16} />}>
+                <DropdownItem onClick={()=>{handleRepliedMessageChanged(message);}} key="reply" endContent={<ReplyIcon size={16} />}>
                   <p className="font-normal text-[13px]">Reply this message</p>
                 </DropdownItem>
               )}
@@ -353,3 +358,17 @@ const MessageDropdown = ({
     </>
   );
 };
+
+
+const ParentMessage = ({content, senderUsername}:{content:string, senderUsername: string}) =>(
+<div className="w-[70%]  flex justify-center ">
+<div
+
+
+  className="w-full bg-neutral-100 dark:bg-neutral-900 backdrop-blur-md z-[30] rounded-xl px-3 py-1 items-center mr-[-4px]  flex justify-between gap-2 opacity-50">
+       <p className="text-[13px] line-clamp-2 font-normal whitespace-pre-line  text-ellipsis overflow-hidden "><span className="text-blue-600">Reply to @{senderUsername}:</span> {content}</p>
+       
+  </div>
+</div>
+  
+)

@@ -32,6 +32,8 @@ interface GlobalData {
   setDeletedMessageId: (id: string | null) => void;
   newMessageRecievedOnCurrentGroup: MessageResponse | null;
   setNewMessageRecievedOnCurrentGroup: (message: MessageResponse | null) => void;
+  messageToReplyTo: MessageResponse | null;
+  setMessageToReplyTo: (message: MessageResponse | null)=>void
   clearGlobalData: ()=>void
 }
 
@@ -49,6 +51,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   currentGroupIdAtChatroomPage: null,
   deletedMessageId: null,
   newMessageRecievedOnCurrentGroup: null,
+  messageToReplyTo: null,
 
   setDeletedChannelId: (id: string | null) => {
     set((state) => ({
@@ -137,6 +140,15 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     set((state)=>({
         ...state,
         newMessageRecievedOnCurrentGroup: message
+
+    }))
+  },
+
+  setMessageToReplyTo: (message: MessageResponse | null) => {
+
+    set((state)=>({
+        ...state,
+        messageToReplyTo: message
 
     }))
   },

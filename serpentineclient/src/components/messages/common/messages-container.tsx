@@ -20,6 +20,7 @@ interface MessagesContainerProps {
   channelMember: ChannelMemberResponse;
   lastAccess: GroupAccessResponse | null;
   unreadMessagesChanged: (count: number) => void;
+
 }
 export default function MessagesContainer({
   groupId,
@@ -63,6 +64,8 @@ export default function MessagesContainer({
 
   //functions
 
+  
+  
   async function fetchCreateOrUpdateGroupAccess() {
     if (!groupId) return;
 
@@ -77,7 +80,6 @@ export default function MessagesContainer({
     return()=>{
 
       fetchCreateOrUpdateGroupAccess();
-      console.log("Component unmounted");
     }
   },[groupId]);
 
@@ -101,6 +103,7 @@ export default function MessagesContainer({
       skip: messages?.length,
     });
   };
+
 
   const fetchMessagesAfter = async () => {
     if (!groupId) return;
