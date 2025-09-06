@@ -15,33 +15,46 @@ using SerpentineApi.Utilities;
 
 namespace SerpentineApi.Features.MessageFeatures.Actions;
 
-        public class GetMessagesByGroupIdRequest : RequestWithUserCredentials, IRequest<OneOf<List<MessageResponse>, Failure>>
-        {
-            [JsonPropertyName("groupId"), FromQuery(Name = "groupId"), Description("The id of the group you want to get the messages from"), Required]
-            public Ulid GroupId { get; set; }
+public class GetMessagesByGroupIdRequest : RequestWithUserCredentials, IRequest<OneOf<List<MessageResponse>, Failure>>
+{
+    [JsonPropertyName("groupId"), FromQuery(Name = "groupId"), Description("The id of the group you want to get the messages from"), Required]
+    public Ulid GroupId { get; set; }
 
-            [JsonPropertyName("take"), Range(1, 15), FromQuery(Name = "take"), Description("The amount of messages to fetch")]
-            public int Take { get; set; } = 15;
+    [JsonPropertyName("take"), Range(1, 15), FromQuery(Name = "take"), Description("The amount of messages to fetch")]
+    public int Take { get; set; } = 15;
 
-            [JsonPropertyName("skip"), Range(1, int.MaxValue), FromQuery(Name = "skip"), Description("The amount of messages to skip after the previous fetch")]
-            public int Skip { get; set; } = 0;
-        }
+    [JsonPropertyName("skip"), Range(1, int.MaxValue), FromQuery(Name = "skip"), Description("The amount of messages to skip after the previous fetch")]
+    public int Skip { get; set; } = 0;
+
+    [Required, JsonPropertyName("after"), Range(1, int.MaxValue), FromQuery(Name = "after"), Description("Whether to fetch messages after the last index. By default it fetches messages before the index.")]
+    public bool After { get; set; } = false;
+
+    [JsonPropertyName("indexDate"), FromQuery(Name = "indexDate"), Description("The date of the index to reference from where to start fetching messages.")]
+    public DateTime? IndexDate { get; set; }
+}
+
 
         public class GetMessagesByGroupIdRequestValidator : AbstractValidator<GetMessagesByGroupIdRequest>
         {
-            public GetMessagesByGroupIdRequestValidator()
-            {
-                RuleFor(x => x.GroupId)
-                    .NotEmpty()
-                    .WithMessage("GroupId is required.");
+    public GetMessagesByGroupIdRequestValidator()
+    {
+        RuleFor(x => x.GroupId)
+            .NotEmpty()
+            .WithMessage("GroupId is required.");
 
-                RuleFor(x => x.Take)
-                    .InclusiveBetween(1, 15)
-                    .WithMessage("Take must be between 1 and 15.");
+        RuleFor(x => x.Take)
+            .InclusiveBetween(1, 15)
+            .WithMessage("Take must be between 1 and 15.");
 
-                RuleFor(x => x.Skip)
-                    .GreaterThanOrEqualTo(0)
-                    .WithMessage("Skip must be zero or greater.");
+        RuleFor(x => x.Skip)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Skip must be zero or greater.");
+
+        RuleFor(x => x.After)
+            .NotNull()
+            .WithMessage("After is required.");
+                    
+                    
             }
         }
 
@@ -132,7 +145,18 @@ namespace SerpentineApi.Features.MessageFeatures.Actions;
 
         }
 
-        return await context.Messages.GetMessagesByGroupId(request.GroupId, request.Skip, request.Take, cancellationToken);
+
+
+        
+
+            if (request.After)
+            {
+                return await context.Messages.GetMessagesByGroupIdAfter(request.GroupId, request.Skip, request.Take, Ulid.Empty, request.IndexDate ?? DateTime.UtcNow, cancellationToken);
             }
+            else
+            {
+                return await context.Messages.GetMessagesByGroupIdBefore(request.GroupId, request.Skip, request.Take, Ulid.Empty, request.IndexDate ?? DateTime.UtcNow, cancellationToken);
+            }
+        }
         }
         

@@ -18,6 +18,7 @@ export default function ChatroomPage(){
 
     const {layout} = useLayoutStore();
     const {groupId} = useParams();
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
     const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages, deletedChannelId} = useGlobalDataStore();
@@ -119,11 +120,11 @@ export default function ChatroomPage(){
                 
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
                 {group && 
-                   <CurrentGroupChatroomInfo group={group}/>
+                   <CurrentGroupChatroomInfo newMessagesCount={unreadMessagesCount} group={group}/>
                 }
 
                 {(group && channelMember) &&
-                    <MessagesContainer lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
+                    <MessagesContainer unreadMessagesChanged={setUnreadMessagesCount} lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
                 }
 
                 <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>

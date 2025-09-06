@@ -4,7 +4,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { Info, KeyIcon, PlusIcon, Settings } from "lucide-react";
 import GroupCard from "./group-card";
 import { ChannelBanner } from "@/components/channels/common/channel-banner";
-import { ChannelCover } from "@/components/channels/common/channel-cover";
+import  ChannelCover  from "@/components/channels/common/channel-cover";
 import { useEffect, useRef, useTransition } from "react";
 import { useGetGroupsByChannelId } from "@/hooks/group-hooks.ts";
 import { Spinner } from "@heroui/spinner";

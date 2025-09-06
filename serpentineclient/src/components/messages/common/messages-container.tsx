@@ -8,208 +8,214 @@ import { HubResult } from "@/models/hub-result";
 import { useGetMessagesByGroupId } from "@/hooks/message-hooks";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
-import { channel } from "diagnostics_channel";
 import { useUiSound } from "@/helpers/sound-helper";
-import {ArrowDown, MessageCircle} from "lucide-react";
+import { ArrowDown, MessageCircle } from "lucide-react";
 import { GroupAccessResponse } from "@/models/responses/group-access-response";
 import { useCreateOrUpdateGroupAccess } from "@/hooks/group-access-hooks";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useDateHelper } from "@/helpers/relative-date-helper";
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 
 interface MessagesContainerProps {
   groupId: string;
   channelMember: ChannelMemberResponse;
-  lastAccess: GroupAccessResponse | null; 
+  lastAccess: GroupAccessResponse | null;
+  unreadMessagesChanged: (count: number) => void;
 }
-export default function MessagesContainer({ groupId, channelMember, lastAccess }: MessagesContainerProps) {
+export default function MessagesContainer({
+  groupId,
+  channelMember,
+  lastAccess,
+  unreadMessagesChanged,
+}: MessagesContainerProps) {
   const {
     messages,
     setMessages,
-    hasMore,
+    hasMoreBefore,
+    hasMoreAfter,
     fetchingMessages,
     getMessagesByGroupId,
-    
+    getMessagesByGroupIdIsAvailable
   } = useGetMessagesByGroupId();
 
-  const {createOrUpdateGroupAccess, creatingOrUpdatingGroupAccess} = useCreateOrUpdateGroupAccess();
-  const [lastReadMessageDate, setLastReadMessageDate] = useState<string | null>(null)
-  const {deletedMessageId, setDeletedMessageId} = useGlobalDataStore();
-  const {user} = useAuthStore();
+  const { createOrUpdateGroupAccess, creatingOrUpdatingGroupAccess } =
+    useCreateOrUpdateGroupAccess();
+  const [lastReadMessageDate, setLastReadMessageDate] = useState<string | null>(
+    null
+  ); //leave this to a track the client state, the server state is in the lastAccess prop
+
+  const { deletedMessageId, setDeletedMessageId } = useGlobalDataStore();
+  const { user } = useAuthStore();
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { activeChannelsHub } = useActiveChannelsHubStore();
-  const firstRender = useRef(false);
+  const firstRender = useRef(true);
+  const lastGroupId = useRef<string>("");
 
   const [unreadMessagesCount, setUnreadMessagesCount] = useState<number>(0);
   const creatingOrUpdatingAccess = useRef<boolean | null>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const observerRefTop = useRef<IntersectionObserver | null>(null);
+  const observerRefBottom = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
-  const [isScrolleableToBottom,  setIsScrolleableToBottom] = useState(false);
-  const messagesContainerRef = useRef<VirtuosoHandle | null>(null);
 
-  const {playSubmit} = useUiSound();
-  const {getDate} = useDateHelper();
+  const { playSubmit } = useUiSound();
+  const { getDate } = useDateHelper();
+
+  
+
+  //functions
 
   async function fetchCreateOrUpdateGroupAccess() {
-
-    if(!groupId) return;
+    if (!groupId) return;
 
     await createOrUpdateGroupAccess({
-      groupId: groupId,
+      groupId: lastGroupId.current,
       lastReadMessageDate: lastReadMessageDate,
     });
   }
 
-  function handleMessageRead(message: MessageResponse){
-
-    setLastReadMessageDate(message.createdAt);
+  function handleMessageDateUpdated(date: string) {
+    setLastReadMessageDate(date);
   }
 
   useEffect(() => {
-      if(lastAccess)
-      {
-          setLastReadMessageDate(lastAccess.lastReadMessageDate);
-          console.log("Date setted: ", new Date(lastAccess.lastReadMessageDate));
+    unreadMessagesChanged(unreadMessagesCount);
+  }, [unreadMessagesCount]);
 
-      }
-
-      return()=>{
-        fetchCreateOrUpdateGroupAccess();
-      }
-  }, [lastAccess]);
-
-  useEffect(()=>{
-
-    if(lastReadMessageDate && messages)
-    {
-      console.log("From parent: ", lastReadMessageDate);
-        setUnreadMessagesCount(messages.filter(m => m.createdAt > lastReadMessageDate).length);
-    }
-  },[lastReadMessageDate, messages.length])
-
-
-
-
-
-
-  function scrollToLastUnreadMessage(){
-
-    if(!lastReadMessageDate) return;
-    const message = [...messages.filter(m => m.createdAt >= lastReadMessageDate)]
-
-    if(message.length >= 1)
-    {
-      const element = document.getElementById(message[0].id.toString() + "-message-bubble-id");
-
-      if(element)
-      {
-        element.scrollIntoView({
-          behavior: "smooth", // animación suave
-          block: "center"   
-        })
-      }
-    }
-  }
-
-  useEffect(() => {
-    if (!deletedMessageId) return;
-
-    setMessages((prev) =>
-      prev.filter((m) => m.id !== deletedMessageId)
-    );
-
-    setDeletedMessageId(null);
-  }, [deletedMessageId]);
-
-  const fetchMessages = async () => {
+  const fetchMessagesBefore = async () => {
     if (!groupId) return;
 
     new Promise<void>((resolve) => setTimeout(resolve, 2000));
     await getMessagesByGroupId({
       groupId: groupId,
       take: 15,
+      after: false,
+      indexDate: messages[messages.length - 1]?.createdAt,
       skip: messages?.length,
     });
   };
 
-  
-  
+  const fetchMessagesAfter = async () => {
+    if (!groupId) return;
 
-  useEffect(() => {
+    new Promise<void>((resolve) => setTimeout(resolve, 2000));
+    await getMessagesByGroupId({
+      groupId: groupId,
+      take: 15,
+      after: true,
+      indexDate: messages[0]?.createdAt,
+      skip: messages?.length,
+    });
+  };
 
-    creatingOrUpdatingAccess.current = creatingOrUpdatingGroupAccess;
-  },[creatingOrUpdatingGroupAccess])
-
-  
-
-  
-
-
-  useEffect(()=>{
-
-    if(firstRender.current || !isMounted ) return;
-
-    firstRender.current = true;
-    fetchMessages();
-  },[isMounted]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-   
-  
-
-  const scrollToBottom = useCallback(() => {
-
-    const container = document.getElementById("messages-container");
-    if (container) {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: "smooth"
-      });
-    }
-  }, []);
-
-
-
-  const observeLastElement = useCallback(
+  const observeTop = useCallback(
     (node: HTMLDivElement | null) => {
-      if (fetchingMessages) return;
-      if (observerRef.current) observerRef.current.disconnect();
+      if (fetchingMessages || !getMessagesByGroupIdIsAvailable) return;
+      if (observerRefTop.current) observerRefTop.current.disconnect();
 
-      observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          fetchMessages();
+      observerRefTop.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreBefore) {
+          fetchMessagesBefore();
         }
       });
 
-      if (node) observerRef.current.observe(node);
+      if (node) observerRefTop.current.observe(node);
       lastElementRef.current = node;
     },
-    [fetchingMessages, hasMore, fetchMessages]
+    [fetchingMessages, hasMoreBefore, fetchMessagesBefore]
   );
 
-   const handleMessageRecieved = useCallback((result: HubResult<MessageResponse>) => {
+  const observeBottom = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (fetchingMessages || !getMessagesByGroupIdIsAvailable) return;
+
+      if (observerRefBottom.current) observerRefBottom.current.disconnect();
+
+      observerRefBottom.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreAfter) {
+          fetchMessagesAfter();
+        }
+      });
+
+      if (node) observerRefBottom.current.observe(node);
+      lastElementRef.current = node;
+    },
+    [fetchingMessages, hasMoreAfter, fetchMessagesAfter]
+  );
+
+  //effects
+
+  //main flow
+  //1. mount component and set the effect so the lastAccess is created once the component is unmounted
+
+  useEffect(() => {
+    setIsMounted(true);
+    lastGroupId.current = groupId;
+  }, []);
+
+ 
+
+  useEffect(() => {
+    if (lastAccess) {
+      setLastReadMessageDate(lastAccess.lastReadMessageDate);
+    }
+  }, [lastAccess]);
+
+  //2. first we need to do the first fetch of messages. We need to especify is there is a last seen message.
+  //if there is we shall fetch messages before that date, if not, it means the user is entering for the first time
+  //by default the lastReadMessageDate is set as the date the user first entered the group. Btw, we need to check nullability of the access itself
+  useEffect(() => {
+    if (!firstRender.current || !isMounted) return; //always check if its first render to avoid re-rendering problems
+
+    firstRender.current = false;
+
+    const firstFetch = async () => {
+
+      await getMessagesByGroupId({
+        groupId: groupId,
+        take: 15,
+        after: false,
+        indexDate: lastAccess?.lastReadMessageDate, // this can be null btw
+        skip: messages?.length,
+      });
+
+
+    };
+
+    firstFetch();
+  }, [isMounted]);
+
+  //other effects
+
+  
+
+  useEffect(() => {
+    if (!deletedMessageId) return;
+
+    setMessages((prev) => prev.filter((m) => m.id !== deletedMessageId));
+
+    setDeletedMessageId(null);
+  }, [deletedMessageId]);
+
+  useEffect(() => {
+    creatingOrUpdatingAccess.current = creatingOrUpdatingGroupAccess;
+  }, [creatingOrUpdatingGroupAccess]);
+
+  const handleMessageRecieved = useCallback(
+    (result: HubResult<MessageResponse>) => {
       if (!result.data) return;
 
       if (result.data.groupId !== groupId) return;
 
       console.log(result.data);
-      setMessages((prev) => ([...prev, result.data as MessageResponse ]));
-      
-     
+
+      setMessages((prev) => [result.data as MessageResponse, ...prev]);
+
       playSubmit();
-    },[groupId]);
+    },
+    [groupId]
+  );
 
-
-
-    
-    
   useEffect(() => {
     if (!activeChannelsHub) return;
-
-   
 
     activeChannelsHub.on("SendMessage", handleMessageRecieved);
 
@@ -220,129 +226,90 @@ export default function MessagesContainer({ groupId, channelMember, lastAccess }
 
   return (
     <motion.div className="flex justify-center pt-[60px]   pb-[70px] w-full  h-full ">
-
-        
-        <Virtuoso
-          data={messages}
-          totalCount={messages.length}
-         reversed={true}
-          initialTopMostItemIndex={messages.length - 1} // empieza desde abajo
-          followOutput={true}
-          
-          
-          style={{ height: "calc(100vh - 130px)" }}
-          id={"messages-container"} ref={messagesContainerRef} 
-          className="w-[70%] relative" // ocupa todo el alto del contenedor
-          itemContent={(idx, message) => {
-            const isLast = idx === 0;
-
-            return (
-              <div
-               
-                className="w-full"
-                key={message.id.toString()}
-              >
-
-                {isLast &&  <div className="mb-[40px]" ref={observeLastElement}></div>}
-               
-                <MessageBubble
-                  lastReadMessageDate={lastReadMessageDate ?? ""}
-                  index={idx}
-                  onReaded={handleMessageRead}
-                  userId={user?.id ?? ""}
-                  isOwner={channelMember.isOwner}
-                  isAdmin={channelMember.isAdmin}
-                  message={message}
-                />
-                {idx < (messages.length - 1) &&
-                  getDate(messages[idx + 1].createdAt).day !==
-                    getDate(messages[idx].createdAt).day && (
-                    <MessageDateDivider date={messages[idx + 1].createdAt} />
-                )}
-               
-              </div>
-
-              
-            );
-          }}
-           components={{
-          Footer: () =>
-            unreadMessagesCount >= 1 ? (
-              <NewUnseenMessage
-                onClick={scrollToLastUnreadMessage}
-                unseenMessages={unreadMessagesCount}
-              />
-            ) : null,
-          Header: () => (
+      <div
+        className="relative w-[70%] max-md:w-[90%] flex flex-col-reverse overflow-auto"
+        style={{ height: "calc(100vh - 130px)" }}
+      >
+        {messages.map((message, idx) => {
+          return (
             <>
-              {fetchingMessages && <Spinner size="sm" variant="spinner" />}
-              {!fetchingMessages && !hasMore && messages.length <= 0 && (
-                <div className="h-full w-full flex flex-col items-center justify-center">
-                  <MessageCircle size={30} />
-                  <label>Start the conversation</label>
-                </div>
+              {(idx === 0 && hasMoreAfter && !fetchingMessages && getMessagesByGroupIdIsAvailable) && <div className="w-full " ref={observeBottom}></div>}
+              <MessageBubble
+                lastReadMessageDate={lastReadMessageDate ?? ""}
+                index={idx}
+                onMessageSateChanged={(e) => setUnreadMessagesCount((prev)=>(prev + e))}
+                onLastMessageDateUpdated={handleMessageDateUpdated}
+                userId={user?.id ?? ""}
+                isOwner={channelMember.isOwner}
+                isAdmin={channelMember.isAdmin}
+                message={message}
+              />
+              {idx < messages.length - 1 &&
+                getDate(messages[idx + 1].createdAt).day !==
+                  getDate(messages[idx].createdAt).day && (
+                  <MessageDateDivider date={messages[idx].createdAt} />
+                )}
+              {(idx === messages.length - 1 && hasMoreBefore && !fetchingMessages && getMessagesByGroupIdIsAvailable) &&(
+                <div className="w-full" ref={observeTop}></div>
               )}
             </>
-          ),
-        }}
-         
-        />
-        
+          );
+        })}
+
+        {fetchingMessages && (
+          <div className="h-full w-full flex flex-col items-center justify-center">
+            <Spinner size="sm" variant="spinner" />
+          </div>
+        )}
+        {!fetchingMessages && !hasMoreBefore && messages.length <= 0 && (
+          <div className="h-full w-full flex flex-col items-center justify-center">
+            <MessageCircle size={30} />
+            <label>Start the conversation</label>
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }
 
-interface MessageDateDividerProps{
-
-  date: string
+interface MessageDateDividerProps {
+  date: string;
 }
 
-function MessageDateDivider({date}:MessageDateDividerProps){
-  const {getDate} = useDateHelper();
+function MessageDateDivider({ date }: MessageDateDividerProps) {
+  const { getDate } = useDateHelper();
 
   const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-  return(
-
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return (
     <div className="flex gap-3 w-full items-center opacity-60">
-      <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
-      <p className="text-[13px] whitespace-nowrap"> {monthNames[getDate(date).month - 1] } {getDate(date).day}, {getDate(date).year}</p>
-      <hr className="w-full  border-neutral-300 dark:border-neutral-800"/>
-
+      <hr className="w-full  border-neutral-300 dark:border-neutral-800" />
+      <p className="text-[13px] whitespace-nowrap">
+        {" "}
+        {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
+        {getDate(date).year}
+      </p>
+      <hr className="w-full  border-neutral-300 dark:border-neutral-800" />
     </div>
-  )
+  );
 }
 
-const  NewMessagesDivider = () => (
-<div className="flex gap-3 w-full items-center opacity-60">
-            <hr className="w-full  border-blue-500 dark:border-neutral-800"/>
-            <p className="text-[13px] text-blue-500 whitespace-nowrap">New Messages</p>
-            <hr className="w-full  border-blue-500 dark:border-neutral-800"/>
-
-        </div>
-
-)
-
-interface NewUnseenMessageProps{
-    
-    unseenMessages: number;
-    onClick: ()=> void;
-    
-}
-const NewUnseenMessage = ({unseenMessages, onClick}:NewUnseenMessageProps) =>(
-    
-    <motion.div 
-    key={"scroll-to-last-unseen-message"}
-    initial={{opacity: 0, bottom: -30}}
-    animate={{opacity: 1, bottom: 20, transform: 1}}
-    whileHover={{transform: 1.05}}
-    className={"sticky w-full !cursor-pointer flex right-[0px] bottom-[20px] z-[30]"}>
-        <Button onPress={()=> onClick()} size="sm" className={"  w-fit flex ml-auto items-center gap-2  rounded-xl text-[11px]  text-white bg-blue-600 p-2"}>
-            {unseenMessages} new messages
-            <ArrowDown size={13}/>
-        </Button>
-    </motion.div>
-  
-)
+const NewMessagesDivider = () => (
+  <div className="flex gap-3 w-full items-center opacity-60">
+    <hr className="w-full  border-blue-500 dark:border-neutral-800" />
+    <p className="text-[13px] text-blue-500 whitespace-nowrap">New Messages</p>
+    <hr className="w-full  border-blue-500 dark:border-neutral-800" />
+  </div>
+);

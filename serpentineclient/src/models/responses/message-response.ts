@@ -18,7 +18,7 @@ export class MessageResponse extends BaseResponse {
     
     
     //front-end-only properties
-    isNewAndUnread: boolean = false;//this property is set when the message bubble gets into the viewport for the first time
+    isUnread: boolean | null = null;//this property is set when the message bubble gets into the viewport for the first time
 
  
 

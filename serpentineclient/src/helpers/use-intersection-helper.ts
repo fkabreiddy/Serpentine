@@ -1,20 +1,23 @@
 import { useEffect, useState } from "react";
 
-export const useIntersection = (element: { current: any; }, rootMargin: any) => {
+export const useIntersection = (elementId: string, rootMargin: any) => {
   const [isVisible, setState] = useState(false);
 
-  useEffect(() => {
-    const current = element?.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setState(entry.isIntersecting);
-      },
-      { rootMargin }
-    );
-    current && observer?.observe(current);
+   useEffect(() => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
 
-    return () => current && observer.unobserve(current);
-  }, []);
+    const observer = new IntersectionObserver(([entry]) => {
+      setState(entry.isIntersecting);
+    });
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [elementId]);
+
 
   return isVisible;
 };

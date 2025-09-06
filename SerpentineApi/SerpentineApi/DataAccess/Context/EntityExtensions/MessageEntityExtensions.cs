@@ -26,6 +26,7 @@ public static class MessageEntityExtensions
         Ulid groupId,
         int skip,
         int take,
+        Ulid? lastReadMessageId = null,
         CancellationToken cancellationToken = default
     )
     {
@@ -35,6 +36,94 @@ public static class MessageEntityExtensions
         .Where(m => m.GroupId == groupId)
         .OrderByDescending(m => m.CreatedAt)
         .Skip(skip)
+        .Take(take)
+        .Select(m => new MessageResponse()
+        {
+
+            SenderName = m.Sender != null ? m.Sender.FullName : "",
+            SenderUsername = m.Sender != null ? m.Sender.Username : "",
+            SenderProfilePictureUrl = m.Sender != null ? m.Sender.ProfilePictureUrl : "",
+            ParentContent = m.Parent != null ? m.Parent.Content.Substring(1, 50) : "",
+            ChannelId = m.Group.ChannelId,
+            ChannelName = m.Group.Channel.Name,
+            GroupName = m.Group.Name
+
+
+
+        }.Spread(m, new[]
+        {
+            nameof(Message.SenderName),
+            nameof(Message.SenderProfilePictureUrl),
+            nameof(Message.ParentContent),
+            nameof(Message.SenderUsername),
+            nameof(Message.ChannelId),
+            nameof(Message.GroupName),
+            nameof(Message.ChannelName),
+        })).ToListAsync(cancellationToken);
+
+        return messages.ToList();
+    }
+
+
+    public static async Task<List<MessageResponse>> GetMessagesByGroupIdAfter(
+
+        this DbSet<Message> messageSet,
+        Ulid groupId,
+        int skip,
+        int take,
+        Ulid messageId,
+        DateTime afterDate,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var messages = await messageSet
+        .AsNoTracking()
+        .AsSplitQuery()
+        .OrderByDescending(m => m.CreatedAt)
+        .Where(m => m.GroupId == groupId && m.Id != messageId && m.CreatedAt > afterDate)
+        .Take(take)
+        .Select(m => new MessageResponse()
+        {
+
+            SenderName = m.Sender != null ? m.Sender.FullName : "",
+            SenderUsername = m.Sender != null ? m.Sender.Username : "",
+            SenderProfilePictureUrl = m.Sender != null ? m.Sender.ProfilePictureUrl : "",
+            ParentContent = m.Parent != null ? m.Parent.Content.Substring(1, 50) : "",
+            ChannelId = m.Group.ChannelId,
+            ChannelName = m.Group.Channel.Name,
+            GroupName = m.Group.Name
+
+
+
+        }.Spread(m, new[]
+        {
+            nameof(Message.SenderName),
+            nameof(Message.SenderProfilePictureUrl),
+            nameof(Message.ParentContent),
+            nameof(Message.SenderUsername),
+            nameof(Message.ChannelId),
+            nameof(Message.GroupName),
+            nameof(Message.ChannelName),
+        })).ToListAsync(cancellationToken);
+
+        return messages.ToList();
+    }
+     public static async Task<List<MessageResponse>> GetMessagesByGroupIdBefore(
+
+        this DbSet<Message> messageSet,
+        Ulid groupId,
+        int skip,
+        int take,
+        Ulid messageId,
+        DateTime beforeDate,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var messages = await messageSet
+        .AsNoTracking()
+        .AsSplitQuery()
+        .OrderByDescending(m => m.CreatedAt)
+        .Where(m => m.GroupId == groupId && m.Id != messageId && m.CreatedAt < beforeDate)
         .Take(take)
         .Select(m => new MessageResponse()
         {

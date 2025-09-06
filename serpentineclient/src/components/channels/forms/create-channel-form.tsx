@@ -1,4 +1,3 @@
-import { ChannelResponse } from "@/models/responses/channel-response";
 import { Input, Textarea } from "@heroui/input";
 import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -10,15 +9,10 @@ import {
   CreateChannelRequest,
   createChannelSchema,
 } from "@/models/requests/channels/create-channel-request";
-import Avatar from "boring-avatars";
-import IconButton from "@/components/common/icon-button";
-import { AppWindowMacIcon, ImageIcon } from "lucide-react";
-import Noise from "@/components/common/noise-ext";
 import { showToast } from "@/helpers/sonner-helper";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
-import { motion } from "motion/react";
 import {ChannelBanner} from "@/components/channels/common/channel-banner.tsx";
-import {ChannelCover} from "@/components/channels/common/channel-cover.tsx";
+import ChannelCover from "@/components/channels/common/channel-cover.tsx";
 interface CreateChannelFormProps {
   triggerClose: () => void;
 }

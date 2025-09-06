@@ -48,7 +48,7 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
     
     if(firstRender.current === true)
     {
-      playStartUp();
+      //playStartUp();
       firstRender.current = false;
 
 

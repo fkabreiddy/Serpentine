@@ -3,7 +3,7 @@ import { useDeleteChannel, useGetChannelById } from "@/hooks/channel-hooks";
 import { useEffect, useState, useRef, useCallback, EventHandler } from "react";
 import { Spinner } from "@heroui/spinner";
 import { ChannelBanner } from "../common/channel-banner";
-import { ChannelCover } from "../common/channel-cover";
+import ChannelCover  from "../common/channel-cover";
 import InfiniteScroll from "react-infinite-scroll-component"
 import {
   Activity,

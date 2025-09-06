@@ -29,8 +29,6 @@ import {
 } from "@heroui/dropdown";
 import { useAuthStore } from "@/contexts/authentication-context";
 
-
-
 type MessageBubbleProps = {
   message: MessageResponse;
   withImage?: boolean;
@@ -39,7 +37,8 @@ type MessageBubbleProps = {
   userId: string;
   index: number;
   lastReadMessageDate: string;
-  onReaded: (message: MessageResponse) => void;
+  onMessageSateChanged: (count: number) => void;
+  onLastMessageDateUpdated: (date: string) => void;
 };
 
 export default function MessageBubble({
@@ -50,23 +49,40 @@ export default function MessageBubble({
   userId = "",
   index = 0,
   withImage,
-  onReaded,
+  onMessageSateChanged,
+  onLastMessageDateUpdated,
 }: MessageBubbleProps) {
+  const [openDropdown, setOpenDropdown] = useState(false);
+  function handleLastMessageDateUpdated(date: string) {
+    onLastMessageDateUpdated(date);
+  }
 
-
-    const [openDropdown, setOpenDropdown] = useState(false);
-    function handleOnReaded(message: MessageResponse) {
-      onReaded(message);
-    }
+  function handleMessageStateChanged(count: number) {
+    onMessageSateChanged(count);
+  }
 
   return (
-   <MessageDropdown open={openDropdown} openChanged={setOpenDropdown} userId={userId} message={message} isOwner={isOwner} isAdmin={isAdmin}>
-     <MessageBubbleCard openDropdown={()=>{setOpenDropdown(true)}} onReaded={handleOnReaded} index={index} message={message}  lastReadMessageDate={lastReadMessageDate}/>
-   </MessageDropdown>
+    <MessageDropdown
+      open={openDropdown}
+      openChanged={setOpenDropdown}
+      userId={userId}
+      message={message}
+      isOwner={isOwner}
+      isAdmin={isAdmin}
+    >
+      <MessageBubbleCard
+        openDropdown={() => {
+          setOpenDropdown(true);
+        }}
+        onUpdateLastSeenMessageDate={handleLastMessageDateUpdated}
+        onMessageReadStateChanged={handleMessageStateChanged}
+        index={index}
+        message={message}
+        lastReadMessageDate={lastReadMessageDate}
+      />
+    </MessageDropdown>
   );
 }
-
-
 
 type MessageBubbleCardProps = {
   message: MessageResponse;
@@ -74,7 +90,8 @@ type MessageBubbleCardProps = {
   index: number;
   openDropdown: () => void;
   lastReadMessageDate: string;
-  onReaded: (message: MessageResponse) => void;
+  onMessageReadStateChanged: (count: number) => void;
+  onUpdateLastSeenMessageDate: (date: string) => void;
 };
 
 const MessageBubbleCard = ({
@@ -82,7 +99,8 @@ const MessageBubbleCard = ({
   lastReadMessageDate,
   withImage,
   openDropdown,
-  onReaded,
+  onUpdateLastSeenMessageDate,
+  onMessageReadStateChanged,
 }: MessageBubbleCardProps) => {
   const { getDate } = useDateHelper();
 
@@ -91,29 +109,35 @@ const MessageBubbleCard = ({
 
   const [showMoreContent, setShowMoreContent] = useState(false);
   const messageBubbleRef = useRef<HTMLDivElement | null>(null);
-  const isVisible = useIntersection(messageBubbleRef, "0px");
+  const isVisible = useIntersection(message.id + "-message-bubble-id", "0px");
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const container = document.getElementById(
-        message.id.toString() + "-message-bubble-id"
-      );
-      if (container && !container.contains(event.target as Node)) {
-        setClicked(false); // clic fuera → cerrar
+    if (message.createdAt > lastReadMessageDate) {
+      if (message.isUnread === null || message.isUnread === undefined) {
+        message.isUnread = !isVisible;
+
+        if (!isVisible) {
+          onMessageReadStateChanged(1);
+        }
+        return;
+      }
+
+      if (message.isUnread === true && isVisible) {
+        message.isUnread = !isVisible;
+
+        if (isVisible) {
+          onMessageReadStateChanged(-1);
+        }
+
+        return;
       }
     }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [message]);
+  }, [isVisible, lastReadMessageDate, message]);
 
   useEffect(() => {
     if (isVisible) {
       if (message.createdAt > lastReadMessageDate) {
-        console.log("Marking message as read: ", message.id);
-        onReaded(message);
+        onUpdateLastSeenMessageDate(message.createdAt);
       }
     }
   }, [lastReadMessageDate, isVisible]);
@@ -123,9 +147,8 @@ const MessageBubbleCard = ({
       ref={messageBubbleRef}
       key={message.id.toString() + "-message-bubble"}
       id={message.id.toString() + "-message-bubble-id"}
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       onClick={(e) => {
         e.stopPropagation();
         setClicked(false);
@@ -194,16 +217,10 @@ const MessageBubbleCard = ({
             {showMoreContent ? "Show less..." : "Show more..."}
           </a>
         )}
-
-       
       </div>
-       
     </motion.div>
   );
-}
-
-
-
+};
 
 interface MessageImageProps {
   src: string;
@@ -232,9 +249,9 @@ interface MessageDropdownProps {
   isOwner: boolean;
   isAdmin: boolean;
   children: ReactNode;
-  userId: string
+  userId: string;
   open: boolean;
-  openChanged:(value: boolean)=>void;
+  openChanged: (value: boolean) => void;
 }
 
 const MessageDropdown = ({
@@ -247,7 +264,7 @@ const MessageDropdown = ({
   openChanged,
 }: MessageDropdownProps) => {
   const { getDate } = useDateHelper();
-    const { deleteMessage, deletingMessage } = useDeleteMessage();
+  const { deleteMessage, deletingMessage } = useDeleteMessage();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
 
   async function fetchDelete() {
@@ -256,7 +273,7 @@ const MessageDropdown = ({
 
   return (
     <>
-        <CustomDialog
+      <CustomDialog
         title="Confirm Deletion"
         open={showConfirmationDialog}
         onOpenChanged={setShowConfirmationDialog}
@@ -269,66 +286,70 @@ const MessageDropdown = ({
         Are you sure you want to delete this message? This action cannot be
         undone.
       </CustomDialog>
-        <Dropdown
+      <Dropdown
         isOpen={open}
         onOpenChange={openChanged}
-      placement="bottom-end"
-      showArrow={true}
-      className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  "
-    >
-      <DropdownTrigger>
-        <button className="w-full flex justify-start items-start">
-          {children}
-        </button>
-      </DropdownTrigger>
-      <DropdownMenu
-        disabledKeys={["divider", "divider2", "channelInf"]}
-        aria-label="Channel Actions"
-        variant="flat"
+        placement="bottom-end"
+        showArrow={true}
+        className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  "
       >
-        <DropdownSection showDivider={true} title={"About this message"}>
-          <DropdownItem
-            key="channelInfo"
-            startContent={<InfoIcon size={16} />}
-            className="h-14 gap-2"
-          >
-            <p className="font-semibold text-xs">
-              Sent by: @{message.senderUsername}
-            </p>
-            <p className="font-normal text-xs opacity-60">
-              {" "}
-              on {getDate(message.createdAt).month}/
-              {getDate(message.createdAt).day}/{getDate(message.createdAt).year}
-            </p>
-          </DropdownItem>
-        </DropdownSection>
+        <DropdownTrigger>
+          <button className="w-full flex justify-start items-start">
+            {children}
+          </button>
+        </DropdownTrigger>
+        <DropdownMenu
+          disabledKeys={["divider", "divider2", "channelInf"]}
+          aria-label="Channel Actions"
+          variant="flat"
+        >
+          <DropdownSection showDivider={true} title={"About this message"}>
+            <DropdownItem
+              key="channelInfo"
+              startContent={<InfoIcon size={16} />}
+              className="h-14 gap-2"
+            >
+              <p className="font-semibold text-xs">
+                Sent by: @{message.senderUsername}
+              </p>
+              <p className="font-normal text-xs opacity-60">
+                {" "}
+                on {getDate(message.createdAt).month}/
+                {getDate(message.createdAt).day}/
+                {getDate(message.createdAt).year}
+              </p>
+            </DropdownItem>
+          </DropdownSection>
 
-        <DropdownSection  title={"Actions"}>
-          <>
-            {!message.isNotification && (
-              <DropdownItem key="reply" endContent={<ReplyIcon size={16} />}>
-                <p className="font-normal text-[13px]">Reply this message</p>
-              </DropdownItem>
-            )}
-          </>
+          <DropdownSection title={"Actions"}>
+            <>
+              {!message.isNotification && (
+                <DropdownItem key="reply" endContent={<ReplyIcon size={16} />}>
+                  <p className="font-normal text-[13px]">Reply this message</p>
+                </DropdownItem>
+              )}
+            </>
 
-          <DropdownItem
-            key="report"
-            endContent={<MessageCircleWarningIcon size={16} />}
-          >
-            <p className="font-normal text-[13px]">Report an issue</p>
-          </DropdownItem>
-          <>
-            {(isAdmin || isOwner || message.senderId === userId) && (
-              <DropdownItem color="danger" key="edit" endContent={<TrashIcon size={16} />}>
-                <p className="font-normal text-[13px]">Delete this message</p>
-              </DropdownItem>
-            )}
-          </>
-        </DropdownSection>
-      </DropdownMenu>
-    </Dropdown>
+            <DropdownItem
+              key="report"
+              endContent={<MessageCircleWarningIcon size={16} />}
+            >
+              <p className="font-normal text-[13px]">Report an issue</p>
+            </DropdownItem>
+            <>
+              {(isAdmin || isOwner || message.senderId === userId) && (
+                <DropdownItem
+                  color="danger"
+                  key="edit"
+                  endContent={<TrashIcon size={16} />}
+                >
+                  <p className="font-normal text-[13px]">Delete this message</p>
+                </DropdownItem>
+              )}
+            </>
+          </DropdownSection>
+        </DropdownMenu>
+      </Dropdown>
     </>
-  
   );
 };

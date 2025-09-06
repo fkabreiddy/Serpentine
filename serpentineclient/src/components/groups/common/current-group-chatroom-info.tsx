@@ -7,12 +7,16 @@ import React, { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface CurrentGroupChatroomInfoProps {
-  group: GroupResponse;
+
 }
 
 export default function CurrentGroupChatroomInfo({
   group,
-}: CurrentGroupChatroomInfoProps) {
+  newMessagesCount = 0,
+}: {  
+  group: GroupResponse;
+  newMessagesCount?: number;
+}) {
   const navigate = useNavigate();
   return (
     <>
@@ -45,6 +49,11 @@ export default function CurrentGroupChatroomInfo({
                 </Tooltip>
               )}
             </div>
+            {newMessagesCount > 0 && (
+              <div className=" px-2 py-1 rounded-xl bg-blue-600">
+                <p className="text-xs">{newMessagesCount} new messages</p>
+              </div>
+            )}
           </div>
 
           <IconButton tooltipText="About">
@@ -56,12 +65,3 @@ export default function CurrentGroupChatroomInfo({
   );
 }
 
-interface ContextButtonProps {
-  children: ReactNode;
-}
-
-const ContextButton = ({ children }: ContextButtonProps) => (
-  <button className="rounded-full dark:bg-neutral-950/20 bg-neutral-50/20  p-2 flex items-center justify-center backdrop-blur-xl  backdrop-opacity-70 shadow-inner dark:shadow-neutral-900/70 shadow-neutral-100/70 dark:border-neutral-900/70 border-neutral-100/70 ">
-    {children}
-  </button>
-);
