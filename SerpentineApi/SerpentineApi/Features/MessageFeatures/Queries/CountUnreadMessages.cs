@@ -80,7 +80,7 @@ using Microsoft.EntityFrameworkCore;
         {
             public async Task<OneOf<int, Failure>> HandleAsync(GetCountUnreadMessagesRequest request, CancellationToken cancellationToken = default)
             {
-                if (await context.GroupAccesses.FirstOrDefaultAsync(g => g.Id == request.GroupId) is var access && access is null)
+                if (await context.GroupAccesses.FirstOrDefaultAsync(g => g.GroupId == request.GroupId && g.UserId == request.CurrentUserId) is var access && access is null)
                 {
                     return 0;
                 }

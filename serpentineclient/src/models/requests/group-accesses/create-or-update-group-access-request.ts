@@ -1,4 +1,6 @@
-﻿interface CreateOrUpdateGroupAccessRequest{
+﻿import { CalendarDateTime} from "@internationalized/date";
+
+interface CreateOrUpdateGroupAccessRequest{
     groupId: string;
-    lastReadMessageDate: string | null;
+    lastReadMessageDate:    Date | null;
 }

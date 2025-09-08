@@ -19,8 +19,8 @@ using System.Text.Json.Serialization;
             [Required, JsonPropertyName("groupId"), FromBody, Description("The id of the last acceceed group")]
             public Ulid GroupId { get; set; }
 
-            [JsonPropertyName("lastRedMessageId"), FromBody, Description("The id of the last message the user red")]
-            public DateTime LastReadMessageDate { get; set; } = DateTime.UtcNow;
+            [JsonPropertyName("lastReadMessageDate"), FromBody, Description("The date of the last message the user red")]
+            public DateTime? LastReadMessageDate { get; set; } 
         }
 
         public class CreateGroupAccessRequestValidator : AbstractValidator<CreateGroupAccessRequest>
@@ -55,7 +55,11 @@ using System.Text.Json.Serialization;
                         command.SetCurrentUserId(UserIdentityRequesterHelper.GetUserIdFromClaims(context.User));
                         command.SetCurrentUserAge(UserIdentityRequesterHelper.GetUserAgeFromClaims(context.User));
 
-                        var result = await sender.SendAndValidateAsync(command, cancellationToken);
+                            if (!command.LastReadMessageDate.HasValue)
+                            {
+                                command.LastReadMessageDate = DateTime.UtcNow;
+                            }
+                            var result = await sender.SendAndValidateAsync(command, cancellationToken);
 
                         if (result.IsT1)
                         {

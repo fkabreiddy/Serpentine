@@ -20,6 +20,7 @@ export class MessageResponse extends BaseResponse {
     //front-end-only properties
     isUnread: boolean | null = null;//this property is set when the message bubble gets into the viewport for the first time
 
+    recievedInChat: boolean | null = null;
  
 
 

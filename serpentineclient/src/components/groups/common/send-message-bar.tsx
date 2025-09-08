@@ -17,17 +17,15 @@ export default function SendMessageBar({
   group,
   loading = false,
   hasPermisson = false,
-  unreadMessagesCount,
 }: {
   group: GroupResponse | null;
   loading: boolean;
   hasPermisson?: boolean;
-  unreadMessagesCount: number;
 }) {
   const textArea = useRef<HTMLTextAreaElement | null>(null);
   const [isListening, setIsListening] = useState(false);
-   const [alignEnd, setAlignEnd] = useState(false);
-const {messageToReplyTo, setMessageToReplyTo} = useGlobalDataStore();
+  const [alignEnd, setAlignEnd] = useState(false);
+  const {messageToReplyTo, setMessageToReplyTo} = useGlobalDataStore();
   const [createMessageRequest, setCreateMessageRequest] = useState<CreateMessageRequest>({
     
     content: "",
@@ -41,7 +39,7 @@ const {messageToReplyTo, setMessageToReplyTo} = useGlobalDataStore();
 
     if( messageToReplyTo?.groupId === group?.id || messageToReplyTo === null)
     {
-      setCreateMessageRequest((prev)=>({...prev, parentId: messageToReplyTo?.id}))
+      setCreateMessageRequest((prev)=>({...prev, parentId: messageToReplyTo?.id ?? null}))
     }
   },[messageToReplyTo])
   useEffect(()=>{
@@ -130,7 +128,6 @@ useEffect(() => {
     <div
       className={` ${(loading || !group || !hasPermisson) && "opacity-50"} w-full  pb-4 py-2 px-3  absolute left-0 bottom-0 flex flex-col items-center`}
     >
-      {unreadMessagesCount >= 1 && <UnreadMessagesBubble unreadMessagesCount={unreadMessagesCount}/>}
       {messageToReplyTo && <MessageToReply onCancelReply={()=>{setMessageToReplyTo(null)}} message={messageToReplyTo}/> }
 
       <div
@@ -192,18 +189,6 @@ useEffect(() => {
   );
 }
 
-const UnreadMessagesBubble = ({unreadMessagesCount, }:{unreadMessagesCount: number, }) =>(
-
-    <motion.div
-      key={"unread-messages-bubble-div"}
-      initial={{y: "-10px", opacity: 0}}
-      animate={{y: "10px", opacity: 1}} 
-      className="w-[70%] flex justify-end mb-[20px]">
-        <Button size="sm" radius="full" className="text-[13] px-2 z-[30] bg-blue-600" >
-            {unreadMessagesCount} unseen message{unreadMessagesCount > 1 && "s"}
-        </Button>
-    </motion.div>
-)
 
 const MessageToReply = ({message, onCancelReply}:{message: MessageResponse, onCancelReply: ()=>void}) =>(
 <div className="w-[70%]  flex justify-center px-1">

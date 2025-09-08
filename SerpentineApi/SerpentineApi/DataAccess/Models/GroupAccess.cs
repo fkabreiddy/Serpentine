@@ -15,7 +15,7 @@ public class GroupAccess : BaseEntity
     {
         UserId = request.CurrentUserId,
         GroupId = request.GroupId,
-        LastReadMessageDate = request.LastReadMessageDate,
+        LastReadMessageDate = request.LastReadMessageDate ?? DateTime.UtcNow,
     };
 
 

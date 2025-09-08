@@ -2,5 +2,5 @@
     groupId: string;  
     content: string;
     isNotification: boolean; 
-    parentId?: string; 
+    parentId?: string | null; 
 }

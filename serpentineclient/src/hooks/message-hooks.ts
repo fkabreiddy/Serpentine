@@ -119,6 +119,8 @@ export function useGetMessagesByGroupId() {
     const [isBefore, setIsBefore] = useState(true);
     const [busy, setBusy] = useState(false);
 
+   
+    
 
 
     
@@ -220,6 +222,7 @@ export function useGetCountUnreadMessages() {
 
         if (result.data && result.statusCode === 200) {
 
+            console.log("Unread messages: ", result.data);
           setUnreadMessagesCount(result.data)
 
            
@@ -238,6 +241,7 @@ export function useGetCountUnreadMessages() {
 
     const getCountUnreadMessages = async (data: GetUnreadMessagesCount) => {
 
+        
         setUnreadMessagesCount(0);
          setFetchingUnreadMessagesCount(true);
         setResult(null);

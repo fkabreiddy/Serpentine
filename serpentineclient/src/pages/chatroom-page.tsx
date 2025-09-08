@@ -28,11 +28,13 @@ export default function ChatroomPage(){
     const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
     const [showChannelDeletedDialog, setShowChannelDeletedDialog] = useState(false);
     
+    
 
     const navigate = useNavigate();
     
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
 
+  
     async function fecthGetUnreadMessagesCount(groupId: string){
         await getCountUnreadMessages({groupId: groupId});
     }
@@ -66,6 +68,7 @@ export default function ChatroomPage(){
 
         if(group && hasPermisson)
         {
+           
             fecthGetUnreadMessagesCount(group.id);
         }
     },[group, hasPermisson])
@@ -138,10 +141,10 @@ export default function ChatroomPage(){
                 }
 
                 {(group && channelMember) &&
-                    <MessagesContainer  unreadMessagesChanged={setUnreadMessagesCount} lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
+                    <MessagesContainer  lastAccess={group.myAccess} channelMember={channelMember} groupId={group.id}/>
                 }
 
-                <SendMessageBar  unreadMessagesCount={unreadMessagesCount} group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
+                <SendMessageBar group={group} loading={loadingChannelMember || searchingGroup } hasPermisson={hasPermisson}/>
             </ScrollShadow>
 
         </>

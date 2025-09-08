@@ -9,7 +9,7 @@ import {
   ReplyIcon,
   TrashIcon,
 } from "lucide-react";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useDeleteMessage } from "@/hooks/message-hooks";
 import CustomDialog from "@/components/common/custom-dialog";
 import { useIntersection } from "@/helpers/use-intersection-helper";
@@ -32,7 +32,6 @@ export default function MessageBubble({
   userId = "",
   index = 0,
   withImage,
-  onMessageSateChanged,
   onLastMessageDateUpdated
 }: {
   message: MessageResponse;
@@ -42,7 +41,6 @@ export default function MessageBubble({
   userId: string;
   index: number;
   lastReadMessageDate: string;
-  onMessageSateChanged: (count: number) => void;
   onLastMessageDateUpdated: (date: string) => void;
 }) {
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -50,9 +48,6 @@ export default function MessageBubble({
     onLastMessageDateUpdated(date);
   }
 
-  function handleMessageStateChanged(count: number) {
-    onMessageSateChanged(count);
-  }
 
  
   return (
@@ -69,7 +64,6 @@ export default function MessageBubble({
           setOpenDropdown(true);
         }}
         onUpdateLastSeenMessageDate={handleLastMessageDateUpdated}
-        onMessageReadStateChanged={handleMessageStateChanged}
         index={index}
         message={message}
         lastReadMessageDate={lastReadMessageDate}
@@ -84,7 +78,6 @@ const MessageBubbleCard = ({
   withImage,
   openDropdown,
   onUpdateLastSeenMessageDate,
-  onMessageReadStateChanged,
   
 }: {
   message: MessageResponse;
@@ -92,48 +85,33 @@ const MessageBubbleCard = ({
   index: number;
   openDropdown: () => void;
   lastReadMessageDate: string;
-  onMessageReadStateChanged: (count: number) => void;
   onUpdateLastSeenMessageDate: (date: string) => void;
 }) => {
   const { getDate } = useDateHelper();
 
   const [clicked, setClicked] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
 
   const [showMoreContent, setShowMoreContent] = useState(false);
   const messageBubbleRef = useRef<HTMLDivElement | null>(null);
   const isVisible = useIntersection(message.id + "-message-bubble-id", "0px");
 
-  useEffect(() => {
-    if (message.createdAt > lastReadMessageDate) {
-      if (message.isUnread === null || message.isUnread === undefined) {
-        message.isUnread = !isVisible;
+  
 
-        if (!isVisible) {
-          onMessageReadStateChanged(1);
-        }
-        return;
-      }
+  
+  useEffect(()=>{
 
-      if (message.isUnread === true && isVisible) {
-        message.isUnread = !isVisible;
-
-        if (isVisible) {
-          onMessageReadStateChanged(-1);
-        }
-
-        return;
-      }
+    if(isVisible && message.createdAt > lastReadMessageDate)
+    {
+      onUpdateLastSeenMessageDate(message.createdAt);
     }
-  }, [isVisible, lastReadMessageDate, message]);
+  },[isVisible])
 
-  useEffect(() => {
-    if (isVisible) {
-      if (message.createdAt > lastReadMessageDate) {
-        onUpdateLastSeenMessageDate(message.createdAt);
-      }
-    }
-  }, [lastReadMessageDate, isVisible]);
+  
+
+
+
+
+  
 
   
   return (
@@ -141,8 +119,7 @@ const MessageBubbleCard = ({
       ref={messageBubbleRef}
       key={message.id.toString() + "-message-bubble"}
       id={message.id.toString() + "-message-bubble-id"}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+     
       onClick={(e) => {
         e.stopPropagation();
         setClicked(false);
@@ -155,6 +132,7 @@ const MessageBubbleCard = ({
       }}
       className={`w-full transition-all flex gap-3 items-start group  ${clicked ? "bg-neutral-100 dark:bg-neutral-950" : "hover:bg-neutral-100/50 hover:dark:bg-neutral-950/50"} p-3 rounded-lg`}
     >
+      
       {message.isNotification ? (
         <div className="size-[28px] shrink-0 bg-yellow-500 text-white  rounded-full flex justify-center items-center">
           <MessageCircleIcon className="size-[16px] fill-white" />
@@ -182,18 +160,7 @@ const MessageBubbleCard = ({
           </label>
         </div>
 
-        {withImage && (
-          <div className="relative h-[180px] w-[180px] py-2 ">
-            {images.map((image, index) => (
-              <MessageImage
-                lenght={images.length}
-                src={image}
-                index={index}
-                key={index}
-              />
-            ))}
-          </div>
-        )}
+        
 
         {message.parentId && <ParentMessage content={message.parentContent ?? ""} senderUsername={message.senderUsername ?? ""}/>}
         <p
