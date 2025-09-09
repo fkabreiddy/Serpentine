@@ -78,7 +78,7 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
           
           className="fixed left-0 max-md:z-[31]  bottom-0 z-10 backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-default-100 "
           style={{
-            width: "355px",
+            width: "357px",
               minWidth:"355px",
             transition: "width 0.2s",
           }}

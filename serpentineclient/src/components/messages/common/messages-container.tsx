@@ -253,20 +253,23 @@ export default function MessagesContainer({
   return (
 
     
-    <motion.div ref={containerRef} style={{ height: "calc(100vh - 120px)" }} className="flex items-center  mt-[50px] flex-col-reverse w-full  h-full overflow-auto  ">
+    <motion.div ref={containerRef} style={{ height: "calc(100vh - 100px)" }} className="flex w-full  mt-[50px] flex-col-reverse items-center max-w-full   h-full overflow-y-auto   ">
       <div
         
-        className="relative w-[70%] max-md:w-[90%] flex flex-col-reverse h-fit  "
+        className=" flex flex-col-reverse h-fit w-[90%] pb-[40px]    "
         
       >
 
+
         {messages.map((message, idx) => {
 
-         
+          
+          const nextMessageHasTheSameSenderAndDate = idx < messages.length - 1 && message.senderId === messages[idx + 1].senderId;
+          const prevMessageHasTheSameSenderAndDate = idx > 0  && message.senderId === messages[idx - 1].senderId;
 
           return (
+            
             <div className="w-full " key={message.id + "-wrapper"}>
-              
               {idx < messages.length - 1 &&
                 getDate(messages[idx + 1].createdAt).day !==
                   getDate(messages[idx].createdAt).day && (
@@ -284,6 +287,8 @@ export default function MessagesContainer({
               }
               {(idx === 0 && hasMoreAfter && !fetchingMessages && getMessagesByGroupIdIsAvailable) && <div className="w-full " ref={observeBottom}></div>}
               <MessageBubble
+               nextMessageHasTheSameSenderAndDate={nextMessageHasTheSameSenderAndDate}
+               prevMessageHasTheSameSenderAndDate={prevMessageHasTheSameSenderAndDate}
                 lastReadMessageDate={lastReadMessageDate ?? ""}
                 index={idx}
                 onLastMessageDateUpdated={handleMessageDateUpdated}
@@ -301,8 +306,10 @@ export default function MessagesContainer({
               
                 <div className="w-full " ref={observeTop}></div>
               )}
+
             </div>
           );
+
         })}
 
 
@@ -343,15 +350,14 @@ function MessageDateDivider({ date }: {date: string}) {
   ];
   return (
     <div className="flex gap-3 w-full items-center opacity-60">
-       <div className="flex  w-full items-center ">
-      <hr className="w-full border-2 border-neutral-300 rounded-l-full dark:border-neutral-800" />
-      <p className="text-[13px] whitespace-nowrap bg-neutral-300 dark:bg-neutral-800  px-2 rounded-md"> New since
-        {" "}
-        {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
-        {getDate(date).year}
-      </p>
-      <hr className="w-full border-2 border-neutral-300 rounded-r-full dark:border-neutral-800" />
-    </div>
+       <div className="flex  w-full items-center justify-end ">
+          <hr className="w-[30px] border-2 border-neutral-300 rounded-l-full dark:border-neutral-800" />
+          <p className="text-[13px] whitespace-nowrap bg-neutral-300 dark:bg-neutral-800  px-2 rounded-md">
+            {" "}
+            {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
+            {getDate(date).year}
+          </p>
+      </div>
     </div>
   );
 }
@@ -374,14 +380,13 @@ const UnreadMessagesDivider = ({date}:{date: string}) => {
     "December",
   ];
   return (
-    <div className="flex  w-full items-center ">
-      <hr className="w-full border-2 border-blue-600 rounded-l-full" />
+    <div className="flex  w-full items-center justify-end">
+      <hr className="w-[30px] border-2 border-blue-600 rounded-l-full " />
       <p className="text-[13px] whitespace-nowrap bg-blue-600  px-2 rounded-md"> New since
         {" "}
         {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
         {getDate(date).year}  at {getDate(date).hour}:{getDate(date).minute}
       </p>
-      <hr className="w-full border-2 border-blue-600 rounded-r-full" />
     </div>
   );};
 

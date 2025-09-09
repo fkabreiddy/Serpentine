@@ -132,7 +132,7 @@ useEffect(() => {
 
       <div
       id={"send-message-containter"}
-        className={`w-[70%] flex ${alignEnd  ? "flex-col items-end" : ""} transition-all  backdrop-blur-xl  h-fit max-h-[400px] dark:bg-neutral-950/50 bg-neutral-300/20 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900 border-neutral-100 gap-2 z-[30]`}
+        className={`w-[90%] flex ${alignEnd  ? "flex-col items-end" : ""} transition-all  backdrop-blur-xl  h-fit max-h-[400px] dark:bg-neutral-950/50 bg-neutral-300/50 p-3 max-md:w-[90%] rounded-3xl border dark:border-neutral-900 border-neutral-100 gap-2 z-[30]`}
       >
           
         <div className="w-full">
@@ -142,7 +142,8 @@ useEffect(() => {
             id={"send-message-textarea"}
             ref={textArea}
             disabled={loading || !group || !hasPermisson}
-            className=" w-full px-2 border-0 !outline-none !bg-transparent resize-none"
+            className=" w-full px-2 border-0 !outline-none !bg-transparent resize-none break-words break-all text-start font-normal opacity-80 text-[13px]"
+
             maxLength={1000}
             style={{ backgroundColor: "transparent !important", border: "0" }}
             autoCorrect="false"
@@ -191,7 +192,7 @@ useEffect(() => {
 
 
 const MessageToReply = ({message, onCancelReply}:{message: MessageResponse, onCancelReply: ()=>void}) =>(
-<div className="w-[70%]  flex justify-center px-1">
+<div className="w-[90%]  flex justify-center px-1">
 <motion.div
   key={"message-to-reply-div"}
   initial={{y: "30px", opacity: 0}}

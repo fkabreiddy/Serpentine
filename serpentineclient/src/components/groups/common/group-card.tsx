@@ -32,7 +32,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index, channelMember }) =>
     <>
     <CustomDialog onAccept={()=>{setShowLockedGroupDialog(false);}} open={showLockedGroupDialog} showDismiss={false} acceptText="Understood" onOpenChanged={setShowLockedGroupDialog} title="Group is private">
       <p className="text-[13px]">
-        This group is private you cannot acceed if you are not an admin or the owner of the group
+        This group is private you cannot access if you are not an admin or the owner of the group
       </p>
     </CustomDialog>
     <motion.div
@@ -67,10 +67,11 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index, channelMember }) =>
                        <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
                         No messages available.
                       </span> :
-                      <span className="font-normal text-[10px] opacity-60 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                      <span className="font-normal text-[10px] opacity-60 break-words break-all  max-w-full line-clamp-1">
                         <strong>
                           {
-                            group.lastMessage.senderUsername}{" "}
+                            group.lastMessage.senderUsername + " "
+                          }
                         </strong>
                         {group.lastMessage && group.lastMessage.content}
                       </span>
@@ -95,7 +96,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, index, channelMember }) =>
                 &&
                 <Popover showArrow={true} placement={"bottom"}>
                   <PopoverTrigger>
-                    <LockIcon className={"text-red-500 cursor-pointer"} size={14}/>
+                    <LockIcon className={"text-neutral-600 dark:text-neutral-600 cursor-pointer"} size={14}/>
                   </PopoverTrigger>
                   <PopoverContent className={"max-w-[250px]"}>
                     <ul>

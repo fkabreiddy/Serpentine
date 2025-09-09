@@ -157,10 +157,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
   return (
     <>
-      <div ref={leftPanelRef} style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}} className={`relative z-[31] max-md:z-[33]  bg-white dark:bg-black`}>
-        <ScrollShadow
-          hideScrollBar
-          offset={0}
+      <div ref={leftPanelRef} style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}} className={`relative z-[31] max-md:z-[50]  bg-white dark:bg-black`}>
+        <div
+         
           id="side-bar"
           
           className={`${
@@ -222,7 +221,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
               variant="spinner"
             />
           )}
-        </ScrollShadow>
+        </div>
         
         <StatusBar isReady={(!hasMore && !loadingChannels && !isBusy)} channels={channels} /> 
             

@@ -21,8 +21,7 @@ import {
   DropdownTrigger,
 } from "@heroui/dropdown";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
-
-
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function MessageBubble({
   message,
@@ -31,11 +30,13 @@ export default function MessageBubble({
   isOwner = false,
   userId = "",
   index = 0,
-  withImage,
-  onLastMessageDateUpdated
+  nextMessageHasTheSameSenderAndDate,
+  prevMessageHasTheSameSenderAndDate,
+  onLastMessageDateUpdated,
 }: {
   message: MessageResponse;
-  withImage?: boolean;
+  nextMessageHasTheSameSenderAndDate: boolean;
+  prevMessageHasTheSameSenderAndDate: boolean;
   isAdmin: boolean;
   isOwner: boolean;
   userId: string;
@@ -48,8 +49,6 @@ export default function MessageBubble({
     onLastMessageDateUpdated(date);
   }
 
-
- 
   return (
     <MessageDropdown
       open={openDropdown}
@@ -63,6 +62,8 @@ export default function MessageBubble({
         openDropdown={() => {
           setOpenDropdown(true);
         }}
+        prevMessageHasTheSameSenderAndDate={prevMessageHasTheSameSenderAndDate}
+        nextMessageHasTheSameSenderAndDate={nextMessageHasTheSameSenderAndDate}
         onUpdateLastSeenMessageDate={handleLastMessageDateUpdated}
         index={index}
         message={message}
@@ -77,11 +78,14 @@ const MessageBubbleCard = ({
   lastReadMessageDate,
   withImage,
   openDropdown,
+  prevMessageHasTheSameSenderAndDate,
+  nextMessageHasTheSameSenderAndDate,
   onUpdateLastSeenMessageDate,
-  
 }: {
   message: MessageResponse;
   withImage?: boolean;
+  prevMessageHasTheSameSenderAndDate:boolean;
+  nextMessageHasTheSameSenderAndDate: boolean;
   index: number;
   openDropdown: () => void;
   lastReadMessageDate: string;
@@ -90,36 +94,34 @@ const MessageBubbleCard = ({
   const { getDate } = useDateHelper();
 
   const [clicked, setClicked] = useState(false);
-
+  const isMobile = useIsMobile()
+  const parragraphContentRef = useRef<HTMLParagraphElement | null>(null);
   const [showMoreContent, setShowMoreContent] = useState(false);
+    const [showMoreButton, setShowMoreButton] = useState(false);
   const messageBubbleRef = useRef<HTMLDivElement | null>(null);
   const isVisible = useIntersection(message.id + "-message-bubble-id", "0px");
 
   
+useEffect(() => {
+  if (!parragraphContentRef.current) return;
 
   
-  useEffect(()=>{
+  setShowMoreButton(parragraphContentRef.current.clientHeight >= 40);
+}, [message.content, parragraphContentRef, isMobile]);
 
-    if(isVisible && message.createdAt > lastReadMessageDate)
-    {
+  useEffect(() => {
+    if (isVisible && message.createdAt > lastReadMessageDate) {
       onUpdateLastSeenMessageDate(message.createdAt);
     }
-  },[isVisible])
+  }, [isVisible]);
 
-  
+  const isTheSameSender = nextMessageHasTheSameSenderAndDate;
 
-
-
-
-  
-
-  
   return (
     <motion.div
       ref={messageBubbleRef}
       key={message.id.toString() + "-message-bubble"}
       id={message.id.toString() + "-message-bubble-id"}
-     
       onClick={(e) => {
         e.stopPropagation();
         setClicked(false);
@@ -130,46 +132,75 @@ const MessageBubbleCard = ({
         e.preventDefault();
         openDropdown();
       }}
-      className={`w-full transition-all flex gap-3 items-start group  ${clicked ? "bg-neutral-100 dark:bg-neutral-950" : "hover:bg-neutral-100/50 hover:dark:bg-neutral-950/50"} p-3 rounded-lg`}
+      className={`w-full max-w-full  group min-h-[30px]   transition-all flex gap-3 items-stretch group  ${clicked ? "bg-neutral-100 dark:bg-neutral-950" : "hover:bg-neutral-100/50 hover:dark:bg-neutral-950/50"} ${nextMessageHasTheSameSenderAndDate ? "pt-0" : "pt-3"} ${prevMessageHasTheSameSenderAndDate ? "pb-0" : "pb-3"} px-3 rounded-lg`}
     >
+      <div className="relative flex justify-center  w-[25px] mr-[12px] ">
       
-      {message.isNotification ? (
-        <div className="size-[28px] shrink-0 bg-yellow-500 text-white  rounded-full flex justify-center items-center">
-          <MessageCircleIcon className="size-[16px] fill-white" />
-        </div>
-      ) : (
-        <UserAvatar
-          src={message?.senderProfilePictureUrl ?? ""}
-          userNameFallback={message?.senderUsername ?? "fka.breiddy"}
-        />
-      )}
-      <div className="w-full flex flex-col items-start gap-1">
-        <div className={"w-full flex gap-3 items-start opacity-50"}>
-          {!message.isNotification ? (
-            <strong className="text-[13px] font-normal ">
-              @{message?.senderUsername}
-            </strong>
-          ) : (
-            <div className="dark:bg-neutral-900 bg-neutral-200 rounded-md px-2 text-[12px]">
-              Notification
-            </div>
-          )}
-          <label className="text-[13px] font-normal ">
-            {getDate(message.createdAt).hour}:
-            {getDate(message.createdAt).minute}
-          </label>
-        </div>
+      {isTheSameSender ? 
+            <>
+              <div className="absolute top-1/2 -translate-y-1/2  dark:bg-neutral-950 bg-neutral-300  group-hover:flex hidden rounded-full px-2  items-center justify-center transition-all">
+                <label className="text-[10]">{getDate(message.createdAt).hour}:{getDate(message.createdAt).minute}</label>
 
+              </div>
+             <div className="dark:border-neutral-950 border-neutral-300  border-2 h-full  "/> 
+
+            </>
+            :
+              <>
+            
+                {message.isNotification ? (
+                  <div className="size-[28px] shrink-0 bg-yellow-500 text-white rounded-full flex justify-center items-center">
+                    <MessageCircleIcon className="size-[16px] fill-white" />
+                  </div>
+                ) : (
+                  <UserAvatar
+                    src={message?.senderProfilePictureUrl ?? ""}
+                    userNameFallback={message?.senderUsername ?? "fka.breiddy"}
+                  />
+                )}
+              </>
+            }
+      </div>
+     
+      
+      <div  className={`w-full  flex flex-col items-start gap-1 ${isTheSameSender && ""}`}>
+        <div className={"w-full   flex gap-3 items-start opacity-50   "}>
+          
+          {isTheSameSender || <>
+          
+            {!message.isNotification ? (
+               <strong className="text-[13px] font-normal ">
+                  @{message?.senderUsername}
+                </strong>
+              ) : (
+                <div className="dark:bg-neutral-900 bg-neutral-200 rounded-md px-2 text-[12px]">
+                  Notification
+                </div>
+              )}
+
+               <label className={`text-[13px] font-normal ${isTheSameSender && "hidden group-hover:block"}`}>
+                {getDate(message.createdAt).hour}:
+                {getDate(message.createdAt).minute}
+              </label>
+          </>}
         
 
-        {message.parentId && <ParentMessage content={message.parentContent ?? ""} senderUsername={message.senderUsername ?? ""}/>}
+
+         
+        </div>
+        {message.parentId && (
+          <ParentMessage
+            content={message.parentContent ?? ""}
+            senderUsername={message.senderUsername ?? ""}
+          />
+        )}
         <p
-          className={` w-full text-start font-normal opacity-80 text-[13px] whitespace-pre-line  text-ellipsis overflow-hidden ${showMoreContent ? "" : "line-clamp-3"}`}
+          ref={parragraphContentRef}
+          className={`break-words break-all text-start font-normal opacity-80 text-[13px] my-2 ${showMoreContent ? "" : "line-clamp-3"}`}
         >
           {message.content}
         </p>
-
-        {message.content.length >= 100 && (
+        {showMoreButton && (
           <a
             className="text-blue-500 text-xs cursor-pointer"
             onClick={(e) => {
@@ -215,8 +246,6 @@ interface MessageDropdownProps {
   userId: string;
   open: boolean;
   openChanged: (value: boolean) => void;
-
-  
 }
 
 const MessageDropdown = ({
@@ -227,20 +256,18 @@ const MessageDropdown = ({
   isAdmin,
   open,
   openChanged,
-  
 }: MessageDropdownProps) => {
   const { getDate } = useDateHelper();
   const { deleteMessage, deletingMessage } = useDeleteMessage();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
-  const {setMessageToReplyTo}=useGlobalDataStore();
+  const { setMessageToReplyTo } = useGlobalDataStore();
 
   async function fetchDelete() {
     await deleteMessage({ messageId: message.id });
   }
 
-  function handleRepliedMessageChanged(message: MessageResponse | null){
-
-    setMessageToReplyTo(message)
+  function handleRepliedMessageChanged(message: MessageResponse | null) {
+    setMessageToReplyTo(message);
   }
 
   return (
@@ -293,10 +320,16 @@ const MessageDropdown = ({
             </DropdownItem>
           </DropdownSection>
 
-          <DropdownSection  title={"Actions"}>
+          <DropdownSection title={"Actions"}>
             <>
               {!message.isNotification && (
-                <DropdownItem onClick={()=>{handleRepliedMessageChanged(message);}} key="reply" endContent={<ReplyIcon size={16} />}>
+                <DropdownItem
+                  onClick={() => {
+                    handleRepliedMessageChanged(message);
+                  }}
+                  key="reply"
+                  endContent={<ReplyIcon size={16} />}
+                >
                   <p className="font-normal text-[13px]">Reply this message</p>
                 </DropdownItem>
               )}
@@ -313,6 +346,7 @@ const MessageDropdown = ({
                 <DropdownItem
                   color="danger"
                   key="edit"
+                  onClick={fetchDelete}
                   endContent={<TrashIcon size={16} />}
                 >
                   <p className="font-normal text-[13px]">Delete this message</p>
@@ -326,16 +360,18 @@ const MessageDropdown = ({
   );
 };
 
+const ParentMessage = ({
+  content,
+  senderUsername,
+}: {
+  content: string;
+  senderUsername: string;
+}) => (
+  <div style={{width: "calc(90% - 20px)"}} className="w-full  flex gap-2 flex-nowrap ">
+      <span className="text-blue-600 text-[13px] text-nowrap">Reply to @{senderUsername + ": "}</span>
 
-const ParentMessage = ({content, senderUsername}:{content:string, senderUsername: string}) =>(
-<div className="w-[70%]  flex justify-center ">
-<div
-
-
-  className="w-full bg-neutral-100 dark:bg-neutral-900 backdrop-blur-md z-[30] rounded-xl px-3 py-1 items-center mr-[-4px]  flex justify-between gap-2 opacity-50">
-       <p className="text-[13px] line-clamp-2 font-normal whitespace-pre-line  text-ellipsis overflow-hidden "><span className="text-blue-600">Reply to @{senderUsername}:</span> {content}</p>
-       
+      <p className="text-[13px] line-clamp-2 font-normal whitespace-pre-line  text-ellipsis overflow-hidden ">
+        {content}
+      </p>
   </div>
-</div>
-  
-)
+);

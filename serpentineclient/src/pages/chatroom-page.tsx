@@ -132,7 +132,7 @@ export default function ChatroomPage(){
                 <CustomDialog onDismiss={()=>{ navigate("/home");}} onAccept={()=>{ navigate("/home");}} open={showChannelDeletedDialog} showDismiss={false} acceptText="Understood" onOpenChanged={(value)=> {setShowChannelDeletedDialog(value); navigate("/home")}} title="Channel deleted">
                         This channel has been deleted
                 </CustomDialog>
-            <ScrollShadow  className="  h-full z-[1] relative shadow-inner  shadow-white dark:shadow-black">
+            <ScrollShadow  className="  h-full z-[1] relative shadow-inner">
                 
                 <div className="doodle-pattern opacity-10 -z-[1]"/>
 
