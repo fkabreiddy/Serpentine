@@ -8,23 +8,27 @@ public static class OpenApiDependency
 {
     public static IServiceCollection AddOpenApiServices(this IServiceCollection services)
     {
-        services.AddOpenApi(ApiConstants.DocumentName,opts =>
-        {
-            opts.AddDocumentTransformer<OpenApiConfigurer>();
-        });
+        services.AddOpenApi(
+            ApiConstants.DocumentName,
+            opts =>
+            {
+                opts.AddDocumentTransformer<OpenApiConfigurer>();
+            }
+        );
         return services;
     }
 }
+
 public class OpenApiConfigurer : IOpenApiDocumentTransformer
 {
     public Task TransformAsync(
         OpenApiDocument document,
         OpenApiDocumentTransformerContext context,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         document.Info = new OpenApiInfo
         {
-            
             Title = ApiConstants.Title,
             Description = ApiConstants.Description,
             Version = "v1",
@@ -33,7 +37,7 @@ public class OpenApiConfigurer : IOpenApiDocumentTransformer
                 Name = "Breiddy Garcia",
                 Email = "breiddysubzero@gmail.com",
                 Url = new Uri("https://github.com/fkabreiddy"),
-            }
+            },
         };
 
         var securitySchema = new OpenApiSecurityScheme
@@ -43,7 +47,7 @@ public class OpenApiConfigurer : IOpenApiDocumentTransformer
             BearerFormat = "JWT",
             Description = "JWT Authorization header using the Bearer scheme.",
             In = ParameterLocation.Header,
-            Name = "Authorization"
+            Name = "Authorization",
         };
 
         var securityRequirement = new OpenApiSecurityRequirement
@@ -57,10 +61,10 @@ public class OpenApiConfigurer : IOpenApiDocumentTransformer
                         Type = ReferenceType.SecurityScheme,
                     },
                     In = ParameterLocation.Header,
-                    Name = "Authorization"
+                    Name = "Authorization",
                 },
                 Array.Empty<string>()
-            }
+            },
         };
 
         document.SecurityRequirements ??= new List<OpenApiSecurityRequirement>();

@@ -46,10 +46,10 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
         FileExtensions(Extensions = "jpg, png, webp, img, jpeg")
     ]
     public IFormFile? CoverPictureFile { get; set; }
-    
+
     [BindNever, JsonIgnore]
-    public Ulid RoleId { get; private set; } 
-    
+    public Ulid RoleId { get; private set; }
+
     public void SetRoleId(Ulid roleId)
     {
         RoleId = roleId;
@@ -59,8 +59,6 @@ public class CreateChannelRequest : IRequest<OneOf<ChannelResponse, Failure>>
     {
         CurrentUserId = userId;
     }
-    
-    
 }
 
 public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequest>
@@ -89,22 +87,23 @@ public class CreateChannelRequestValidator : AbstractValidator<CreateChannelRequ
         RuleFor(x => x.BannerPictureFile)
             .Must(file =>
             {
-                if (file == null) return true;
+                if (file == null)
+                    return true;
                 var allowedExtensions = new[] { ".jpg", ".png", ".webp", ".img", ".jpeg" };
                 var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
                 return allowedExtensions.Contains(ext);
             })
             .WithMessage("The file extension is not valid. Use jpg, png, webp, img o jpeg.");
-             RuleFor(x => x.CoverPictureFile)
-                    .Must(file =>
-                    {
-                        if (file == null) return true;
-                        var allowedExtensions = new[] { ".jpg", ".png", ".webp", ".img", ".jpeg" };
-                        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-                        return allowedExtensions.Contains(ext);
-                    })
-                    .WithMessage("The file extension is not valid. Use jpg, png, webp, img o jpeg.");
-        
+        RuleFor(x => x.CoverPictureFile)
+            .Must(file =>
+            {
+                if (file == null)
+                    return true;
+                var allowedExtensions = new[] { ".jpg", ".png", ".webp", ".img", ".jpeg" };
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                return allowedExtensions.Contains(ext);
+            })
+            .WithMessage("The file extension is not valid. Use jpg, png, webp, img o jpeg.");
     }
 }
 
@@ -114,7 +113,7 @@ internal class CreateChannelEndpoint : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-             app.MapPost(
+        app.MapPost(
                 _settings.BaseUrl,
                 async (
                     [FromForm] CreateChannelRequest command,
@@ -174,8 +173,7 @@ internal class CreateChannelRequestHandler(
             return new UnauthorizedApiResult(
                 "You are trying to create a channel without being logged in"
             );
-        
-       
+
         var channel = Channel.Create(request);
 
         var exist = await context.Channels.AnyAsync(
@@ -195,8 +193,6 @@ internal class CreateChannelRequestHandler(
 
         try
         {
-          
-            
             var creation = await context.Channels.AddAsync(channel, cancellationToken);
 
             await context.SaveChangesAsync(cancellationToken);
@@ -234,7 +230,6 @@ internal class CreateChannelRequestHandler(
                     false,
                     300,
                     300
-                  
                 );
                 if (bannerUploadResponse.IsSuccess)
                 {
@@ -252,13 +247,11 @@ internal class CreateChannelRequestHandler(
 
             await context.SaveChangesAsync(cancellationToken);
 
-
             Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
                 creation.Entity.Id,
                 request.CurrentUserId,
                 cancellationToken
             );
-
 
             if (response is null)
             {

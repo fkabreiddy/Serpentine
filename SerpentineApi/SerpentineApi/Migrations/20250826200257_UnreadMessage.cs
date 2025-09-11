@@ -14,35 +14,56 @@ namespace SerpentineApi.Migrations
             migrationBuilder.RenameColumn(
                 name: "LastAccess",
                 table: "GroupAccesses",
-                newName: "LastReadMessageDate");
+                newName: "LastReadMessageDate"
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEJ2SQ283X365D8QBJP",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 26, 20, 2, 55, 244, DateTimeKind.Utc).AddTicks(3965), new DateTime(2025, 8, 26, 20, 2, 55, 244, DateTimeKind.Utc).AddTicks(3969) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 26, 20, 2, 55, 244, DateTimeKind.Utc).AddTicks(3965),
+                    new DateTime(2025, 8, 26, 20, 2, 55, 244, DateTimeKind.Utc).AddTicks(3969),
+                }
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEP473CNR8N01ZCXRV9",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(571), new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(571) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(571),
+                    new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(571),
+                }
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEPDA7ZFCX6YCP3MY7M",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(535), new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(535) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(535),
+                    new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(535),
+                }
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEPTCVKR97AKSWKHTP8",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(561), new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(561) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(561),
+                    new DateTime(2025, 8, 26, 20, 2, 55, 248, DateTimeKind.Utc).AddTicks(561),
+                }
+            );
         }
 
         /// <inheritdoc />
@@ -51,35 +72,56 @@ namespace SerpentineApi.Migrations
             migrationBuilder.RenameColumn(
                 name: "LastReadMessageDate",
                 table: "GroupAccesses",
-                newName: "LastAccess");
+                newName: "LastAccess"
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEJ2SQ283X365D8QBJP",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 16, 19, 43, 41, 761, DateTimeKind.Utc).AddTicks(3160), new DateTime(2025, 8, 16, 19, 43, 41, 761, DateTimeKind.Utc).AddTicks(3165) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 16, 19, 43, 41, 761, DateTimeKind.Utc).AddTicks(3160),
+                    new DateTime(2025, 8, 16, 19, 43, 41, 761, DateTimeKind.Utc).AddTicks(3165),
+                }
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEP473CNR8N01ZCXRV9",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3966), new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3966) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3966),
+                    new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3966),
+                }
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEPDA7ZFCX6YCP3MY7M",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3931), new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3933) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3931),
+                    new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3933),
+                }
+            );
 
             migrationBuilder.UpdateData(
                 table: "Roles",
                 keyColumn: "Id",
                 keyValue: "01K1Y24KEPTCVKR97AKSWKHTP8",
                 columns: new[] { "CreatedAt", "UpdatedAt" },
-                values: new object[] { new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3955), new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3956) });
+                values: new object[]
+                {
+                    new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3955),
+                    new DateTime(2025, 8, 16, 19, 43, 41, 765, DateTimeKind.Utc).AddTicks(3956),
+                }
+            );
         }
     }
 }

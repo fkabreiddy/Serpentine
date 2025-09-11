@@ -18,7 +18,6 @@ public static class UserRolesHelper
                 return UserRoles.Developer;
             default:
                 return UserRoles.User;
-            
         }
     }
 }
@@ -28,6 +27,5 @@ public enum UserRoles
     User = 0,
     Admin = 1,
     Tester = 2,
-    Developer = 3
-    
+    Developer = 3,
 }

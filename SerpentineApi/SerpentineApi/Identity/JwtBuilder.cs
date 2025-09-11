@@ -29,9 +29,9 @@ public class JwtBuilder(IOptions<JwtSettings> jwtSettings)
                     new Claim(JwtRegisteredClaimNames.Picture, user.ProfilePictureUrl),
                     new Claim(JwtRegisteredClaimNames.Name, user.FullName),
                     new Claim("age", user.Age.ToString()),
-                    new Claim("role",  user.Role.ToString()), //for the client
+                    new Claim("role", user.Role.ToString()), //for the client
                     new Claim(JwtRegisteredClaimNames.Birthdate, user.DayOfBirth.ToString()),
-                    new Claim("createdAt", user.CreatedAt.ToString())
+                    new Claim("createdAt", user.CreatedAt.ToString()),
                 ]
             ),
             Expires = DateTime.Now.AddDays(7),

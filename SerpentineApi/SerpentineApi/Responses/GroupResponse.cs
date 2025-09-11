@@ -10,7 +10,7 @@ public class GroupResponse : BaseResponse
     public bool RequiresOverage { get; set; } = false;
 
     public bool Public { get; set; } = true;
-    public GroupAccessResponse? MyAccess { get; set; } 
-    
-    public MessageResponse? LastMessage { get; set; } 
+    public GroupAccessResponse? MyAccess { get; set; }
+
+    public MessageResponse? LastMessage { get; set; }
 }

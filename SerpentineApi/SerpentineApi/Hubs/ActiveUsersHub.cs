@@ -5,8 +5,11 @@ using SerpentineApi.DataAccess.Cache;
 
 namespace SerpentineApi.Hubs;
 
-public sealed class ActiveUsersHub(ActiveUsersCache cache, ILogger<ActiveUsersHub> logger, HubExecutor<ActiveUsersHub> executor)
-    : Hub<IActiveUsersHub>
+public sealed class ActiveUsersHub(
+    ActiveUsersCache cache,
+    ILogger<ActiveUsersHub> logger,
+    HubExecutor<ActiveUsersHub> executor
+) : Hub<IActiveUsersHub>
 {
     [Authorize(JwtBearerDefaults.AuthenticationScheme)]
     public override async Task OnConnectedAsync()
@@ -24,8 +27,9 @@ public sealed class ActiveUsersHub(ActiveUsersCache cache, ILogger<ActiveUsersHu
                 cache.AddUser(userId, Context.ConnectionId);
                 await Clients.All.SendUserConnected(new HubResult<string>(userId));
             }
-            logger.LogInformation($"[{typeof(ActiveUsersHub).Name}] User with Id: {userId} connected. Connection Id: {Context.ConnectionId}");
-
+            logger.LogInformation(
+                $"[{typeof(ActiveUsersHub).Name}] User with Id: {userId} connected. Connection Id: {Context.ConnectionId}"
+            );
         });
     }
 
@@ -37,8 +41,9 @@ public sealed class ActiveUsersHub(ActiveUsersCache cache, ILogger<ActiveUsersHu
             if (cache.RemoveUser(userId))
                 await Clients.All.SendUserDisconnected(new HubResult<string>(userId));
 
-            logger.LogInformation($"[{typeof(ActiveUsersHub).Name}] User with Id: {userId} and Connection Id: {Context.ConnectionId} was disconnected." );
-
+            logger.LogInformation(
+                $"[{typeof(ActiveUsersHub).Name}] User with Id: {userId} and Connection Id: {Context.ConnectionId} was disconnected."
+            );
         });
     }
 }
@@ -47,6 +52,4 @@ public interface IActiveUsersHub
 {
     Task SendUserConnected(HubResult<string> result);
     Task SendUserDisconnected(HubResult<string> result);
-    
-
 }

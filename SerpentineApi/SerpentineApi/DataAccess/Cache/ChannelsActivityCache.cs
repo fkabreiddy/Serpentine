@@ -47,7 +47,9 @@ public class ChannelsActivityCache(ILogger<ChannelsActivityCache> logger)
                 {
                     ActiveChannels.TryRemove(channelId, out _);
                 }
-                logger.LogInformation($"Removed user {userId} from channel {channelId}. Remaining users: {usersSet.Count}");
+                logger.LogInformation(
+                    $"Removed user {userId} from channel {channelId}. Remaining users: {usersSet.Count}"
+                );
 
                 if (!removed)
                     return false;
@@ -59,7 +61,9 @@ public class ChannelsActivityCache(ILogger<ChannelsActivityCache> logger)
             lock (channelsSet)
             {
                 channelsSet.Remove(channelId);
-                logger.LogInformation($"Removed channel {channelId} from user {userId}. Remaining channels: {channelsSet.Count}");
+                logger.LogInformation(
+                    $"Removed channel {channelId} from user {userId}. Remaining channels: {channelsSet.Count}"
+                );
             }
         }
 

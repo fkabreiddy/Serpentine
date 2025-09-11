@@ -70,14 +70,18 @@ public class DeleteChannelEndpoint : IEndpoint
 
                         if (deleted)
                         {
-                            await channelsHub.Clients.Group(command.ChannelId.ToString()).SendChannelRemoved(new HubResult<string>(command.ChannelId.ToString()));
+                            await channelsHub
+                                .Clients.Group(command.ChannelId.ToString())
+                                .SendChannelRemoved(
+                                    new HubResult<string>(command.ChannelId.ToString())
+                                );
                         }
 
                         return deleted
-                                ? Results.Ok(new SuccessApiResult<bool>(true))
-                                : ResultsBuilder.Match<bool>(
-                                    new NotFoundApiResult("Channel not found")
-                                );
+                            ? Results.Ok(new SuccessApiResult<bool>(true))
+                            : ResultsBuilder.Match<bool>(
+                                new NotFoundApiResult("Channel not found")
+                            );
                     });
                 }
             )
@@ -88,9 +92,7 @@ public class DeleteChannelEndpoint : IEndpoint
             .WithOpenApi()
             .WithTags(new[] { nameof(ApiHttpVerbs.Delete), nameof(Channel) })
             .WithName(nameof(DeleteChannelEndpoint))
-            .WithDescription(
-                $"Deletes a channel by id. Requires authorization. Requires CORS"
-            )
+            .WithDescription($"Deletes a channel by id. Requires authorization. Requires CORS")
             .Produces<SuccessApiResult<bool>>(200, ApiContentTypes.ApplicationJson)
             .Produces<UnauthorizedApiResult>(401, ApiContentTypes.ApplicationJson)
             .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)

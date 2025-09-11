@@ -130,38 +130,40 @@ internal class UpdateChannelRequestChannel(SerpentineDbContext context)
         CancellationToken cancellationToken = default
     )
     {
-
         request.Name.Trim();
 
         if (request.CurrentUserId.ToString() == "")
             return new UnauthorizedApiResult(
                 "You are trying to update a channel without being logged in"
-        );
+            );
 
-
-
-        if (await context.Channels.AnyAsync(ch => ch.Name.ToLower() == request.Name.ToLower() && ch.Id != request.ChannelId))
+        if (
+            await context.Channels.AnyAsync(ch =>
+                ch.Name.ToLower() == request.Name.ToLower() && ch.Id != request.ChannelId
+            )
+        )
         {
             return new ConflictApiResult("Another channel with the same name already exist");
         }
 
         if (
-                await context.ChannelMembers.AsNoTracking().FirstOrDefaultAsync(cm =>
-                    cm.UserId == request.CurrentUserId
-                    && cm.ChannelId == request.ChannelId,
-                        cancellationToken
-                ) is var permission && permission is null
-            )
-            {
-                return new NotFoundApiResult("Channel not found");
-            }
+            await context
+                .ChannelMembers.AsNoTracking()
+                .FirstOrDefaultAsync(
+                    cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
+                    cancellationToken
+                )
+                is var permission
+            && permission is null
+        )
+        {
+            return new NotFoundApiResult("Channel not found");
+        }
 
         if (!permission.IsOwner && !permission.IsAdmin)
         {
             return new BadRequestApiResult("You dont have permissions to update this channel");
-
         }
-
 
         Channel? channel = await context.Channels.FirstOrDefaultAsync(
             ch => ch.Id == request.ChannelId,
@@ -188,9 +190,9 @@ internal class UpdateChannelRequestChannel(SerpentineDbContext context)
         }
 
         result.UnreadMessages = await context.GroupAccesses.GetMessagesCountByChannelId(
-                channel.Id,
-                request.CurrentUserId,
-                cancellationToken
+            channel.Id,
+            request.CurrentUserId,
+            cancellationToken
         );
 
         return result.ToResponse();

@@ -22,11 +22,14 @@ public class CreateGroupRequest : IRequest<OneOf<GroupResponse, Failure>>
         FromBody
     ]
     public string Name { get; set; } = null!;
-    
-    [JsonPropertyName("requiresOverage"), FromBody, Description("Tells if this group requires to be overage to access to the messages")]
+
+    [
+        JsonPropertyName("requiresOverage"),
+        FromBody,
+        Description("Tells if this group requires to be overage to access to the messages")
+    ]
     public bool RequiresOverage { get; set; } = false;
 
-    
     [JsonPropertyName("public"), Required, FromBody]
     public bool Public { get; set; } = true;
 
@@ -105,10 +108,8 @@ internal class CreateGroupEndpoint : IEndpoint
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(Group)})
-            .WithDescription(
-                $"Creates a group on a channel. Requires authorization. Requires CORS"
-            )
+            .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(Group) })
+            .WithDescription($"Creates a group on a channel. Requires authorization. Requires CORS")
             .Accepts<CreateGroupRequest>(false, ApiContentTypes.ApplicationJson)
             .Produces<SuccessApiResult<GroupResponse>>(200, ApiContentTypes.ApplicationJson)
             .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
@@ -127,7 +128,6 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
         CancellationToken cancellationToken = default
     )
     {
-
         using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         try
@@ -135,30 +135,39 @@ internal class CreateGroupEndpointHandler(SerpentineDbContext dbContext)
             if (!await dbContext.Channels.AnyAsync(ch => ch.Id == request.ChannelId))
                 return new BadRequestApiResult("Channel do not exist");
 
-            if (await dbContext.ChannelMembers
-                                .AsNoTracking()
-                                .AsSplitQuery()
-                                .FirstOrDefaultAsync(cm => cm.ChannelId == request.ChannelId && cm.UserId == request.CurrentUserId
-                                , cancellationToken) is var permission && permission is null)
+            if (
+                await dbContext
+                    .ChannelMembers.AsNoTracking()
+                    .AsSplitQuery()
+                    .FirstOrDefaultAsync(
+                        cm =>
+                            cm.ChannelId == request.ChannelId && cm.UserId == request.CurrentUserId,
+                        cancellationToken
+                    )
+                    is var permission
+                && permission is null
+            )
             {
-                return new BadRequestApiResult("You dont have permissions to create a group in this channel");
-                 
+                return new BadRequestApiResult(
+                    "You dont have permissions to create a group in this channel"
+                );
             }
 
             if (!permission.IsOwner && !permission.IsAdmin)
             {
-                return new BadRequestApiResult("You dont have permissions to create a group in this channel");
-
+                return new BadRequestApiResult(
+                    "You dont have permissions to create a group in this channel"
+                );
             }
 
             if (
-                    await dbContext.Groups.AnyAsync(x =>
-                        x.ChannelId == request.ChannelId && x.Name.ToLower() == request.Name.ToLower()
-                    )
+                await dbContext.Groups.AnyAsync(x =>
+                    x.ChannelId == request.ChannelId && x.Name.ToLower() == request.Name.ToLower()
                 )
-                    return new ConflictApiResult(
-                        "Another group on this channel with the same name already exist"
-                    );
+            )
+                return new ConflictApiResult(
+                    "Another group on this channel with the same name already exist"
+                );
 
             var newGroup = Group.Create(request);
 

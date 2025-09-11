@@ -21,8 +21,8 @@ namespace SerpentineApi.Helpers
 
             return true;
         }
-        
-         public static bool IsValid(Ulid? ulid)
+
+        public static bool IsValid(Ulid? ulid)
         {
             if (ulid == null)
             {
@@ -40,9 +40,9 @@ namespace SerpentineApi.Helpers
             }
 
             if (!Ulid.TryParse(ulid.ToString(), out Ulid parsedUlid))
-                {
-                    return false;
-                }
+            {
+                return false;
+            }
 
             return true;
         }

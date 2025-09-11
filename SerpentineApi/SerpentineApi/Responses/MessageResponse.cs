@@ -20,8 +20,6 @@ public class MessageResponse : BaseResponse
     public string? GroupName { get; set; }
 
     public string? ChannelName { get; set; }
-    
-    public  bool IsNewAndUnread { get; private set; } = false;
-    
-    
+
+    public bool IsNewAndUnread { get; private set; } = false;
 }

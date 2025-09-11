@@ -7,7 +7,6 @@ public interface IApiResult
     public bool IsSuccess { get; }
 
     public List<string> Errors { get; set; }
-
 }
 
 public class SuccessApiResult<T> : IApiResult
@@ -22,8 +21,8 @@ public class SuccessApiResult<T> : IApiResult
         Data = data;
         Message = message;
     }
-    
-    public SuccessApiResult(T data, string message, bool success = true  )
+
+    public SuccessApiResult(T data, string message, bool success = true)
     {
         Data = data;
         Message = message;
@@ -38,13 +37,12 @@ public class SuccessApiResult<T> : IApiResult
         IsSuccess = success;
         StatusCode = statusCode;
     }
-    
+
     public T Data { get; set; }
     public bool IsSuccess { get; private set; } = true;
     public string Message { get; set; } = "Everything went well";
     public int StatusCode { get; private set; } = 200;
     public List<string> Errors { get; set; } = new();
-
 }
 
 public abstract class Failure : IApiResult
@@ -56,7 +54,6 @@ public abstract class Failure : IApiResult
 
     public List<string> Errors { get; set; } = [];
 
-
     public void Build(string message, int statusCode, List<string>? messages = null)
     {
         Message = message;
@@ -66,30 +63,34 @@ public abstract class Failure : IApiResult
     }
 }
 
-
 public class NotFoundApiResult : Failure
 {
-    public NotFoundApiResult(string message = "The requested resource does not exist or has been deleted.", List<string>? messages = null)
+    public NotFoundApiResult(
+        string message = "The requested resource does not exist or has been deleted.",
+        List<string>? messages = null
+    )
     {
         Build(message, 404, messages);
     }
-
-
 }
 
 public class ForbiddenApiResult : Failure
 {
-    public ForbiddenApiResult(string message = "The requested resource is forbidden." , List<string>? messages = null)
+    public ForbiddenApiResult(
+        string message = "The requested resource is forbidden.",
+        List<string>? messages = null
+    )
     {
         Build(message, 403, messages);
     }
 }
 
-
-
 public class ValidationApiResult : Failure
 {
-    public ValidationApiResult(string message = "One or more parameters are invalid or missing or are invalid. Try again.", List<string>? messages = null)
+    public ValidationApiResult(
+        string message = "One or more parameters are invalid or missing or are invalid. Try again.",
+        List<string>? messages = null
+    )
     {
         Build(message, 422, messages);
     }
@@ -97,7 +98,10 @@ public class ValidationApiResult : Failure
 
 public class UnauthorizedApiResult : Failure
 {
-    public UnauthorizedApiResult(string message = "You are not authorized to access this resource.", List<string>? messages = null)
+    public UnauthorizedApiResult(
+        string message = "You are not authorized to access this resource.",
+        List<string>? messages = null
+    )
     {
         Build(message, 401, messages);
     }
@@ -105,7 +109,10 @@ public class UnauthorizedApiResult : Failure
 
 public class BadRequestApiResult : Failure
 {
-    public BadRequestApiResult(string message =  "One or more parameters are invalid or missing.", List<string>? messages = null)
+    public BadRequestApiResult(
+        string message = "One or more parameters are invalid or missing.",
+        List<string>? messages = null
+    )
     {
         Build(message, 404, messages);
     }
@@ -113,7 +120,10 @@ public class BadRequestApiResult : Failure
 
 public class ConflictApiResult : Failure
 {
-    public ConflictApiResult(string message = "The resource already exists or cannot be modified in its current state.", List<string>? messages = null)
+    public ConflictApiResult(
+        string message = "The resource already exists or cannot be modified in its current state.",
+        List<string>? messages = null
+    )
     {
         Build(message, 409, messages);
     }
@@ -121,7 +131,10 @@ public class ConflictApiResult : Failure
 
 public class ServerErrorApiResult : Failure
 {
-    public ServerErrorApiResult(string message = "An unexpected error occurred. Please try again later.", List<string>? messages = null)
+    public ServerErrorApiResult(
+        string message = "An unexpected error occurred. Please try again later.",
+        List<string>? messages = null
+    )
     {
         Build(message, 500, messages);
     }

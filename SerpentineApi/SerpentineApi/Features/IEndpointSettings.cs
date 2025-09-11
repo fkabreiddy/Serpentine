@@ -11,14 +11,11 @@ public enum ApiHttpVerbs
     Put,
     Delete,
     Patch,
-    Post
+    Post,
 }
 
 public static class ApiContentTypes
 {
     public static readonly string ApplicationJson = "application/json";
     public static readonly string MultipartForm = "multipart/form-data";
-
-    
-
 }

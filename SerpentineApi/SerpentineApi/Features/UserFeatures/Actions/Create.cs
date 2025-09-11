@@ -172,9 +172,7 @@ public class CreateUserEndpoint : IEndpoint
             .RequireCors()
             .WithOpenApi()
             .WithTags(new[] { nameof(ApiHttpVerbs.Post), nameof(User) })
-            .WithDescription(
-                $"Creates an user. Require CORS."
-            )
+            .WithDescription($"Creates an user. Require CORS.")
             .Accepts<AuthenticateUserRequest>(false, ApiContentTypes.MultipartForm)
             .Produces<SuccessApiResult<UserResponse>>(200, ApiContentTypes.ApplicationJson)
             .Produces<ConflictApiResult>(409, ApiContentTypes.ApplicationJson)
@@ -196,10 +194,14 @@ internal class CreateUserRequestHandler(
         CancellationToken cancellationToken = default
     )
     {
-        var role = await context.Roles.AsNoTracking().FirstOrDefaultAsync(x => x.AccessLevel == 0 && x.Name == "User");
+        var role = await context
+            .Roles.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.AccessLevel == 0 && x.Name == "User");
 
         if (role is null)
-            return new ServerErrorApiResult("We could not make you account because we didn't find the role for your user");
+            return new ServerErrorApiResult(
+                "We could not make you account because we didn't find the role for your user"
+            );
         if (
             await context.Users.AnyAsync(
                 u => u.Username.Trim().ToLower() == request.Username.Trim().ToLower(),
@@ -238,7 +240,10 @@ internal class CreateUserRequestHandler(
         await context.SaveChangesAsync(cancellationToken);
         context.ChangeTracker.Clear();
 
-        var response = await context.Users.FirstOrDefaultAsync(u => u.Id == creation.Id, cancellationToken);
+        var response = await context.Users.FirstOrDefaultAsync(
+            u => u.Id == creation.Id,
+            cancellationToken
+        );
 
         if (response is null)
             return new NotFoundApiResult("We could not find your account");

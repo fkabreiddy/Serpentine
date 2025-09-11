@@ -67,24 +67,15 @@ public class CloudinaryService
         transformation.Gravity("auto");
         transformation.Crop("fill");
 
-
-
         if (width is not null)
         {
             transformation.Width(width);
-
         }
 
         if (height is not null)
         {
             transformation.Height(height);
         }
-
-        
-
-
-        
-            
 
         var uploadParams = new ImageUploadParams()
         {
@@ -94,7 +85,7 @@ public class CloudinaryService
             UseFilename = true,
             UniqueFilename = isUnique,
             Folder = folderName,
-            Transformation = transformation
+            Transformation = transformation,
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);

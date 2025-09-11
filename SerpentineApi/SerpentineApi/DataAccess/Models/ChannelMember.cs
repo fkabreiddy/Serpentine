@@ -11,7 +11,7 @@ public class ChannelMember : BaseEntity
     public bool IsSilenced { get; set; } = false;
     public bool IsArchived { get; set; } = false;
     public bool IsOwner { get; set; } = false;
-    
+
     public bool IsAdmin { get; set; } = false;
 
     public DateTime LastAccess { get; set; } = DateTime.UtcNow;
@@ -31,7 +31,7 @@ public class ChannelMember : BaseEntity
             IsOverage = User.GetAge(User.DayOfBirth) >= 18,
             UserName = User.FullName,
             UserUsername = User.Username,
-            IsAdmin = IsAdmin
+            IsAdmin = IsAdmin,
         };
 
     public static ChannelMember Create(CreateChannelMemberRequest request) =>
@@ -40,6 +40,6 @@ public class ChannelMember : BaseEntity
             ChannelId = request.ChannelId,
             UserId = request.CurrentUserId,
             IsOwner = false,
-            IsAdmin = false
+            IsAdmin = false,
         };
 }

@@ -17,19 +17,30 @@ public static class GroupEntityExtensions
             .AsSplitQuery()
             .Include(x => x.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
             .Where(g => g.Id == groupId)
-            .Select(ch => new Group()
-            {
-               
-                ChannelName = ch.Channel.Name,
-                MyAccess = ch.Accesses.FirstOrDefault(a => a.UserId == userId),
-                LastMessage = ch.Messages.OrderByDescending(m => m.CreatedAt).Select( m => new Message
+            .Select(ch =>
+                new Group()
                 {
-                    
-                    SenderName = m.Sender != null ? m.Sender.FullName : "",
-                    SenderUsername = m.Sender != null ? m.Sender.Username : "",
-                    Content = m.Content
-                }).FirstOrDefault()
-            }.Spread(ch, new string[]{nameof(Group.ChannelName), nameof(Group.LastMessage), nameof(Group.MyAccess)}))
+                    ChannelName = ch.Channel.Name,
+                    MyAccess = ch.Accesses.FirstOrDefault(a => a.UserId == userId),
+                    LastMessage = ch
+                        .Messages.OrderByDescending(m => m.CreatedAt)
+                        .Select(m => new Message
+                        {
+                            SenderName = m.Sender != null ? m.Sender.FullName : "",
+                            SenderUsername = m.Sender != null ? m.Sender.Username : "",
+                            Content = m.Content,
+                        })
+                        .FirstOrDefault(),
+                }.Spread(
+                    ch,
+                    new string[]
+                    {
+                        nameof(Group.ChannelName),
+                        nameof(Group.LastMessage),
+                        nameof(Group.MyAccess),
+                    }
+                )
+            )
             .ToListAsync(token);
 
         return groups.FirstOrDefault();
@@ -45,7 +56,6 @@ public static class GroupEntityExtensions
     )
     {
         return await groupSet
-                
             .AsNoTracking()
             .AsSplitQuery()
             .Include(x => x.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
@@ -53,19 +63,30 @@ public static class GroupEntityExtensions
             .OrderBy(x => x.Id)
             .Skip(skip)
             .Take(take)
-            .Select(ch => new Group()
-            {
-               
-                ChannelName = ch.Channel.Name,
-                MyAccess = ch.Accesses.FirstOrDefault(a => a.UserId == userId),
-                LastMessage = ch.Messages.OrderByDescending(m => m.CreatedAt).Select( m => new Message
+            .Select(ch =>
+                new Group()
                 {
-                    
-                    SenderName = m.Sender != null ? m.Sender.FullName : "",
-                    SenderUsername = m.Sender != null ? m.Sender.Username : "",
-                    Content = m.Content
-                }).FirstOrDefault()
-            }.Spread(ch, new string[]{nameof(Group.ChannelName), nameof(Group.LastMessage), nameof(Group.MyAccess)}))
+                    ChannelName = ch.Channel.Name,
+                    MyAccess = ch.Accesses.FirstOrDefault(a => a.UserId == userId),
+                    LastMessage = ch
+                        .Messages.OrderByDescending(m => m.CreatedAt)
+                        .Select(m => new Message
+                        {
+                            SenderName = m.Sender != null ? m.Sender.FullName : "",
+                            SenderUsername = m.Sender != null ? m.Sender.Username : "",
+                            Content = m.Content,
+                        })
+                        .FirstOrDefault(),
+                }.Spread(
+                    ch,
+                    new string[]
+                    {
+                        nameof(Group.ChannelName),
+                        nameof(Group.LastMessage),
+                        nameof(Group.MyAccess),
+                    }
+                )
+            )
             .ToListAsync(token);
     }
 }

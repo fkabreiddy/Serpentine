@@ -13,7 +13,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
     public DbSet<GroupAccess> GroupAccesses { get; set; }
 
     public DbSet<Message> Messages { get; set; }
-    
+
     public DbSet<Role> Roles { get; set; }
     public DbSet<ChannelBan> ChannelBans { get; set; }
 
@@ -26,22 +26,19 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            t.Navigation(u => u.Role)
-                .AutoInclude()
-                .IsRequired(true);
-            
+            t.Navigation(u => u.Role).AutoInclude().IsRequired(true);
+
             t.HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .IsRequired(true)
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             t.HasMany(u => u.Bans)
                 .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
-            
+
             t.HasIndex(u => u.Username).IsUnique();
 
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
@@ -57,59 +54,48 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
         });
-        
+
         modelBuilder.Entity<Role>(t =>
         {
-           
-            
-           
-            
             t.HasMany(u => u.Users)
                 .WithOne(a => a.Role)
                 .HasForeignKey(a => a.RoleId)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            t.HasData(new Role[]
-            {
-
-                new()
+            t.HasData(
+                new Role[]
                 {
-                    Id = Ulid.Parse("01K1Y24KEJ2SQ283X365D8QBJP"),
-                    Name = "User",
-                    AccessLevel = 0
-
-                },
-                new()
-                {
-                    Id = Ulid.Parse("01K1Y24KEPDA7ZFCX6YCP3MY7M"),
-                    Name = "Admin",
-                    AccessLevel = 1
-
-                },
-                new()
-                {
-                    Id = Ulid.Parse("01K1Y24KEPTCVKR97AKSWKHTP8"),
-                    Name = "Tester",
-                    AccessLevel = 2
-
-                },
-                new()
-                {
-                    Id = Ulid.Parse("01K1Y24KEP473CNR8N01ZCXRV9"),
-                    Name = "Developer",
-                    AccessLevel = 3
-
+                    new()
+                    {
+                        Id = Ulid.Parse("01K1Y24KEJ2SQ283X365D8QBJP"),
+                        Name = "User",
+                        AccessLevel = 0,
+                    },
+                    new()
+                    {
+                        Id = Ulid.Parse("01K1Y24KEPDA7ZFCX6YCP3MY7M"),
+                        Name = "Admin",
+                        AccessLevel = 1,
+                    },
+                    new()
+                    {
+                        Id = Ulid.Parse("01K1Y24KEPTCVKR97AKSWKHTP8"),
+                        Name = "Tester",
+                        AccessLevel = 2,
+                    },
+                    new()
+                    {
+                        Id = Ulid.Parse("01K1Y24KEP473CNR8N01ZCXRV9"),
+                        Name = "Developer",
+                        AccessLevel = 3,
+                    },
                 }
-            });
-            
-            
+            );
+
             t.HasIndex(u => u.Name).IsUnique();
 
-
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
-
-            
         });
 
         modelBuilder.Entity<Channel>(t =>
@@ -121,7 +107,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithOne(mc => mc.Channel)
                 .HasForeignKey(mc => mc.ChannelId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             t.HasMany(u => u.Bans)
                 .WithOne(mc => mc.Channel)
                 .HasForeignKey(mc => mc.ChannelId)
@@ -133,13 +119,10 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithOne(g => g.Channel)
                 .HasForeignKey(g => g.ChannelId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
-           
         });
-        
+
         modelBuilder.Entity<ChannelBan>(t =>
         {
-
             t.HasOne(cb => cb.Channel)
                 .WithMany(c => c.Bans)
                 .HasForeignKey(mc => mc.ChannelId)
@@ -151,18 +134,15 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithMany(u => u.Bans)
                 .HasForeignKey(cb => cb.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
-            t.HasIndex(u => new { u.ChannelId, u.UserId }).IsUnique();
 
+            t.HasIndex(u => new { u.ChannelId, u.UserId }).IsUnique();
         });
-        
-        
 
         modelBuilder.Entity<ChannelMember>(t =>
         {
             t.HasIndex(u => new { u.ChannelId, u.UserId }).IsUnique();
             t.Navigation(cm => cm.User).AutoInclude().IsRequired();
-            
+
             t.HasOne(cm => cm.Channel).WithMany(cm => cm.Members).HasForeignKey(c => c.ChannelId);
             t.HasOne(cm => cm.User).WithMany(cm => cm.MyChannels).HasForeignKey(c => c.UserId);
             t.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
@@ -178,7 +158,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
                 .WithMany(m => m.Replies)
                 .HasForeignKey(m => m.ParentId)
                 .OnDelete(DeleteBehavior.SetNull);
-            
+
             entity.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
 
             entity.HasMany(m => m.Replies).WithOne(m => m.Parent).OnDelete(DeleteBehavior.NoAction);
@@ -212,7 +192,5 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
             entity.HasOne(ga => ga.Group).WithMany(g => g.Accesses).HasForeignKey(a => a.GroupId);
             entity.HasOne(ga => ga.User).WithMany(u => u.MyAccesses).HasForeignKey(a => a.UserId);
         });
-        
-      
     }
 }

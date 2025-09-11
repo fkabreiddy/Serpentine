@@ -20,13 +20,11 @@ public class Channel : BaseEntity
     public string? BannerPicture { get; set; }
 
     public List<Group> Groups { get; set; } = new();
-    
+
     public List<ChannelBan> Bans { get; set; } = new();
 
-    
-
     [NotMapped]
-    public ChannelMember? MyMember { get; set; } 
+    public ChannelMember? MyMember { get; set; }
 
     [NotMapped]
     public int UnreadMessages { get; set; } = 0;
@@ -62,7 +60,6 @@ public class Channel : BaseEntity
             [
                 new()
                 {
-                 
                     UserId = request.CurrentUserId,
                     IsOwner = true,
                     IsAdmin = true,

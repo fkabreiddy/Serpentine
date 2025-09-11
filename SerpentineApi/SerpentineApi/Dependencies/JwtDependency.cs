@@ -32,31 +32,33 @@ public static class JwtDependency
                 {
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
-                    policy.RequireRole(new string[]
-                    {
-                        nameof(UserRoles.User),
-                        nameof(UserRoles.Tester), 
-                        nameof(UserRoles.Developer),
-                        nameof(UserRoles.User)
-                    });
-                    
+                    policy.RequireRole(
+                        new string[]
+                        {
+                            nameof(UserRoles.User),
+                            nameof(UserRoles.Tester),
+                            nameof(UserRoles.Developer),
+                            nameof(UserRoles.User),
+                        }
+                    );
                 }
             );
             opts.AddPolicy(
-                    nameof(AuthorizationPolicies.AllowAllUsers),
+                nameof(AuthorizationPolicies.AllowAllUsers),
                 policy =>
                 {
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
 
-                    policy.RequireRole(new string[]
-                    {
-                        nameof(UserRoles.User),
-                        nameof(UserRoles.Tester), 
-                        nameof(UserRoles.Developer),
-                        nameof(UserRoles.User)
-                    });
-
+                    policy.RequireRole(
+                        new string[]
+                        {
+                            nameof(UserRoles.User),
+                            nameof(UserRoles.Tester),
+                            nameof(UserRoles.Developer),
+                            nameof(UserRoles.User),
+                        }
+                    );
                 }
             );
             opts.AddPolicy(
@@ -65,26 +67,21 @@ public static class JwtDependency
                 {
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
-                    policy.RequireRole(new string[]
-                    {
-                        nameof(UserRoles.Developer),
-                        nameof(UserRoles.Admin)
-                    });
+                    policy.RequireRole(
+                        new string[] { nameof(UserRoles.Developer), nameof(UserRoles.Admin) }
+                    );
                 }
             );
-            
+
             opts.AddPolicy(
                 nameof(AuthorizationPolicies.OnlyTesters),
                 policy =>
                 {
                     policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
-                    policy.RequireRole(new string[]
-                    {
-                        nameof(UserRoles.Developer),
-                        nameof(UserRoles.Tester),
-
-                    });
+                    policy.RequireRole(
+                        new string[] { nameof(UserRoles.Developer), nameof(UserRoles.Tester) }
+                    );
                 }
             );
         });

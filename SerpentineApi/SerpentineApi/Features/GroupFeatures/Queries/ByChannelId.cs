@@ -38,7 +38,7 @@ public class GetGroupsByChannelIdRequestValidator : AbstractValidator<GetGroupsB
         RuleFor(x => x.Skip)
             .GreaterThanOrEqualTo(0)
             .WithMessage("Skip should be greater or equal to 0.");
-        
+
         RuleFor(x => x.ChannelId)
             .Must(x => UlidHelper.IsValid(x))
             .WithMessage("Channel Id should be an valid Ulid.");
@@ -87,13 +87,15 @@ internal class GetGroupsByChannelIdEndpoint : IEndpoint
             .RequireCors()
             .Stable()
             .WithOpenApi()
-            .WithTags(new string[]{nameof(ApiHttpVerbs.Get), nameof(Group)})
+            .WithTags(new string[] { nameof(ApiHttpVerbs.Get), nameof(Group) })
             .Accepts<GetGroupsByChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
             .Produces<SuccessApiResult<List<GroupResponse>>>(200, ApiContentTypes.ApplicationJson)
             .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
             .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
             .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
-            .WithDescription("Returns a list of groups with a certain ChannelId. Require Authorization. Require CORS")
+            .WithDescription(
+                "Returns a list of groups with a certain ChannelId. Require Authorization. Require CORS"
+            )
             .WithName(nameof(GetGroupsByChannelIdEndpoint));
     }
 }
@@ -122,7 +124,6 @@ internal class GetGroupsByChannelIdEndpointHandler(SerpentineDbContext context)
                 group.MyAccess?.LastReadMessageDate ?? group.CreatedAt,
                 cancellationToken
             );
-
         }
 
         return groups.Select(g => g.ToResponse()).ToList();

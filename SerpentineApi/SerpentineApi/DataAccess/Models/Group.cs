@@ -17,7 +17,6 @@ public class Group : BaseEntity
 
     public bool RequiresOverage { get; set; } = false;
 
-
     [NotMapped]
     public GroupAccess? MyAccess { get; set; } = new();
 
@@ -43,7 +42,7 @@ public class Group : BaseEntity
             UnreadMessages = UnreadMessages,
             ChannelName = ChannelName,
             Public = Public,
-            LastMessage = LastMessage?.ToResponse() ?? null
+            LastMessage = LastMessage?.ToResponse() ?? null,
         };
 
     public static Group Create(CreateGroupRequest request) =>

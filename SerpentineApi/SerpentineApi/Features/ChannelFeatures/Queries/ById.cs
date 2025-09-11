@@ -77,9 +77,7 @@ public class GetChannelByIdEndpoint : IEndpoint
             .Produces<NotFoundApiResult>(404, ApiContentTypes.ApplicationJson)
             .Produces<ValidationApiResult>(409, ApiContentTypes.ApplicationJson)
             .WithName(nameof(GetChannelByIdEndpoint))
-            .WithDescription(
-                $"Returns a Channel. Requires Authorization. Requires CORS"
-            );
+            .WithDescription($"Returns a Channel. Requires Authorization. Requires CORS");
     }
 }
 
@@ -91,7 +89,6 @@ internal class GetChannelByIdEndpointHandler(SerpentineDbContext context)
         CancellationToken cancellationToken
     )
     {
-
         Channel? channel = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
             request.ChannelId,
             request.CurrentUserId,
@@ -101,7 +98,6 @@ internal class GetChannelByIdEndpointHandler(SerpentineDbContext context)
         if (channel is null)
             return new NotFoundApiResult($"Channel with the id {request.ChannelId} not found");
 
-      
         return channel.ToResponse();
     }
 }

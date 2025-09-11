@@ -39,9 +39,9 @@ builder.Services.AddSignalRServices();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApiServices();
-builder.Services.AddRequestTimeouts(options => {
-    options.DefaultPolicy =
-        new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(30) };
+builder.Services.AddRequestTimeouts(options =>
+{
+    options.DefaultPolicy = new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(30) };
 });
 var app = builder.Build();
 
@@ -53,16 +53,15 @@ if (app.Environment.IsDevelopment())
     {
         options.Theme = ScalarTheme.Alternate;
         // Fluent API
-        options.WithTitle("Serpentine API")
+        options
+            .WithTitle("Serpentine API")
             .AddDocument(ApiConstants.DocumentName)
             .WithSidebar(true);
-        
+
         // Bearer
         options.Authentication = new ScalarAuthenticationOptions
         {
             PreferredSecuritySchemes = [ApiConstants.AuthenticationScheme],
-            
-            
         }; // Security scheme name from the OpenAPI document
     });
 }
@@ -89,25 +88,28 @@ app.UseExceptionHandler(appError =>
     });
 });
 
-
 app.UseAuthentication();
 app.UseRouting();
 app.UseCors("default");
-app.MapHealthChecks("/health", new()
-{
-    Predicate = healthCheck => healthCheck.Name == nameof(SerpentineHealthCheck),
-    ResponseWriter = HealtCheckActions.WriteResponse
-    
-})
-.RequireCors("default");
+app.MapHealthChecks(
+        "/health",
+        new()
+        {
+            Predicate = healthCheck => healthCheck.Name == nameof(SerpentineHealthCheck),
+            ResponseWriter = HealtCheckActions.WriteResponse,
+        }
+    )
+    .RequireCors("default");
 
-app.MapHealthChecks("/health-database", new()
-{
-    Predicate = healthCheck => healthCheck.Name == "serpentine-db",
-    ResponseWriter = HealtCheckActions.WriteResponse
-    
-})
-.RequireCors("default");
+app.MapHealthChecks(
+        "/health-database",
+        new()
+        {
+            Predicate = healthCheck => healthCheck.Name == "serpentine-db",
+            ResponseWriter = HealtCheckActions.WriteResponse,
+        }
+    )
+    .RequireCors("default");
 
 app.UseAuthorization();
 app.MapHub<ActiveUsersHub>(

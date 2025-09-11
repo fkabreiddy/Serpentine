@@ -84,9 +84,7 @@ internal class GetByUserIdEndpoint : IEndpoint
             .Produces<BadRequestApiResult>(400, ApiContentTypes.ApplicationJson)
             .Produces<ServerErrorApiResult>(500, ApiContentTypes.ApplicationJson)
             .Produces<ValidationApiResult>(422, ApiContentTypes.ApplicationJson)
-            .WithDescription(
-                $"Return a list of channels. Requires Authorization. Requires CORS"
-            )
+            .WithDescription($"Return a list of channels. Requires Authorization. Requires CORS")
             .WithName(nameof(GetByUserIdEndpoint));
     }
 }
@@ -109,15 +107,14 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
             request.Take
         );
 
-       foreach(var channel in channels){
-        
+        foreach (var channel in channels)
+        {
             channel.UnreadMessages = await context.GroupAccesses.GetMessagesCountByChannelId(
                 channel.Id,
                 request.CurrentUserId,
                 cancellationToken
             );
-       }
-
+        }
 
         var response = channels.Select(ch => ch.ToResponse()).ToList();
         return response;

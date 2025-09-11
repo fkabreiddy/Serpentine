@@ -16,5 +16,4 @@ public class UserResponse : BaseResponse
     public UserRoles Role { get; set; } = UserRoles.User;
 
     public int AccessLevel { get; set; } = 0;
-
 }

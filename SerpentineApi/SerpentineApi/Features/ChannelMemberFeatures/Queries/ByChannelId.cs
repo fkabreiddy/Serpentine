@@ -55,7 +55,6 @@ internal class GetChannelMemberByChannelIdEndpoint : IEndpoint
                 {
                     return await executor.ExecuteAsync<List<ChannelMemberResponse>>(async () =>
                     {
-                        
                         var result = await sender.SendAndValidateAsync(command, cancellationToken);
                         if (result.IsT1)
                         {
@@ -75,7 +74,7 @@ internal class GetChannelMemberByChannelIdEndpoint : IEndpoint
             .RequireAuthorization(JwtBearerDefaults.AuthenticationScheme)
             .Stable()
             .WithOpenApi()
-            .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(ChannelMember)})
+            .WithTags(new[] { nameof(ApiHttpVerbs.Get), nameof(ChannelMember) })
             .RequireCors()
             .Accepts<GetChannelMembersByChannelIdRequest>(false, ApiContentTypes.ApplicationJson)
             .Produces<SuccessApiResult<List<ChannelResponse>>>(200, ApiContentTypes.ApplicationJson)
@@ -101,8 +100,7 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
     )
     {
         List<ChannelMember> channels = await context
-            .ChannelMembers
-            .AsNoTracking()
+            .ChannelMembers.AsNoTracking()
             .AsSplitQuery()
             .Where(ch => ch.ChannelId == request.ChannelId)
             .OrderBy(ch => ch.Id)

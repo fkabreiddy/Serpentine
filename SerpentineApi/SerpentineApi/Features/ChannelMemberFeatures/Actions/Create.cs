@@ -12,7 +12,12 @@ namespace SerpentineApi.Features.ChannelMemberFeatures.Actions;
 
 public class CreateChannelMemberRequest : IRequest<OneOf<ChannelMemberResponse, Failure>>
 {
-    [Required, JsonPropertyName("channelId"), FromBody, Description("The id of the channel that user is joining")]
+    [
+        Required,
+        JsonPropertyName("channelId"),
+        FromBody,
+        Description("The id of the channel that user is joining")
+    ]
     public Ulid ChannelId { get; set; }
 
     [JsonIgnore, BindNever]
@@ -101,77 +106,91 @@ internal class CreateChannelMemberEndpointHandler(SerpentineDbContext context)
         CancellationToken cancellationToken
     )
     {
-        if (await context.ChannelBans.FirstOrDefaultAsync(x =>
-                x.ChannelId == request.ChannelId && x.UserId == request.CurrentUserId, cancellationToken) is var ban && ban is not null)
-            return new BadRequestApiResult($"You have been banned from this channel. For {ban.Reason}");
-        
-        if (await context.Channels.FirstOrDefaultAsync(ch => ch.Id == request.ChannelId, cancellationToken) is var channel && channel is null)
+        if (
+            await context.ChannelBans.FirstOrDefaultAsync(
+                x => x.ChannelId == request.ChannelId && x.UserId == request.CurrentUserId,
+                cancellationToken
+            )
+                is var ban
+            && ban is not null
+        )
+            return new BadRequestApiResult(
+                $"You have been banned from this channel. For {ban.Reason}"
+            );
+
+        if (
+            await context.Channels.FirstOrDefaultAsync(
+                ch => ch.Id == request.ChannelId,
+                cancellationToken
+            )
+                is var channel
+            && channel is null
+        )
         {
             return new NotFoundApiResult("The channel do not exist");
         }
 
-        if (await context.Users.FirstOrDefaultAsync(u => u.Id == request.CurrentUserId) is var user && user is null)
+        if (
+            await context.Users.FirstOrDefaultAsync(u => u.Id == request.CurrentUserId) is var user
+            && user is null
+        )
         {
             return new NotFoundApiResult("We couldn't find your account");
         }
 
         if (channel.AdultContent && user.GetAge(user.DayOfBirth) < 18)
         {
-            return new ForbiddenApiResult("This channel contains adult content. You cannot access to this channel if you are not overage.");
+            return new ForbiddenApiResult(
+                "This channel contains adult content. You cannot access to this channel if you are not overage."
+            );
         }
 
-        
-
         if (
-                await context.ChannelMembers.AnyAsync(
-                        cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
-                        cancellationToken
-                    )
-                )
-            {
-                return new ConflictApiResult("You already belong to this channel");
-            }
+            await context.ChannelMembers.AnyAsync(
+                cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
+                cancellationToken
+            )
+        )
+        {
+            return new ConflictApiResult("You already belong to this channel");
+        }
 
         using var transaction = await context.Database.BeginTransactionAsync();
 
         try
         {
-
             ChannelMember creation = ChannelMember.Create(request);
 
-          
-
-            await context.ChannelMembers.AddAsync(
-                creation,
-                cancellationToken
-            );
-
-
+            await context.ChannelMembers.AddAsync(creation, cancellationToken);
 
             await context.SaveChangesAsync(cancellationToken);
 
             context.ChangeTracker.Clear();
 
-            var result = await context.ChannelMembers.AsSplitQuery().AsNoTracking().FirstOrDefaultAsync(cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId, cancellationToken);
+            var result = await context
+                .ChannelMembers.AsSplitQuery()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    cm => cm.UserId == request.CurrentUserId && cm.ChannelId == request.ChannelId,
+                    cancellationToken
+                );
 
             if (result is null)
             {
                 await transaction.RollbackAsync();
-                return new ServerErrorApiResult("Could not create the memebership. Try again later");
+                return new ServerErrorApiResult(
+                    "Could not create the memebership. Try again later"
+                );
             }
 
             await transaction.CommitAsync(cancellationToken);
 
             return result.ToResponse();
-
-
         }
         catch (Exception)
         {
             await transaction.RollbackAsync(cancellationToken);
             throw;
         }
-        
     }
 }
-
