@@ -5,12 +5,10 @@ export const updateGroupSchema = z.object({
         .min(3, "Name must be at least 3 characters")
         .max(30, "Name must be less than 30 characters")
         .default(""),
-
-   
     
     public: z.boolean().default(true),
     requiresOverage: z.boolean().default(true),
-    channelId: z.string().default("")
+    groupId: z.string().default("")
 
    
 

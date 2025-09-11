@@ -37,7 +37,7 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
     <ScrollShadow
       hideScrollBar
       offset={0}
-      style={{width: isMobile ? `calc(100% - 60px)` : "300px"}}
+      style={{width: isMobile ? `calc(100% - 60px)` : "300px", minWidth: isMobile ? `calc(100% - 60px)` : "300px", maxWidth: isMobile ? `calc(100% - 60px)` : "300px",}}
       className={`h-screen ${isMobile ? "  absolute right-0" : ""} z-[31]  bg-white dark:bg-black  animate-all flex flex-col items-center max-md:border-0 border-l  border-default-100 p-3 overflow-auto gap-2  scroll-smooth scrollbar-hide `}
     >
 

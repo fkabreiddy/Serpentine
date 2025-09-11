@@ -44,6 +44,7 @@ export default function CreateGroupForm({ onDone }: FormView) {
       name: "",
       public: true,
       channelId: "",
+      requiresOverage: false
     },
   });
 

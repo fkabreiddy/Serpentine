@@ -5,6 +5,8 @@ import {handleApiErrors, handleApiSuccess} from "@/helpers/api-results-handler-h
 import {GroupResponse} from "@/models/responses/group-response.ts";
 import {GetGroupsByChannelIdRequest} from "@/models/requests/groups/get-by-channel-id-request.ts";
 import {CreateGroupRequest} from "@/models/requests/groups/create-group-request.ts";
+import { UpdateGroupRequest } from "@/models/requests/groups/update-group-request";
+import { showToast } from "@/helpers/sonner-helper";
 const GROUPS_ENDPOINT = "groups"
 
 
@@ -27,7 +29,7 @@ export function useCreateGroup() {
 
         if (result.data && result.statusCode === 200) {
             setGroup(result.data);
-            handleApiSuccess(result);
+            showToast({description: "Group created sucessfully"});
 
         }
         else {
@@ -75,7 +77,7 @@ export function useUpdateGroup() {
 
         if (result.data && result.statusCode === 200) {
             setUpdatedGroup(result.data);
-            handleApiSuccess(result);
+            showToast({description: "Group updated sucessfully"});
 
         }
         else {
@@ -90,7 +92,7 @@ export function useUpdateGroup() {
     }, [result]);
 
 
-    const updateGroup = async (data: CreateGroupRequest) => {
+    const updateGroup = async (data: UpdateGroupRequest) => {
 
         setResult(null);
         setUpdatingGroup(true);

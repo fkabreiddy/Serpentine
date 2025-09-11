@@ -20,9 +20,9 @@ import { X } from "lucide-react";
 
 
 export default function UpdateGroupForm({ onDone }: FormView) {
-  const { groupToUpdate, setGroupToUpdate, setCreatedGroup } =useGlobalDataStore();
+  const { groupToUpdate, setUpdatedGroup: contextSetUpdatedGroup } =useGlobalDataStore();
   const {setLayout} = useLayoutStore();
-  const { updateGroup, updatedGroup, updatingGroup } = useUpdateGroup();
+  const { updateGroup, updatingGroup, updatedGroup } = useUpdateGroup();
   const {getChannelMemberByUserAndChannelId, channelMember} = useGetChannelMemberByUserAndChannelId();
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [componentReady, setComponentReady] = useState<boolean>(false)
@@ -72,7 +72,7 @@ export default function UpdateGroupForm({ onDone }: FormView) {
     if(hasPermission && groupToUpdate)
     {
         setValue("name", groupToUpdate.name);
-        setValue("channelId", groupToUpdate.channelId);
+        setValue("groupId", groupToUpdate.id);
         setValue("public", groupToUpdate.public);
         setValue("requiresOverage", groupToUpdate.requiresOverage);
         setComponentReady(true);
@@ -84,6 +84,13 @@ export default function UpdateGroupForm({ onDone }: FormView) {
   },[hasPermission, groupToUpdate])
 
   
+  useEffect(()=>{
+    if(updatedGroup)
+    {
+      contextSetUpdatedGroup(updatedGroup);
+      onDone();
+    }
+  },[updatedGroup])
 
 
   const {
@@ -98,7 +105,8 @@ export default function UpdateGroupForm({ onDone }: FormView) {
     defaultValues: {
       name: "",
       public: true,
-      channelId: "",
+      groupId: "",
+      requiresOverage: false
     },
   });
 

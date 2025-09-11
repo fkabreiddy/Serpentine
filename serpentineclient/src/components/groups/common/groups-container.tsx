@@ -42,6 +42,8 @@ export default function GroupsContainer({
     setDeletedMessageId,
     newMessageRecievedOnCurrentGroup,
     setNewMessageRecievedOnCurrentGroup,
+    updatedGroup,
+    setUpdatedGroup,
 
   } = useGlobalDataStore();
   const { layout, setLayout } = useLayoutStore();
@@ -55,6 +57,19 @@ export default function GroupsContainer({
     });
   };
 
+  useEffect(()=>{
+
+    if(updatedGroup && channel && channel.id === updatedGroup.channelId)
+    {
+      setGroups( (prev) => (prev.map(g => g.id === updatedGroup.id ? updatedGroup : g)))
+    }
+
+    if(updatedGroup)
+    {
+      setUpdatedGroup(null);
+    }
+
+  },[updatedGroup, channel])
   useEffect(()=>{
 
     if(!newMessageRecievedOnCurrentGroup) return;
