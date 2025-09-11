@@ -13,24 +13,26 @@ import { showToast } from "@/helpers/sonner-helper";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import {ChannelBanner} from "@/components/channels/common/channel-banner.tsx";
 import ChannelCover from "@/components/channels/common/channel-cover.tsx";
-interface CreateChannelFormProps {
-  triggerClose: () => void;
-}
+import { FormView } from "@/models/utils";
+import IconButton from "@/components/common/icon-button";
+import { X } from "lucide-react";
 
 
-const CreateChannelForm: React.FC<CreateChannelFormProps> = ({
-  triggerClose,
-}) => {
+export default function CreateChannelForm({onDone}:FormView){
   const { channel, createChannel, creatingChannel } = useCreateChannel();
   const { setCreatedChannel } = useGlobalDataStore();
+  const [componentIsReady, setComponentIsReady] = useState<boolean>(false);
 
- 
+  useEffect(()=>{
+    setComponentIsReady(true);
+  },[])
 
   useEffect(() => {
     if (channel) {
       setCreatedChannel(null);
       setCreatedChannel(channel);
-      triggerClose();
+      onDone();
+      
     }
   }, [channel]);
 
@@ -70,12 +72,16 @@ const CreateChannelForm: React.FC<CreateChannelFormProps> = ({
 
   
 
-  
+  if(!componentIsReady) return(<></>);
 
   return (
     <div className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
 
-    
+       <div className="absolute top-2 right-2">
+          <IconButton tooltipText="Close" onClick={onDone}>
+            <X className="size-[18px]" />
+          </IconButton>
+        </div>
       
 
       <div className="">
@@ -341,4 +347,3 @@ function ChannelBannerAndCoverForm({onBannerChanged, onCoverChanged, channelName
 
 }
 
-export default CreateChannelForm;

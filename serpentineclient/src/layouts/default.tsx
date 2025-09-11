@@ -1,6 +1,6 @@
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useIsMobile } from '../hooks/use-mobile';
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useTheme } from "@heroui/use-theme";
 import {  useLayoutStore } from "@/contexts/layout-context";
 import { ArrowLeft, ArrowRight, MenuIcon, X } from "lucide-react";
@@ -73,7 +73,10 @@ export default function DefaultLayout({
   useEffect(() => {
 
     if(!isMobile && !layout.sideBarExpanded)
+    {
        setLayout({sideBarExpanded: true})
+
+    }
 
     
     
@@ -81,43 +84,24 @@ export default function DefaultLayout({
 
   
 
-  const changeSidebarState = () =>{
-      setLayout({sideBarExpanded : !layout.sideBarExpanded})
-  }
-
   if(!loadLayout) return (<div className="flex items-center justify-center w-full h-screen bg-black"><Spinner size="sm" variant="spinner"/></div>)
 
   return (
-    <div className="w-screen h-screen flex">
+    <div className="w-screen h-screen flex items-stretch">
+
+      <LeftSide>
         <AppBar />
         <LeftSideBar />
-          {isMobile && 
-            <div className={`absolute top-[50%] !z-[9999999] ${layout.sideBarExpanded ? "left-[355px]" : "left-[105px]"}`}>
-                <button onClick={changeSidebarState}  className="flex bg-default-100 cursor-pointer items-center justify-center px-1 py-2 rounded-r-xl">
-                    {!layout.sideBarExpanded ? <ArrowRight className="shrink-0 size-4"/> : <ArrowLeft className="shrink-0 size-4"/>}
-                </button>
-            </div>
-          }
-
-        
+      </LeftSide>
       
+      <main 
+        style={{width: (layout.sideBarExpanded && isMobile) ? "100vw" : "calc(100vw - 60px)" }}
+      className={`  flex flex-col animate-[width] bg-white  dark:bg-black     h-full overflow-auto  `}  >
+        {children}
 
-          <div className="flex flex-col w-full h-screen  " style={{marginLeft: !layout.sideBarExpanded ? "50px" : "0px" }}>
-
-            
-              <main className="flex flex-col animate-[width] bg-white  dark:bg-black  float-left h-full overflow-auto "  >
-                {children}
-
-              </main> 
-              
-             
-
-          </div>
-         
-        
-       
-
-       {layout.currentRightPanelView === RightPanelView.DefaultView ? <></> :    <RightSideBar/> }
+      </main> 
+      
+      {layout.currentRightPanelView === RightPanelView.DefaultView ? <></> :    <RightSideBar/> }
  
        
     </div>
@@ -128,4 +112,18 @@ export default function DefaultLayout({
     
       
   );
+}
+
+
+const LeftSide = ({children}:{children: ReactNode}) =>{
+
+  const {layout} = useLayoutStore();
+  const isMobile = useIsMobile();
+  return(
+
+    <div className={`${layout.sideBarExpanded && isMobile && "absolute"} ${layout.sideBarExpanded ? "w-[360px]" : "w-[60px]" } h-screen flex z-[40]  items-stretch`}>
+      {children}
+     
+    </div>
+  )
 }

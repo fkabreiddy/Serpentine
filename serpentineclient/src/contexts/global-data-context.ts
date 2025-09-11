@@ -4,7 +4,7 @@ import { GroupResponse } from "@/models/responses/group-response.ts";
 import { MessageResponse } from "@/models/responses/message-response";
 
 interface GlobalData {
-  createChannelGroupData: { channelId: string; channelName: string } | null;
+  createGroupChannelData: { channelId: string; channelName: string } | null;
   setCreateGroupChannelData: (
     data: { channelId: string; channelName: string } | null
   ) => void;
@@ -19,7 +19,7 @@ interface GlobalData {
   channelJoined: ChannelResponse | null;
   setChannelJoined: (channel: ChannelResponse | null) => void;
   updateChannelId: string | null;
-  setUpdateChannelid: (channelId : string | null) => void;
+  setUpdateChannelId: (channelId : string | null) => void;
   updatedChannel: ChannelResponse | null;
   setUpdatedChannel: (channelId: ChannelResponse | null) => void;
   newUnreadMessage: MessageResponse | null;
@@ -34,11 +34,13 @@ interface GlobalData {
   setNewMessageRecievedOnCurrentGroup: (message: MessageResponse | null) => void;
   messageToReplyTo: MessageResponse | null;
   setMessageToReplyTo: (message: MessageResponse | null)=>void
+  groupToUpdate: GroupResponse | null;
+  setGroupToUpdate: (group: GroupResponse | null)=>void;
   clearGlobalData: ()=>void
 }
 
 export const useGlobalDataStore = create<GlobalData>((set) => ({
-  createChannelGroupData: null,
+  createGroupChannelData: null,
   createdChannel: null,
   deletedChannelId: null,
   createdGroup: null,
@@ -52,6 +54,8 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   deletedMessageId: null,
   newMessageRecievedOnCurrentGroup: null,
   messageToReplyTo: null,
+  groupToUpdate: null,
+
 
   setDeletedChannelId: (id: string | null) => {
     set((state) => ({
@@ -77,7 +81,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   ) => {
     set((state) => ({
       ...state,
-      createChannelGroupData: data,
+      createGroupChannelData: data,
     }));
   },
   setCreatedChannel: (channel: ChannelResponse | null) => {
@@ -94,7 +98,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }));
   },
   
-  setUpdateChannelid: (channelId: string | null) => {
+  setUpdateChannelId: (channelId: string | null) => {
     set((state) => ({
       ...state,
       updateChannelId: channelId,
@@ -153,11 +157,20 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }))
   },
 
+  setGroupToUpdate: (group: GroupResponse | null) => {
+
+    set((state)=>({
+        ...state,
+        groupToUpdate: group
+
+    }))
+  },
+
   clearGlobalData: () => {
     set((state) => ({
       ...state,
-      createChannelGroupData: null,
-      channelInfoId: null
+      createGroupChannelData: null,
+      channelInfoId: null,
     }))
   }
 

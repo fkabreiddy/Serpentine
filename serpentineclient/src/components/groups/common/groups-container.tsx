@@ -30,7 +30,7 @@ export default function GroupsContainer({
   const {
     setCreateGroupChannelData,
     
-    createChannelGroupData,
+    createGroupChannelData: createChannelGroupData,
     setChannelInfoId,
     createdGroup,
     setCreatedGroup,

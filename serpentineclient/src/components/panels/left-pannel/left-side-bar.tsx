@@ -16,6 +16,7 @@ import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
 import {BoxIcon} from "lucide-react";
 import { motion } from "motion/react";
 import { Skeleton } from "@heroui/react";
+import { useIsMobile } from "@/hooks/use-mobile";
 interface LeftSideBarProps {}
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () => {
@@ -51,6 +52,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
   const statusBarRef = React.useRef<HTMLDivElement | null>(null);
   const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
   const alreadyMounted = useRef<boolean>(false);
+  const isMobile = useIsMobile();
 
    useEffect(()=>{
   
@@ -157,16 +159,12 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
   return (
     <>
-      <div ref={leftPanelRef} style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}} className={`relative z-[31] max-md:z-[50]  bg-white dark:bg-black`}>
+      <div ref={leftPanelRef}  className={`${layout.sideBarExpanded ? "flex flex-col" : "hidden"}  w-[300px] z-[31] max-md:z-[50] bg-white dark:bg-black`}>
         <div
          
           id="side-bar"
           
-          className={`${
-            layout.sideBarExpanded
-              ? "w-[300px]"
-              : "w-[50px]"
-          } h-full  py-4  max-md:h-full rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t max-md:absolute border-default-100 px-3 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
+          className={` h-full py-4  border rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t  border-default-100 px-3 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
         >
           <div className="flex flex-col w-full items-center gap-3">
             <ChannelsContainer

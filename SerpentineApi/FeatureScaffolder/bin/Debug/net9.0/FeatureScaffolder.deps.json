@@ -7,8 +7,19 @@
   "targets": {
     ".NETCoreApp,Version=v9.0": {
       "FeatureScaffolder/1.0.0": {
+        "dependencies": {
+          "Spectre.Console": "0.51.1"
+        },
         "runtime": {
           "FeatureScaffolder.dll": {}
+        }
+      },
+      "Spectre.Console/0.51.1": {
+        "runtime": {
+          "lib/net9.0/Spectre.Console.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.51.1.0"
+          }
         }
       }
     }
@@ -18,6 +29,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Spectre.Console/0.51.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-84xNywgnaG8XgOypnZAL+EZUbhCGE0umj7fuMrSI6esdE74HYHRoeBioeMUJXPiCt7iBDKHLwiBcg0IliYIIxA==",
+      "path": "spectre.console/0.51.1",
+      "hashPath": "spectre.console.0.51.1.nupkg.sha512"
     }
   }
 }

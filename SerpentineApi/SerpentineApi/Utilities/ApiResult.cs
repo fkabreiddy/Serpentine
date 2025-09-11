@@ -29,6 +29,15 @@ public class SuccessApiResult<T> : IApiResult
         Message = message;
         IsSuccess = success;
     }
+
+    public SuccessApiResult(T data, string message, bool success = true, int statusCode = 200)
+    {
+        Data = data;
+        Message = message;
+
+        IsSuccess = success;
+        StatusCode = statusCode;
+    }
     
     public T Data { get; set; }
     public bool IsSuccess { get; private set; } = true;
@@ -57,6 +66,7 @@ public abstract class Failure : IApiResult
     }
 }
 
+
 public class NotFoundApiResult : Failure
 {
     public NotFoundApiResult(string message = "The requested resource does not exist or has been deleted.", List<string>? messages = null)
@@ -64,7 +74,7 @@ public class NotFoundApiResult : Failure
         Build(message, 404, messages);
     }
 
-    
+
 }
 
 public class ForbiddenApiResult : Failure

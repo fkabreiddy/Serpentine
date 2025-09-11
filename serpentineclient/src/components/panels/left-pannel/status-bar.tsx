@@ -71,17 +71,11 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
 
   return (
     <>
-      {layout.sideBarExpanded && (
         <div
-          id="status-bar"
        
           
-          className="fixed left-0 max-md:z-[31]  bottom-0 z-10 backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-default-100 "
-          style={{
-            width: "357px",
-              minWidth:"355px",
-            transition: "width 0.2s",
-          }}
+          className="w-full backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-default-100 "
+          
         >
           <div className="absolute w-full h-full backdrop-blur-2xl dark:bg-neutral-950/80   bg-neutral-100/80  z-[-1]" />
           <SquarePattern />
@@ -126,7 +120,7 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
             </div>
           </>
         </div>
-      )}
+      
     </>
   );
 }

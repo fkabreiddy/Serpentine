@@ -7,16 +7,16 @@ public class Group : BaseEntity
 {
     [MaxLength(100), MinLength(3), RegularExpression(@"^[a-zA-Z0-9_]+$")]
     public string Name { get; set; } = null!;
-    
+
     public List<Message> Messages { get; set; } = new();
     public List<GroupAccess> Accesses { get; set; } = new();
     public Channel Channel { get; set; } = null!;
     public Ulid ChannelId { get; set; }
 
     public bool Public { get; set; } = true;
-    
+
     public bool RequiresOverage { get; set; } = false;
-    
+
 
     [NotMapped]
     public GroupAccess? MyAccess { get; set; } = new();
@@ -26,9 +26,9 @@ public class Group : BaseEntity
 
     [NotMapped]
     public string ChannelName { get; set; } = "";
-    
+
     [NotMapped]
-    public Message? LastMessage { get; set; } 
+    public Message? LastMessage { get; set; }
 
     public GroupResponse ToResponse() =>
         new()
@@ -43,7 +43,7 @@ public class Group : BaseEntity
             UnreadMessages = UnreadMessages,
             ChannelName = ChannelName,
             Public = Public,
-            LastMessage = LastMessage?.ToResponse() ?? null 
+            LastMessage = LastMessage?.ToResponse() ?? null
         };
 
     public static Group Create(CreateGroupRequest request) =>
@@ -62,4 +62,34 @@ public class Group : BaseEntity
                 new() { UserId = request.CurrentUserId, LastReadMessageDate = DateTime.UtcNow },
             },
         };
+
+    public bool Update(UpdateGroupRequest request)
+    {
+        bool hasBeenUpdated = false;
+
+        if (Name != request.Name)
+        {
+            Name = request.Name;
+            hasBeenUpdated = true;
+        }
+
+        if (Public != request.Public)
+        {
+            Name = request.Name;
+            hasBeenUpdated = true;
+        }
+
+        if (RequiresOverage != request.RequiresOverage)
+        {
+            RequiresOverage = request.RequiresOverage;
+            hasBeenUpdated = true;
+        }
+
+        if (hasBeenUpdated)
+        {
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        return hasBeenUpdated;
+    }
 }

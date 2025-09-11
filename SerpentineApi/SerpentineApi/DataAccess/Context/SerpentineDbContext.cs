@@ -188,7 +188,6 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
 
         modelBuilder.Entity<Group>(entity =>
         {
-            entity.Navigation(cm => cm.Channel).AutoInclude().IsRequired();
             entity.Property(o => o.Id).HasConversion(v => v.ToString(), v => Ulid.Parse(v));
 
             entity.HasIndex(u => new { u.ChannelId, u.Name }).IsUnique();

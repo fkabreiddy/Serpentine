@@ -57,6 +57,54 @@ export function useCreateGroup() {
     return { createGroup, group, creatingGroup};
 }
 
+export function useUpdateGroup() {
+
+    const [updatedGroup, setUpdatedGroup] = useState<GroupResponse | null>(null);
+    const [updatingGroup, setUpdatingGroup] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<GroupResponse> | null>(null);
+    const { put } = useFetch<GroupResponse>();
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            setUpdatingGroup(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+            setUpdatedGroup(result.data);
+            handleApiSuccess(result);
+
+        }
+        else {
+
+            handleApiErrors(result);
+        }
+
+        setUpdatingGroup(false);
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const updateGroup = async (data: CreateGroupRequest) => {
+
+        setResult(null);
+        setUpdatingGroup(true);
+        setUpdatedGroup(null);
+        const response = await put({endpoint: GROUPS_ENDPOINT, contentType: "application/json"}, data );
+        setResult(response);
+
+
+
+    };
+
+    return { updateGroup,  updatedGroup, updatingGroup};
+}
+
 
 //queries
 export function useGetGroupsByChannelId() {

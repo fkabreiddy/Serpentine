@@ -28,3 +28,6 @@ C:\Proyectos\Serpentine-App\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\ref
 C:\Proyectos\Serpentine-App\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.pdb
 C:\Proyectos\Serpentine-App\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\FeatureScaffolder.genruntimeconfig.cache
 C:\Proyectos\Serpentine-App\SerpentineApi\FeatureScaffolder\obj\Debug\net9.0\ref\FeatureScaffolder.dll
+C:\Proyectos\Serpentine\serpentineapi\featurescaffolder\bin\Debug\net9.0\Spectre.Console.dll
+C:\Proyectos\Serpentine\serpentineapi\featurescaffolder\obj\Debug\net9.0\FeatureScaffolder.csproj.AssemblyReference.cache
+C:\Proyectos\Serpentine\serpentineapi\featurescaffolder\obj\Debug\net9.0\FeatureS.1E782F4A.Up2Date

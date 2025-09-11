@@ -1,4 +1,7 @@
-﻿namespace SerpentineApi.DataAccess.Models;
+﻿using System.Reflection;
+using SerpentineApi.Features;
+
+namespace SerpentineApi.DataAccess.Models;
 
 public abstract class BaseEntity
 {
@@ -7,4 +10,5 @@ public abstract class BaseEntity
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
 }

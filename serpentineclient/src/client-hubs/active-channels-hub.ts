@@ -223,6 +223,26 @@ export function useActiveChannelsHubActions() {
   const { activeChannelsHub, addChannel, removeChannel } =
     useActiveChannelsHubStore();
 
+    const [activeUsersCount,setActiveUsersCount] = useState(0);
+
+  const getChannelActiveMembersCount = async (channelId: string) => {
+    if (!activeChannelsHub) return;
+
+    try {
+      const result: HubResult<number> = await activeChannelsHub.invoke(
+        "GetActiveUsersOnAChannelById",
+        channelId
+      );
+      if (result.isSuccess && result.data !== null) {
+        setActiveUsersCount(result.data);
+        return;
+      }
+      setActiveUsersCount(0);
+    } catch (error) {
+      setActiveUsersCount(0);
+    }
+  };
+
   const listenToChannel = async (
     channelId: string,
     channelName: string | null = null
@@ -271,6 +291,8 @@ export function useActiveChannelsHubActions() {
 
   return {
     listenToChannel,
+    getChannelActiveMembersCount,
+    activeUsersCount,
     stopListeningToChannel,
   }
 }

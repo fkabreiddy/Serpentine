@@ -5,7 +5,7 @@ import { Spinner } from "@heroui/spinner";
 import { useCloseSession } from "@/hooks/user-hooks";
 import IconButton from "@/components/common/icon-button";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { Compass, Home, Inbox, PlugIcon, Settings2, TestTubeIcon } from "lucide-react";
+import { Compass, Home, Inbox, PlugIcon, Settings2, SidebarClose, SidebarOpen, TestTubeIcon } from "lucide-react";
 import { useActiveUserHubStore } from "@/contexts/active-user-hub-context";
 import { HubConnectionState } from "@microsoft/signalr";
 import {
@@ -21,6 +21,7 @@ import { useActiveUser, useActiveUsersActions } from "@/client-hubs/active-user-
 import { useTest } from "@/hooks/channel-member-hooks";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useUiSound } from "@/helpers/sound-helper";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProfilePanelProps {}
 
@@ -30,6 +31,8 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
   const {} = useActiveUser();
   const navigate = useNavigate();
   const {layout, setLayout} = useLayoutStore();
+  const isMobile = useIsMobile();
+  
   const {playStartUp} = useUiSound();
   const [isMounted, setIsMounted] = useState(false);
   const appBarRef = useRef<HTMLDivElement | null>(null);
@@ -42,22 +45,12 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
     await test({typeOfResponse: "validation"});
   }
 
-  useEffect(() => {
-    
-    if(!isMounted || !appBarRef) return;
-    
-    if(firstRender.current === true)
-    {
-      //playStartUp();
-      firstRender.current = false;
+  function changeSidebarState()
+  {
+    setLayout({sideBarExpanded: !layout.sideBarExpanded})
+  }
 
-
-    }
-
-    setLayout({appBarWidth: appBarRef.current?.offsetWidth});
-    
-
-  }, [isMounted, appBarRef]);
+  
 
   useEffect(()=>{
     
@@ -69,14 +62,24 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
 
   return (
     <nav
-        ref={appBarRef}
+      ref={appBarRef}
       id="app-bar"
-      style={{height: layout.sideBarExpanded ? `calc(100vh - 60px)` : "100vh"}}
-      className=" w-[60px] rounded-br-lg rounded-tr-lg opacity-60 hover:opacity-100 transition-all  border-r border-default-100 relative px-3 py-5 z-[31] max-md:z-[50] flex flex-col  bg-neutral-100/30 dark:bg-neutral-950/30 items-center justify-between"
+      className={` w-[60px] rounded-br-lg rounded-tr-lg  hover:opacity-100 transition-all  border-r border-default-100 relative px-3 py-5 z-[31] max-md:z-[50] flex flex-col  bg-neutral-100 dark:bg-black items-center justify-between`}
     >
+      <div className="w-full flex justify-center items-center flex-col gap-3">
+        { isMobile &&
 
+          <IconButton
+          tooltipText={layout.sideBarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          onClick={()=> {changeSidebarState()}}>
+            {layout.sideBarExpanded ? <SidebarClose size={18}/> : <SidebarOpen size={16}/>}
+          </IconButton>
+
+        }
 
       <AvatarDropdown />
+      </div>
+     
 
       <div className=" flex flex-col  items-center justify-end gap-4 ">
         <IconButton tooltipText="Test" placement={"right"} onClick={() => tryTest()}>
