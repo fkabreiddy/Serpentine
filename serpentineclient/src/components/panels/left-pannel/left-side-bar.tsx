@@ -164,7 +164,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
          
           id="side-bar"
           
-          className={` h-full py-4  border rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t  border-default-100 px-3 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
+          className={` h-full py-4   rounded-tr-lg bg-white dark:bg-black animate-all flex flex-col border-r border-t  border-default-100 px-3 overflow-auto gap-4 scroll-smooth scrollbar-hide`}
         >
           <div className="flex flex-col w-full items-center gap-3">
             <ChannelsContainer

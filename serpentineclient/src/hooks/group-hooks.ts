@@ -77,7 +77,7 @@ export function useUpdateGroup() {
 
         if (result.data && result.statusCode === 200) {
             setUpdatedGroup(result.data);
-            showToast({description: "Group updated sucessfully"});
+            showToast({ title: "Group updated sucessfully.", description: "Changes will be available soon for other users"});
 
         }
         else {

@@ -6,7 +6,7 @@ import { Input, Textarea } from "@heroui/input";
 import { Checkbox } from "@heroui/checkbox";
 import { Button } from "@heroui/button";
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
-import { useCreateGroup, useUpdateGroup } from "@/hooks/group-hooks.ts";
+import { useCreateGroup, useGetGroupById, useUpdateGroup } from "@/hooks/group-hooks.ts";
 import { motion } from "motion/react";
 import { UpdateGroupRequest, updateGroupSchema } from "@/models/requests/groups/update-group-request";
 import { useGetChannelMemberByUserAndChannelId } from "@/hooks/channel-member-hooks";
@@ -20,10 +20,11 @@ import { X } from "lucide-react";
 
 
 export default function UpdateGroupForm({ onDone }: FormView) {
-  const { groupToUpdate, setUpdatedGroup: contextSetUpdatedGroup } =useGlobalDataStore();
+  const { groupToUpdateId, setUpdatedGroup: contextSetUpdatedGroup } =useGlobalDataStore();
   const {setLayout} = useLayoutStore();
   const { updateGroup, updatingGroup, updatedGroup } = useUpdateGroup();
   const {getChannelMemberByUserAndChannelId, channelMember} = useGetChannelMemberByUserAndChannelId();
+  const {getGroupById, group}=useGetGroupById();
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [componentReady, setComponentReady] = useState<boolean>(false)
 
@@ -34,23 +35,37 @@ export default function UpdateGroupForm({ onDone }: FormView) {
     await getChannelMemberByUserAndChannelId(data);
   }
 
+  async function fetchGetGroupById(data:GetGroupByIdRequest)
+  {
+    await getGroupById(data);
+  }
+
 
   
   //flow
 
-  //first lets fetch the permission to see if the user is an admin or the owner of the channel
+  //first we fetch the group
+
+  useEffect(()=>{
+    if(groupToUpdateId)
+    {
+      fetchGetGroupById({groupId: groupToUpdateId});
+    }
+  },[groupToUpdateId])
+
+  //then lets fetch the permission to see if the user is an admin or the owner of the channel
 
   useEffect(()=>{
 
-    if(!groupToUpdate) return;
+    if(!group) return;
 
-    fetchGetMembership({channelId: groupToUpdate.channelId});
+    fetchGetMembership({channelId: group.channelId});
 
   
    
-  },[ groupToUpdate])
+  },[group])
 
-  //if user is not and admin and if is not the owner whe kick'em out
+  //if user is not and admin nor the owner whe kick'em out
   useEffect(()=>{
     if(channelMember)
     {
@@ -69,19 +84,19 @@ export default function UpdateGroupForm({ onDone }: FormView) {
 
   useEffect(()=>{
 
-    if(hasPermission && groupToUpdate)
+    if(hasPermission && group)
     {
-        setValue("name", groupToUpdate.name);
-        setValue("groupId", groupToUpdate.id);
-        setValue("public", groupToUpdate.public);
-        setValue("requiresOverage", groupToUpdate.requiresOverage);
+        setValue("name", group.name);
+        setValue("groupId", group.id);
+        setValue("public", group.public);
+        setValue("requiresOverage", group.requiresOverage);
         setComponentReady(true);
     }
 
    
 
    
-  },[hasPermission, groupToUpdate])
+  },[hasPermission, group])
 
   
   useEffect(()=>{
@@ -137,7 +152,7 @@ export default function UpdateGroupForm({ onDone }: FormView) {
             </h2>
             <p className="text-xs opacity-45 max-md:text-center">
               You are updating the group:{" "}
-              <strong>{groupToUpdate?.name}</strong>. Be sure
+              <strong>{group?.name}</strong>. Be sure
               that your group name is unique in your channel. You can change any
               information previously
             </p>

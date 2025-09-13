@@ -29,6 +29,8 @@ export default function CurrentGroupChatroomInfo({
 }) {
 
   const [activeUsers, setActiveUsers] = useState();
+  const {activeChannelsHub} = useActiveChannelsHubStore();
+  
   const {activeUsersCount, getChannelActiveMembersCount} = useActiveChannelsHubActions();
 
   async function fetchGetChannelActiveMembersCount(channelId: string)
@@ -37,11 +39,11 @@ export default function CurrentGroupChatroomInfo({
 
   }
   useEffect(()=>{
-    if(group)
+    if(group && activeChannelsHub)
     {
       fetchGetChannelActiveMembersCount(group.channelId);
     }
-  }, [group])
+  }, [group, activeChannelsHub])
   
   const navigate = useNavigate();
   return (
@@ -50,10 +52,10 @@ export default function CurrentGroupChatroomInfo({
         initial={{ opacity: 0 }}
         exit={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="  w-full p-4 px-3  bg-neutral-100 dark:bg-neutral-950 z-[33] justify-between   absolute left-0 top-0 flex flex-col "
+        className="  w-full p-4  bg-neutral-100 dark:bg-neutral-950 z-[33] justify-between   absolute left-0 top-0 flex flex-col "
       >
         <div className="flex w-full justify-between items-center gap-3">
-          <div className="w-[full] flex gap-2 items-center  ">
+          <div className="w-[full] flex gap-4 items-center  ">
               <IconButton tooltipText="Close" onClick={() => navigate("/home")}>
                 <ArrowLeftIcon className="size-[16px]" />
               </IconButton>
@@ -78,7 +80,7 @@ export default function CurrentGroupChatroomInfo({
 
            <OptionsDropdown group={group} membership={channelMembership}/>
         </div>
-        <div className="flex items-center gap-2  ml-[35px]">
+        <div className="flex items-center gap-2  ml-[45px]">
           <div className="size-2 rounded-full bg-green-600"/>
          <p className="text-green-700 text-xs "> {activeUsersCount} Active members</p>
 
@@ -96,18 +98,18 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
 }) => {
 
   const {layout, setLayout} = useLayoutStore();
-  const {groupToUpdate, setGroupToUpdate} = useGlobalDataStore();
+  const {groupToUpdateId, setGroupToUpdateId} = useGlobalDataStore();
 
  
 
   useEffect(()=>{
 
-    if(groupToUpdate)
+    if(groupToUpdateId)
     {
       setLayout({currentRightPanelView: RightPanelView.UpdateGroupFormView})
     }
 
-  },[groupToUpdate])
+  },[groupToUpdateId])
 
 
   
@@ -146,7 +148,7 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
            {(membership.isAdmin ||
                membership.isOwner) && (
                <>
-                 <DropdownItem textValue="edit" onClick={()=>{setGroupToUpdate(group);}} key="edit" endContent={<Edit3Icon size={16} />}>
+                 <DropdownItem textValue="edit" onClick={()=>{setGroupToUpdateId(group.id);}} key="edit" endContent={<Edit3Icon size={16} />}>
                    <p className="font-normal text-[13px]">Edit this Group</p>
                  </DropdownItem>
                </>

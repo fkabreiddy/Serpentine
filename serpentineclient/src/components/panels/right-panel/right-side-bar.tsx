@@ -18,7 +18,7 @@ interface RightSideBarProps {}
 const RightSideBar: React.FC<RightSideBarProps> = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { layout, setLayout } = useLayoutStore();
-  const {setChannelInfoId, setCreateGroupChannelData, setGroupToUpdate, setUpdateChannelId} = useGlobalDataStore();
+  const {setChannelInfoId, setCreateGroupChannelData, setGroupToUpdateId, setUpdateChannelId} = useGlobalDataStore();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
 
       {layout.currentRightPanelView === RightPanelView.UpdateGroupFormView && (
 
-        <UpdateGroupForm onDone={()=>{close(); setGroupToUpdate(null);}}/>
+        <UpdateGroupForm onDone={()=>{close(); setGroupToUpdateId(null);}}/>
       )}
      
     </ScrollShadow>
