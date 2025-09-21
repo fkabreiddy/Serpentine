@@ -220,9 +220,8 @@ export function useGetCountUnreadMessages() {
             return;
         }
 
-        if (result.data && result.statusCode === 200) {
+        if (result.data !== null && result.statusCode === 200) {
 
-            console.log("Unread messages: ", result.data);
           setUnreadMessagesCount(result.data)
 
            
@@ -241,10 +240,9 @@ export function useGetCountUnreadMessages() {
 
     const getCountUnreadMessages = async (data: GetUnreadMessagesCount) => {
 
-        
+        setResult(null);
         setUnreadMessagesCount(0);
          setFetchingUnreadMessagesCount(true);
-        setResult(null);
         const response = await get({endpoint: MESSAGES_ENDPOINT + "/count-unread-by-group-id", contentType: "application/json"}, data );
         setResult(response);
       

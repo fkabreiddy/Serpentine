@@ -11,6 +11,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { Spinner } from "@heroui/spinner";
 import { HubConnectionState } from "@microsoft/signalr";
 import {useEffect, useRef, useState} from "react";
+import CountUp from "@/components/common/count-up";
 
 interface StatusBarProps {
   channels: ChannelResponse[];
@@ -114,7 +115,7 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
                 <label className="text-xs">
                   {listeningToChannel
                     ? "Connecting to channels..."
-                    : `Connected to ${activeChannels.length} channels`}
+                    : <>Connected to <CountUp from={0} to={activeChannels.length} duration={1} /></>}
                 </label>
               )}
             </div>

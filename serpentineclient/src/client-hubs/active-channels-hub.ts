@@ -24,7 +24,7 @@ export function useActiveChannelsHubConnection(){
   const {getToken} = useJwtHelper();
   const {activeChannelsHub, setConnection, setActiveChannelsHubConnectionState, clearChannels, quitConnection} = useActiveChannelsHubStore();
   const firstRender = useRef<boolean>(true);
-  const {setDeletedChannelId, setNewUnreadMessage, currentGroupIdAtChatroomPage, setDeletedMessageId, setNewMessageRecievedOnCurrentGroup} = useGlobalDataStore()
+  const {setDeletedChannelId, setNewUnreadMessage, setDeletedGroupId, currentGroupIdAtChatroomPage, setDeletedMessageId, setNewMessageRecievedOnCurrentGroup} = useGlobalDataStore()
   const [isMounted, setIsMounted]=useState<boolean>(false);
   const currentGroupIdRef = useRef(currentGroupIdAtChatroomPage);
   useEffect(() => {
@@ -42,6 +42,15 @@ export function useActiveChannelsHubConnection(){
       description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`, 
       color: "danger"
     });
+  }, []); // Sin dependencias - solo usa setters y funciones
+
+  const handleSendGroupDeleted = useCallback((result: HubResult<string | null>) => {
+   
+    const groupId = result.data;
+   
+    if(!groupId) return;
+    setDeletedGroupId(groupId);
+   
   }, []); // Sin dependencias - solo usa setters y funciones
 
 
@@ -119,6 +128,7 @@ export function useActiveChannelsHubConnection(){
     activeChannelsHub.on("SendUserKickedOut",  handleSendChannelMemberKickedOut);
     activeChannelsHub.on("SendMessage", handleSendMessage);
     activeChannelsHub.on("SendMessageDeleted", handleSendMessageDeleted);
+    activeChannelsHub.on("SendGroupDeleted", handleSendGroupDeleted);
 
    
 
@@ -131,6 +141,8 @@ export function useActiveChannelsHubConnection(){
     activeChannelsHub.off("SendUserKickedOut")
     activeChannelsHub.off("SendMessage");
     activeChannelsHub.off("SendMessageDeleted");
+    activeChannelsHub.off("SendGroupDeleted");
+
 
 
   }, [activeChannelsHub]);

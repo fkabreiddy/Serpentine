@@ -5,7 +5,7 @@ import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-contex
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageResponse } from "@/models/responses/message-response.ts";
 import { HubResult } from "@/models/hub-result";
-import { useGetMessagesByGroupId } from "@/hooks/message-hooks";
+import { useGetCountUnreadMessages, useGetMessagesByGroupId } from "@/hooks/message-hooks";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { useUiSound } from "@/helpers/sound-helper";
@@ -18,16 +18,18 @@ import { CalendarDateTime, parseDateTime, parseZonedDateTime, ZonedDateTime } fr
 
 
 interface MessagesContainerProps {
-  groupId: string;
-  channelMember: ChannelMemberResponse;
-  lastAccess: GroupAccessResponse | null;
-
+  
 }
 export default function MessagesContainer({
   groupId,
   channelMember,
   lastAccess,
-}: MessagesContainerProps) {
+  onNoMessagesAfter
+}: {groupId: string;
+  channelMember: ChannelMemberResponse;
+  lastAccess: GroupAccessResponse | null;
+  onNoMessagesAfter: (value: boolean) => void;
+}) {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +51,8 @@ export default function MessagesContainer({
   ); //leave this to a track the client state, the server state is in the lastAccess prop
 
 
+    const {unreadMessagesCount, getCountUnreadMessages, setUnreadMessagesCount} = useGetCountUnreadMessages();
+  
   const { deletedMessageId, setDeletedMessageId } = useGlobalDataStore();
   const { user } = useAuthStore();
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -57,16 +61,18 @@ export default function MessagesContainer({
   const lastGroupIdRef = useRef<string>("");
   const lastReadMessageDateRef = useRef<string | null>(null);
   const {getDate} = useDateHelper();
-
+  const [fetchAfterPerformed, setFetchAfterPerformed] = useState(false);
   const creatingOrUpdatingAccess = useRef<boolean | null>(null);
   const observerRefTop = useRef<IntersectionObserver | null>(null);
   const observerRefBottom = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
-
+  const hasMoreAfterRef = useRef<boolean>(hasMoreAfter);
   const { playSubmit } = useUiSound();
 
 
- 
+  async function fecthGetUnreadMessagesCount(groupId: string){
+      await getCountUnreadMessages({groupId: groupId});
+  }
 
   
   async function fetchCreateOrUpdateGroupAccess() {
@@ -82,13 +88,7 @@ export default function MessagesContainer({
   }
 
   
-  useEffect(()=>{
-
-    return()=>{
-
-      fetchCreateOrUpdateGroupAccess();
-    }
-  },[groupId]);
+  
 
   function handleMessageDateUpdated(date: string) {
 
@@ -117,16 +117,18 @@ export default function MessagesContainer({
     if(!containerRef.current ) return
 
     containerRef.current.scrollTop = containerRef.current.scrollTop - 50;
-        if (!groupId) return;
+    if (!groupId) return;
 
-        new Promise<void>((resolve) => setTimeout(resolve, 2000));
-        await getMessagesByGroupId({
-          groupId: groupId,
-          take: 15,
-          after: true,
-          indexDate: messages[0]?.createdAt ?? null,
-          skip: messages?.length,
-        });
+    new Promise<void>((resolve) => setTimeout(resolve, 2000));
+    await getMessagesByGroupId({
+      groupId: groupId,
+      take: 15,
+      after: true,
+      indexDate: messages[0]?.createdAt ?? null,
+      skip: messages?.length,
+    });
+
+    setFetchAfterPerformed(true);
    
   };
 
@@ -167,6 +169,37 @@ export default function MessagesContainer({
 
   //effects
 
+  useEffect(()=>{
+
+    if(groupId !== lastGroupIdRef.current && lastGroupIdRef.current !== ""){
+
+      fetchCreateOrUpdateGroupAccess();
+
+    }
+
+    
+
+    return()=>{
+
+      fetchCreateOrUpdateGroupAccess();
+    }
+  },[groupId]);
+
+  useEffect(()=>{
+
+    if(fetchAfterPerformed && !hasMoreAfter && lastReadMessageDate === messages[0]?.createdAt){
+
+      setUnreadMessagesCount(0);
+    }
+
+  },[fetchAfterPerformed, hasMoreAfter, lastReadMessageDate])
+
+  useEffect(()=>{
+
+    hasMoreAfterRef.current = hasMoreAfter;
+    
+  },[hasMoreAfter])
+
   //main flow
   //1. mount component and set the effect so the lastAccess is created once the component is unmounted
 
@@ -200,13 +233,17 @@ export default function MessagesContainer({
         take: 15,
         after: false,
         indexDate: lastAccess?.lastReadMessageDate ?? null, // this can be null btw
-        skip: messages?.length,
+        skip: messages?.length, // this is unecesary
       });
 
+      
 
     };
 
+    
+
     firstFetch();
+    fecthGetUnreadMessagesCount(groupId);
   }, [isMounted]);
 
   //other effects
@@ -227,7 +264,7 @@ export default function MessagesContainer({
 
   const handleMessageRecieved = useCallback(
     (result: HubResult<MessageResponse>) => {
-      if (!result.data) return;
+      if (!result.data || hasMoreAfterRef.current) return;
 
       if (result.data.groupId !== groupId) return;
 
@@ -236,7 +273,7 @@ export default function MessagesContainer({
 
       playSubmit();
     },
-    [groupId]
+    [groupId, hasMoreAfter]
   );
 
   useEffect(() => {
@@ -253,14 +290,13 @@ export default function MessagesContainer({
   return (
 
     
-    <motion.div ref={containerRef} style={{ height: "calc(100vh - 100px)" }} className="flex w-full  mt-[50px] flex-col-reverse items-center max-w-full   h-full overflow-y-auto   ">
+    <motion.div ref={containerRef} style={{ height: "calc(100vh - 136px)" }} className="flex w-full  mt-[76px] flex-col-reverse items-center max-w-full   h-full overflow-y-auto   ">
       <div
         
         className=" flex flex-col-reverse h-fit w-[90%] pb-[40px]    "
         
-      >
-
-
+      > 
+        {unreadMessagesCount > 0 && <UnreadMessagesCountBanner date={lastAccess?.lastReadMessageDate ?? new Date().toString()} count={unreadMessagesCount} />}
         {messages.map((message, idx) => {
 
           
@@ -277,7 +313,6 @@ export default function MessagesContainer({
                 )}
               {
                 idx < messages.length - 1 &&
-                user?.id !== message.senderId &&
                 lastAccess &&
                 !message.recievedInChat &&
                 messages[idx + 1].createdAt <= lastAccess.lastReadMessageDate && 
@@ -391,3 +426,12 @@ const UnreadMessagesDivider = ({date}:{date: string}) => {
   );};
 
 
+const UnreadMessagesCountBanner = ({count, date}: {count: number, date: string})=>{
+
+  return(
+
+    <div className="absolute px-3 py-2 flex items-center justify-between  w-full bg-pink-500/50 backdrop-blur-md z-[30] left-[0] text-white h-fit top-[76px]">
+      <p className="text-xs">You have {count} unread messages since {new Date(date).toDateString()}, {new Date(date).getHours()}:{new Date(date).getMinutes()}  </p>
+    </div>
+  )
+}

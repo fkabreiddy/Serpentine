@@ -2,9 +2,11 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
+using SerpentineApi.Hubs;
 
 namespace SerpentineApi.Features.GroupFeatures.Actions;
 
@@ -83,7 +85,7 @@ internal class DeleteGroupEndpoint : IEndpoint
     }
 }
 
-internal class DeleteGroupEndpointHandler(SerpentineDbContext context)
+internal class DeleteGroupEndpointHandler(SerpentineDbContext context, IHubContext<ActiveChannelsHub, IActiveChannelsHub> activeChannelsHub)
     : IEndpointHandler<DeleteGroupRequest, OneOf<bool, Failure>>
 {
     public async Task<OneOf<bool, Failure>> HandleAsync(
@@ -123,8 +125,17 @@ internal class DeleteGroupEndpointHandler(SerpentineDbContext context)
             return new ForbiddenApiResult("You don't have permission to update this group");
         }
 
-        return await context
-                .Groups.Where(g => g.Id == group.Id)
-                .ExecuteDeleteAsync(cancellationToken) >= 1;
+        var deletedRows = await context.Groups
+                                        .Where(g => g.Id == group.Id)
+                                        .ExecuteDeleteAsync(cancellationToken);
+
+
+        if (deletedRows > 0)
+        {
+            await activeChannelsHub.Clients.Group(group.ChannelId.ToString()).SendGroupDeleted(new HubResult<string>(group.Id.ToString()));
+        }
+
+
+        return deletedRows > 0;
     }
 }

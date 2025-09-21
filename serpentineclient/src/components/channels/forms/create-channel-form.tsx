@@ -16,6 +16,7 @@ import ChannelCover from "@/components/channels/common/channel-cover.tsx";
 import { FormView } from "@/models/utils";
 import IconButton from "@/components/common/icon-button";
 import { X } from "lucide-react";
+import CloseRightViewButton from "@/components/common/close-right-view-button";
 
 
 export default function CreateChannelForm({onDone}:FormView){
@@ -77,12 +78,7 @@ export default function CreateChannelForm({onDone}:FormView){
   return (
     <div className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4">
 
-       <div className="absolute top-2 right-2">
-          <IconButton tooltipText="Close" onClick={onDone}>
-            <X className="size-[18px]" />
-          </IconButton>
-        </div>
-      
+  <CloseRightViewButton onClick={onDone}/>
 
       <div className="">
         <h2 className="text-md font-semibold max-md:text-center">

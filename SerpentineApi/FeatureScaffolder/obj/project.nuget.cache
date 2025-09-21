@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/V0q70aK9rs=",
+  "dgSpecHash": "fUoQ8WJthRg=",
   "success": true,
-  "projectFilePath": "C:\\Proyectos\\Serpentine\\serpentineapi\\featurescaffolder\\FeatureScaffolder.csproj",
+  "projectFilePath": "C:\\Proyectos\\Serpentine\\SerpentineApi\\FeatureScaffolder\\FeatureScaffolder.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\breid\\.nuget\\packages\\spectre.console\\0.51.1\\spectre.console.0.51.1.nupkg.sha512"
   ],

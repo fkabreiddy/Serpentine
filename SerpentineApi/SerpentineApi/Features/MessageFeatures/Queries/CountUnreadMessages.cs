@@ -108,6 +108,6 @@ internal class GetCountUnreadMessagesEndpointHandler(SerpentineDbContext context
             return 0;
         }
 
-        return await context.Messages.CountAsync(m => m.CreatedAt > access.LastReadMessageDate);
+        return await context.Messages.CountAsync(m => m.CreatedAt > access.LastReadMessageDate && m.GroupId == request.GroupId, cancellationToken);
     }
 }

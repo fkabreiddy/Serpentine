@@ -1,5 +1,3 @@
-import DotsPatter from "@/components/common/dots-pattern";
-import WarmBeigeBg from "@/components/common/warm-beige-bg";
 import CurrentGroupChatroomInfo from "@/components/groups/common/current-group-chatroom-info";
 import SendMessageBar from "@/components/groups/common/send-message-bar";
 import MessagesContainer from "@/components/messages/common/messages-container";
@@ -7,24 +5,20 @@ import { useLayoutStore } from "@/contexts/layout-context";
 import { useGetChannelMemberByUserAndChannelId } from "@/hooks/channel-member-hooks";
 import { useGetGroupById } from "@/hooks/group-hooks";
 import { ScrollShadow } from "@heroui/scroll-shadow";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {useActiveChannelsHubStore} from "@/contexts/active-channels-hub-context.ts";
 import { MessageCircleIcon } from "lucide-react";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import CustomDialog from "@/components/common/custom-dialog";
-import { Button } from "@heroui/react";
 import { useGetCountUnreadMessages } from "@/hooks/message-hooks";
-import { MessageResponse } from "@/models/responses/message-response";
 
 export default function ChatroomPage(){
 
     const {layout} = useLayoutStore();
     const {groupId} = useParams();
-    const {unreadMessagesCount, getCountUnreadMessages, setUnreadMessagesCount} = useGetCountUnreadMessages();
     const {getGroupById, group, searchingGroup} = useGetGroupById();
     const [hasPermisson, setHasPermisson] = useState<boolean>(false);
-    const {currentGroupIdAtChatroomPage, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages, deletedChannelId} = useGlobalDataStore();
+    const {currentGroupIdAtChatroomPage, deletedGroupId, setDeletedGroupId, setCurrentGroupIdAtChatroomPage, setResetGroupUnreadMessages, deletedChannelId} = useGlobalDataStore();
     const [showLockedGroupDialog, setShowLockedGroupDialog] = useState(false);
     const [showChannelDeletedDialog, setShowChannelDeletedDialog] = useState(false);
     
@@ -35,9 +29,19 @@ export default function ChatroomPage(){
     const {getChannelMemberByUserAndChannelId, channelMember, loadingChannelMember} = useGetChannelMemberByUserAndChannelId();
 
   
-    async function fecthGetUnreadMessagesCount(groupId: string){
-        await getCountUnreadMessages({groupId: groupId});
-    }
+ 
+
+    useEffect(()=>{
+
+
+        if(deletedGroupId && group && deletedGroupId === group.id)
+        {
+            setDeletedGroupId(null);
+            navigate("/home");
+            
+        }
+    },[deletedGroupId, group])
+
     useEffect(()=>{
 
         if(deletedChannelId && group?.channelId === deletedChannelId)
@@ -46,6 +50,7 @@ export default function ChatroomPage(){
         }
 
     },[deletedChannelId])
+    
   
     useEffect(()=>{
 
@@ -64,14 +69,7 @@ export default function ChatroomPage(){
       
     },[groupId])
     
-    useEffect(()=>{
-
-        if(group && hasPermisson)
-        {
-           
-            fecthGetUnreadMessagesCount(group.id);
-        }
-    },[group, hasPermisson])
+    
     
     const fetchGroup = async(id: string)=>{
 

@@ -1,0 +1,4 @@
+interface DeleteGroupRequest{
+
+    groupId: string
+}

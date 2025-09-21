@@ -1,3 +1,4 @@
+import CloseRightViewButton from "@/components/common/close-right-view-button";
 import IconButton from "@/components/common/icon-button";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
@@ -94,12 +95,7 @@ export default function EditChannelForm({onDone}:FormView){
       if(!channel) return <div className="w-full justify-center flex h-screen"><Spinner size="sm" variant="spinner"/></div>
     return(
         <>
-        
-               <div className="absolute top-2 right-2">
-                  <IconButton tooltipText="Close" onClick={onDone}>
-                    <X className="size-[18px]" />
-                  </IconButton>
-                </div>
+        <CloseRightViewButton onClick={onDone}/>
               
           <div className="">
                 <h2 className="text-md font-semibold max-md:text-center">

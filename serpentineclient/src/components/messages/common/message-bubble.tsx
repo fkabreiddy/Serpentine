@@ -238,15 +238,7 @@ const MessageImage = ({ src, index, lenght }: MessageImageProps) => {
   );
 };
 
-interface MessageDropdownProps {
-  message: MessageResponse;
-  isOwner: boolean;
-  isAdmin: boolean;
-  children: ReactNode;
-  userId: string;
-  open: boolean;
-  openChanged: (value: boolean) => void;
-}
+
 
 const MessageDropdown = ({
   message,
@@ -256,7 +248,16 @@ const MessageDropdown = ({
   isAdmin,
   open,
   openChanged,
-}: MessageDropdownProps) => {
+}: {
+
+  message: MessageResponse;
+  isOwner: boolean;
+  isAdmin: boolean;
+  children: ReactNode;
+  userId: string;
+  open: boolean;
+  openChanged: (value: boolean) => void;
+}) => {
   const { getDate } = useDateHelper();
   const { deleteMessage, deletingMessage } = useDeleteMessage();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
@@ -305,6 +306,7 @@ const MessageDropdown = ({
           <DropdownSection showDivider={true} title={"About this message"}>
             <DropdownItem
               key="channelInfo"
+              textValue="info"
               startContent={<InfoIcon size={16} />}
               className="h-14 gap-2"
             >
@@ -324,6 +326,8 @@ const MessageDropdown = ({
             <>
               {!message.isNotification && (
                 <DropdownItem
+                  textValue="Reply"
+
                   onClick={() => {
                     handleRepliedMessageChanged(message);
                   }}
@@ -337,6 +341,8 @@ const MessageDropdown = ({
 
             <DropdownItem
               key="report"
+              textValue="report"
+
               endContent={<MessageCircleWarningIcon size={16} />}
             >
               <p className="font-normal text-[13px]">Report an issue</p>
@@ -344,8 +350,9 @@ const MessageDropdown = ({
             <>
               {(isAdmin || isOwner || message.senderId === userId) && (
                 <DropdownItem
+                textValue="delete"
                   color="danger"
-                  key="edit"
+                  key="delete"
                   onClick={fetchDelete}
                   endContent={<TrashIcon size={16} />}
                 >

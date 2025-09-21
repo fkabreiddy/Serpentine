@@ -5,7 +5,7 @@ namespace SerpentineApi.DataAccess.Models;
 
 public class Group : BaseEntity
 {
-    [MaxLength(100), MinLength(3), RegularExpression(@"^[a-zA-Z0-9_]+$")]
+    [MaxLength(30), MinLength(3), RegularExpression(@"^[a-zA-Z0-9_]+$")]
     public string Name { get; set; } = null!;
 
     public List<Message> Messages { get; set; } = new();

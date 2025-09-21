@@ -1,24 +1,18 @@
 import { useActiveChannelsHubActions } from "@/client-hubs/active-channels-hub";
-import ChannelCover from "@/components/channels/common/channel-cover";
 import IconButton from "@/components/common/icon-button";
-import UserAvatar from "@/components/users/common/user-avatar";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useDeleteGroup } from "@/hooks/group-hooks";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { GroupResponse } from "@/models/responses/group-response";
 import { RightPanelView } from "@/models/right-panel-view";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, Spinner, Tooltip } from "@heroui/react";
-import { channel } from "diagnostics_channel";
-import { ArrowLeft, ArrowLeftIcon, CopyIcon, Edit3Icon, InfoIcon, LockIcon, MessageCircleWarningIcon, MoreVertical, PlusCircle, TrashIcon, X } from "lucide-react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tooltip } from "@heroui/react";
+import { HubConnectionState } from "@microsoft/signalr";
+import { ArrowLeftIcon, Edit3Icon, InfoIcon, LockIcon, MoreVertical, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { join } from "path";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface CurrentGroupChatroomInfoProps {
-
-}
 
 export default function CurrentGroupChatroomInfo({
   group,
@@ -28,8 +22,7 @@ export default function CurrentGroupChatroomInfo({
   channelMembership: ChannelMemberResponse
 }) {
 
-  const [activeUsers, setActiveUsers] = useState();
-  const {activeChannelsHub} = useActiveChannelsHubStore();
+  const {activeChannelsHub, activeChannelsHubsState, activeChannels} = useActiveChannelsHubStore();
   
   const {activeUsersCount, getChannelActiveMembersCount} = useActiveChannelsHubActions();
 
@@ -39,11 +32,11 @@ export default function CurrentGroupChatroomInfo({
 
   }
   useEffect(()=>{
-    if(group && activeChannelsHub)
+    if(group && activeChannelsHub && activeChannelsHubsState === HubConnectionState.Connected)
     {
       fetchGetChannelActiveMembersCount(group.channelId);
     }
-  }, [group, activeChannelsHub])
+  }, [group, activeChannelsHub, activeChannelsHubsState, activeChannels])
   
   const navigate = useNavigate();
   return (
@@ -99,6 +92,7 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
 
   const {layout, setLayout} = useLayoutStore();
   const {groupToUpdateId, setGroupToUpdateId} = useGlobalDataStore();
+  const [deleteGroupModalOpen, setDeleteGroupModalOpen] = useState<boolean>(false);
 
  
 
@@ -117,7 +111,8 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
     <>
 
       
-      
+      <DeleteGroupModal onOpenChanged={setDeleteGroupModalOpen} open={deleteGroupModalOpen} group={group}/>
+
       <Dropdown  placement="bottom-end" showArrow={true} className="bg-neutral-100/50 backdrop-blur-3xl dark:bg-neutral-950/50  ">
       <DropdownTrigger>
         <button>
@@ -134,7 +129,7 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
         <DropdownSection showDivider={true} title={"About this group"}>
           <DropdownItem
           textValue="info"
-              key="channelInf"
+              key="groupInf"
               startContent={<InfoIcon size={16} />}
               className="h-14 gap-2"
           >
@@ -156,9 +151,7 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
          </>
 
         
-         <DropdownItem key="about_group" textValue="About"  endContent={<CopyIcon size={16} />}>
-           <p className="font-normal text-[13px]">Copy Id</p>
-         </DropdownItem>
+        
        </DropdownSection>
         
         <DropdownSection title={"Danger zone"}>
@@ -171,15 +164,17 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
                 <DropdownItem
                   color="danger"
                   key="delete"
+                  onClick={()=>{setDeleteGroupModalOpen(true);}}
+                  isReadOnly={deleteGroupModalOpen}
                   endContent={
-                    false ? (
+                    deleteGroupModalOpen ? (
                       <Spinner variant="spinner" size="sm" />
                     ) : (
                       <TrashIcon size={16} />
                     )
                   }
                 >
-                  <p className="font-normal text-[13px]">Delete this channel</p>
+                  <p className="font-normal text-[13px]">Delete this group</p>
                 </DropdownItem> 
                 
 
@@ -201,5 +196,88 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
     </Dropdown>
     </>
   
+  );
+};
+
+
+const DeleteGroupModal = ({
+  open,
+  group,
+  onOpenChanged,
+}:{open: boolean, group: GroupResponse, onOpenChanged: (value: boolean) => void}) => {
+  const {deleteGroup,  groupDeleted, deletingGroup } = useDeleteGroup();
+  const [groupNameConfirmation, setGroupNameConfirmation] =
+    useState<string>("");
+  const { setLayout } = useLayoutStore();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGroupNameConfirmation(value);
+  };
+
+  const fetchDeleteChannel = async () => {
+    await deleteGroup({ groupId: group.id });
+  };
+
+  useEffect(() => {
+    if (groupDeleted) {
+      
+      setLayout({ currentRightPanelView: RightPanelView.DefaultView });
+      onOpenChanged(false);
+    }
+  }, [groupDeleted]);
+  return (
+    <Modal
+      style={{ zIndex: "9999999" }}
+      isOpen={open}
+      onOpenChange={onOpenChanged}
+    >
+      <ModalContent
+        style={{ zIndex: "9999999" }}
+        className="dark:bg-neutral-900/50 max-w-[350px] backdrop-blur-lg"
+      >
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">
+              Delete Group
+            </ModalHeader>
+            <ModalBody>
+              <p className="text-[13px] font-normal">
+                Deleting the group <strong>{group.name}</strong> ALL messages will be deleted PERMANENTLY, do you wanna procceed?
+              </p>
+              <Input
+                label="Group name"
+                type="text"
+                placeholder="Write the name of the group to delete"
+                minLength={3}
+                maxLength={100}
+                value={groupNameConfirmation}
+                labelPlacement="outside"
+                isRequired={true}
+                onChange={handleInputChange}
+                errorMessage={"Input the group name to confirm"}
+                isInvalid={group.name !== groupNameConfirmation}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button size="sm" variant="light" onPress={onClose}>
+                Cancel
+              </Button>
+              <Button
+                isLoading={deletingGroup}
+                isDisabled={
+                  group.name !== groupNameConfirmation || deletingGroup
+                }
+                className="bg-red-700 text-white"
+                size="sm"
+                onPress={fetchDeleteChannel}
+              >
+                Yes, delete this channel
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };

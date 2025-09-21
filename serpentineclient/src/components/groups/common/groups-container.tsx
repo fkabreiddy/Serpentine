@@ -42,6 +42,8 @@ export default function GroupsContainer({
     setDeletedMessageId,
     newMessageRecievedOnCurrentGroup,
     setNewMessageRecievedOnCurrentGroup,
+    deletedGroupId,
+    setDeletedGroupId,
     updatedGroup,
     setUpdatedGroup,
 
@@ -56,6 +58,17 @@ export default function GroupsContainer({
       take: 5,
     });
   };
+
+
+  useEffect(()=>{
+
+    if(deletedGroupId)
+    {
+      setGroups((prev)=>(prev.filter(g => g.id != deletedGroupId)));
+      setDeletedGroupId(null);
+    }
+
+  },[deletedGroupId])
 
   useEffect(()=>{
 

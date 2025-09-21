@@ -105,4 +105,6 @@ public interface IActiveChannelsHub
     public Task SendMessage(HubResult<MessageResponse> message);
 
     public Task SendMessageDeleted(HubResult<string> messageId);
+
+    public Task SendGroupDeleted(HubResult<string> groupId);
 }

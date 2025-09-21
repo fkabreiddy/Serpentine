@@ -107,6 +107,54 @@ export function useUpdateGroup() {
     return { updateGroup,  updatedGroup, updatingGroup};
 }
 
+export function useDeleteGroup() {
+
+    const [groupDeleted, setGroupDeleted] = useState<boolean>(false);
+    const [deletingGroup, setDeletingGroup] = useState<boolean>(false);
+    const [result, setResult] = useState<ApiResult<boolean> | null>(null);
+    const { delete: fetchDelete } = useFetch<boolean>();
+
+    useEffect(() => {
+
+
+        if(!result)
+        {
+            setDeletingGroup(false);
+            return;
+        }
+
+        if (result.data && result.statusCode === 200) {
+            setGroupDeleted(result.data);
+            showToast({ title: "Group deleted sucessfully.", description: "This change will be available for other users soon."});
+
+        }
+        else {
+
+            handleApiErrors(result);
+        }
+
+        setDeletingGroup(false);
+        setResult(null);
+
+
+    }, [result]);
+
+
+    const deleteGroup = async (data: DeleteGroupRequest) => {
+
+        setResult(null);
+        setDeletingGroup(true);
+        setGroupDeleted(false);
+        const response = await fetchDelete({endpoint: GROUPS_ENDPOINT, contentType: "application/json"}, data );
+        setResult(response);
+
+
+
+    };
+
+    return { deleteGroup,  deletingGroup, groupDeleted};
+}
+
 
 //queries
 export function useGetGroupsByChannelId() {

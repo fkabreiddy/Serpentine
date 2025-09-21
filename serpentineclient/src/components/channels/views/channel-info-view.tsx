@@ -509,7 +509,7 @@ const DeleteChannelModal: React.FC<DeleteChannelModalProps> = ({
             </ModalHeader>
             <ModalBody>
               <p className="text-[13px] font-normal">
-                Deleting the channel <strong>@{channel.name}</strong> ALL groups
+                Deleting the channel <strong>#{channel.name}</strong> ALL groups
                 and messages will be deleted PERMANENTLY, do you wanna procceed?
               </p>
               <Input
