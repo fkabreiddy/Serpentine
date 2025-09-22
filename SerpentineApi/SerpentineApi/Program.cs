@@ -43,6 +43,11 @@ builder.Services.AddRequestTimeouts(options =>
 {
     options.DefaultPolicy = new RequestTimeoutPolicy { Timeout = TimeSpan.FromSeconds(30) };
 });
+
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

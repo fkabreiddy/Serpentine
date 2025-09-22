@@ -138,51 +138,54 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
           </DropdownItem>
         </DropdownSection>
        
-       <DropdownSection showDivider={true} title={"Actions"}>
+       
          <>
            {(membership.isAdmin ||
                membership.isOwner) && (
-               <>
+               <DropdownSection showDivider={true} title={"Actions"}>
                  <DropdownItem textValue="edit" onClick={()=>{setGroupToUpdateId(group.id);}} key="edit" endContent={<Edit3Icon size={16} />}>
                    <p className="font-normal text-[13px]">Edit this Group</p>
                  </DropdownItem>
-               </>
+               </DropdownSection>
            )}
          </>
 
         
         
-       </DropdownSection>
+
         
-        <DropdownSection title={"Danger zone"}>
+        <>
        
           {membership  &&
           
-            <>
-
-              {membership.isOwner &&
-                <DropdownItem
-                  color="danger"
-                  key="delete"
-                  onClick={()=>{setDeleteGroupModalOpen(true);}}
-                  isReadOnly={deleteGroupModalOpen}
-                  endContent={
-                    deleteGroupModalOpen ? (
-                      <Spinner variant="spinner" size="sm" />
-                    ) : (
-                      <TrashIcon size={16} />
-                    )
-                  }
-                >
-                  <p className="font-normal text-[13px]">Delete this group</p>
-                </DropdownItem> 
-                
-
-                
-              } 
+            <DropdownSection title={"Danger zone"}>
+              <>
+                 {membership.isOwner ?
+                  <DropdownItem
+                    color="danger"
+                    key="delete"
+                    onClick={()=>{setDeleteGroupModalOpen(true);}}
+                    isReadOnly={deleteGroupModalOpen}
+                    endContent={
+                      deleteGroupModalOpen ? (
+                        <Spinner variant="spinner" size="sm" />
+                      ) : (
+                        <TrashIcon size={16} />
+                      )
+                    }
+                  >
+                    <p className="font-normal text-[13px]">Delete this group</p>
+                  </DropdownItem> : <> </>
+                  
 
 
-            </> 
+
+                } 
+              </>
+           
+
+
+            </DropdownSection> 
            
           
 
@@ -191,7 +194,7 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
            
            
           }
-        </DropdownSection>
+        </>
       </DropdownMenu>
     </Dropdown>
     </>

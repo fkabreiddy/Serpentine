@@ -59,7 +59,7 @@ public class GetMessagesByGroupIdRequest
         FromQuery(Name = "indexDate"),
         Description("The date of the index to reference from where to start fetching messages.")
     ]
-    public DateTime? IndexDate { get; set; }
+    public DateTime? IndexDate { get; set; } = DateTime.UtcNow;
 }
 
 public class GetMessagesByGroupIdRequestValidator : AbstractValidator<GetMessagesByGroupIdRequest>
@@ -189,9 +189,7 @@ internal class GetMessagesByGroupIdEndpointHandler(SerpentineDbContext context)
         {
             return await context.Messages.GetMessagesByGroupIdAfter(
                 request.GroupId,
-                request.Skip,
                 request.Take,
-                Ulid.Empty,
                 request.IndexDate ?? DateTime.UtcNow,
                 cancellationToken
             );
@@ -200,9 +198,7 @@ internal class GetMessagesByGroupIdEndpointHandler(SerpentineDbContext context)
         {
             return await context.Messages.GetMessagesByGroupIdBefore(
                 request.GroupId,
-                request.Skip,
                 request.Take,
-                Ulid.Empty,
                 request.IndexDate ?? DateTime.UtcNow,
                 cancellationToken
             );

@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import MessageBubble from "./message-bubble";
-import { Button, CalendarDate, ScrollShadow, spinner, Spinner } from "@heroui/react";
+import { Spinner } from "@heroui/react";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageResponse } from "@/models/responses/message-response.ts";
@@ -9,26 +9,22 @@ import { useGetCountUnreadMessages, useGetMessagesByGroupId } from "@/hooks/mess
 import { useAuthStore } from "@/contexts/authentication-context";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { useUiSound } from "@/helpers/sound-helper";
-import { ArrowDown, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { GroupAccessResponse } from "@/models/responses/group-access-response";
 import { useCreateOrUpdateGroupAccess } from "@/hooks/group-access-hooks";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useDateHelper } from "@/helpers/relative-date-helper";
-import { CalendarDateTime, parseDateTime, parseZonedDateTime, ZonedDateTime } from "@internationalized/date";
 
 
-interface MessagesContainerProps {
-  
-}
+
 export default function MessagesContainer({
   groupId,
   channelMember,
   lastAccess,
-  onNoMessagesAfter
-}: {groupId: string;
+}: {
+  groupId: string;
   channelMember: ChannelMemberResponse;
   lastAccess: GroupAccessResponse | null;
-  onNoMessagesAfter: (value: boolean) => void;
 }) {
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -99,6 +95,7 @@ export default function MessagesContainer({
 
   const fetchMessagesBefore = async () => {
     if (!groupId) return;
+    if(messages.length === 0) return;
 
     new Promise<void>((resolve) => setTimeout(resolve, 2000));
     await getMessagesByGroupId({
@@ -113,11 +110,12 @@ export default function MessagesContainer({
 
   const fetchMessagesAfter = async () => {
    
-  
+    
+    if (!groupId) return;
+    if(messages.length === 0) return;
     if(!containerRef.current ) return
 
     containerRef.current.scrollTop = containerRef.current.scrollTop - 50;
-    if (!groupId) return;
 
     new Promise<void>((resolve) => setTimeout(resolve, 2000));
     await getMessagesByGroupId({
@@ -214,7 +212,7 @@ export default function MessagesContainer({
     if (lastAccess) {
       setLastReadMessageDate(lastAccess.lastReadMessageDate);
       lastReadMessageDateRef.current = lastAccess.lastReadMessageDate;
-
+      
     }
   }, [lastAccess]);
 
@@ -228,17 +226,24 @@ export default function MessagesContainer({
 
     const firstFetch = async () => {
 
-      await getMessagesByGroupId({
+      const data : GetMessagesByGroupIdRequest = {
         groupId: groupId,
         take: 15,
         after: false,
-        indexDate: lastAccess?.lastReadMessageDate ?? null, // this can be null btw
-        skip: messages?.length, // this is unecesary
-      });
+        skip: messages?.length,
+      }
+
+      if(lastAccess && lastAccess.lastReadMessageDate){
+
+        data.indexDate = lastAccess.lastReadMessageDate;
+      }
+      await getMessagesByGroupId(data);
+       
 
       
 
     };
+
 
     
 
@@ -417,7 +422,7 @@ const UnreadMessagesDivider = ({date}:{date: string}) => {
   return (
     <div className="flex  w-full items-center justify-end">
       <hr className="w-[30px] border-2 border-blue-600 rounded-l-full " />
-      <p className="text-[13px] whitespace-nowrap bg-blue-600  px-2 rounded-md"> New since
+      <p className="text-[13px] whitespace-nowrap bg-blue-600 text-white px-2 rounded-md"> New since
         {" "}
         {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
         {getDate(date).year}  at {getDate(date).hour}:{getDate(date).minute}
@@ -431,7 +436,7 @@ const UnreadMessagesCountBanner = ({count, date}: {count: number, date: string})
   return(
 
     <div className="absolute px-3 py-2 flex items-center justify-between  w-full bg-pink-500/50 backdrop-blur-md z-[30] left-[0] text-white h-fit top-[76px]">
-      <p className="text-xs">You have {count} unread messages since {new Date(date).toDateString()}, {new Date(date).getHours()}:{new Date(date).getMinutes()}  </p>
+      <p className="text-xs">You have {count} unread messages </p>
     </div>
   )
 }
