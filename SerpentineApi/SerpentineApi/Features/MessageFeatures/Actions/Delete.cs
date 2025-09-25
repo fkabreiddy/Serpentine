@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Helpers;
-using SerpentineApi.Helpers;
 using SerpentineApi.Hubs;
 using SerpentineApi.Identity;
 using SerpentineApi.Services.CloudinaryStorage;

@@ -186,6 +186,7 @@ internal class CreateChannelRequestHandler(
                 $"Another channel with the same name {channel.Name} already exists"
             );
 
+
         // Start transaction
         await using var transaction = await context.Database.BeginTransactionAsync(
             cancellationToken
@@ -193,7 +194,7 @@ internal class CreateChannelRequestHandler(
 
         try
         {
-            var creation = await context.Channels.AddAsync(channel, cancellationToken);
+            var insertion =  await context.Channels.AddAsync(channel, cancellationToken);
 
             await context.SaveChangesAsync(cancellationToken);
 
@@ -201,15 +202,13 @@ internal class CreateChannelRequestHandler(
             {
                 var coverUploadResponse = await cloudinaryService.UploadImage(
                     request.CoverPictureFile,
-                    CloudinaryFolders.ChannelCovers.ToString(),
-                    creation.Entity.Id.ToString(),
-                    false,
-                    100,
-                    100
+                    insertion.Entity.Id,
+                    UploadType.ChannelCover
+                   
                 );
                 if (coverUploadResponse.IsSuccess)
                 {
-                    creation.Entity.CoverPicture = coverUploadResponse.Data;
+                    insertion.Entity.CoverPicture = coverUploadResponse.Data;
                 }
                 else
                 {
@@ -225,15 +224,13 @@ internal class CreateChannelRequestHandler(
             {
                 var bannerUploadResponse = await cloudinaryService.UploadImage(
                     request.BannerPictureFile,
-                    CloudinaryFolders.ChannelBanners.ToString(),
-                    creation.Entity.Id.ToString(),
-                    false,
-                    300,
-                    300
+                    insertion.Entity.Id,
+                    UploadType.ChannelBanner
+                    
                 );
                 if (bannerUploadResponse.IsSuccess)
                 {
-                    creation.Entity.BannerPicture = bannerUploadResponse.Data;
+                    insertion.Entity.BannerPicture = bannerUploadResponse.Data;
                 }
                 else
                 {
@@ -246,22 +243,22 @@ internal class CreateChannelRequestHandler(
             }
 
             await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            context.ChangeTracker.Clear();
 
             Channel? response = await context.Channels.GetChannelsWithJustMyMembershipByChannelId(
-                creation.Entity.Id,
+                insertion.Entity.Id,
                 request.CurrentUserId,
                 cancellationToken
             );
 
             if (response is null)
             {
-                await transaction.RollbackAsync(cancellationToken);
                 return new NotFoundApiResult(
                     "We could not find the channel you created. Try again."
                 );
             }
 
-            await transaction.CommitAsync(cancellationToken);
             return response.ToResponse();
         }
         catch (Exception)

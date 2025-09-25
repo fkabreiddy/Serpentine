@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SerpentineApi.Helpers;
 using SerpentineApi.Hubs;
+using SerpentineApi.Services.CloudinaryStorage;
 
 namespace SerpentineApi.Features.ChannelFeatures.Actions;
 
@@ -103,7 +104,7 @@ public class DeleteChannelEndpoint : IEndpoint
     }
 }
 
-internal class DeleteChannelEndpointHandler(SerpentineDbContext context)
+internal class DeleteChannelEndpointHandler(SerpentineDbContext context, CloudinaryService cloudinary)
     : IEndpointHandler<DeleteChannelRequest, OneOf<bool, Failure>>
 {
     public async Task<OneOf<bool, Failure>> HandleAsync(
@@ -123,6 +124,46 @@ internal class DeleteChannelEndpointHandler(SerpentineDbContext context)
             return new NotFoundApiResult(
                 "The channel you are looking for do not exist or you don't have the permission to delete it"
             );
+
+        var channel = await context.Channels.AsNoTracking().IgnoreAutoIncludes().Where(ch => ch.Id == request.ChannelId).Select(ch => new Channel()
+        {
+            Id = ch.Id,
+            BannerPicture = ch.BannerPicture,
+            CoverPicture = ch.CoverPicture
+
+
+        }).FirstOrDefaultAsync(cancellationToken);
+
+
+        if (channel is null)
+        {
+            return new NotFoundApiResult("Channel not found");
+        }
+
+        if (channel.BannerPicture is not null)
+        {
+            var deletion = await cloudinary.DeleteFileAsync(channel.Id.ToString(), CloudinaryFolders.ChannelBanners.ToString());
+
+            if (!deletion.IsSuccess)
+            {
+                return new BadRequestApiResult(deletion.Message);
+            }
+
+
+        }
+
+        
+        if (channel.CoverPicture is not null)
+        {
+            var deletion = await cloudinary.DeleteFileAsync(channel.Id.ToString(), CloudinaryFolders.ChannelCovers.ToString());
+
+            if (!deletion.IsSuccess)
+            {
+                return new BadRequestApiResult(deletion.Message);
+            }
+
+            
+        }
 
         var deletedRows = await context
             .Channels.Where(ch => ch.Id == request.ChannelId)

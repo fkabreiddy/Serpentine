@@ -8,10 +8,9 @@ public static class UserRolesHelper
         {
             case 0:
                 return UserRoles.User;
-                break;
             case 1:
                 return UserRoles.Admin;
-                break;
+                
             case 2:
                 return UserRoles.Tester;
             case 3:

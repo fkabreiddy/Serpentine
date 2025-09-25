@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LlJZoK1BSiM=",
+  "dgSpecHash": "zl70J5A9TVg=",
   "success": true,
-  "projectFilePath": "c:\\Proyectos\\Serpentine\\SerpentineApi\\SerpentineApi\\SerpentineApi.csproj",
+  "projectFilePath": "C:\\Proyectos\\Serpentine\\serpentineapi\\serpentineapi\\SerpentineApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\breid\\.nuget\\packages\\aspnetcore.healthchecks.sqlserver\\9.0.0\\aspnetcore.healthchecks.sqlserver.9.0.0.nupkg.sha512",
     "C:\\Users\\breid\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",

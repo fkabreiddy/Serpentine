@@ -222,8 +222,8 @@ internal class CreateUserRequestHandler(
             if (
                 await cloudinaryService.UploadImage(
                     request.ImageFile,
-                    CloudinaryFolders.ProfilePictures.ToString(),
-                    insertion.Entity.Id.ToString()
+                    insertion.Entity.Id,
+                    UploadType.UserProfilePicture
                 )
                     is var imageUpload
                 && imageUpload.TaskSucceded()

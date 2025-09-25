@@ -17,6 +17,7 @@ public class SerpentineDbContext(DbContextOptions<SerpentineDbContext> options) 
     public DbSet<Role> Roles { get; set; }
     public DbSet<ChannelBan> ChannelBans { get; set; }
 
+   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(t =>

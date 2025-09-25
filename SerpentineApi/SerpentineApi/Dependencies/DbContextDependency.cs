@@ -10,6 +10,7 @@ public static class DbContextDependency
         IConfiguration configuration
     )
     {
+
         services.AddDbContext<SerpentineDbContext>(options =>
         {
             options.UseSqlServer(configuration.GetConnectionString("MSSQL"));

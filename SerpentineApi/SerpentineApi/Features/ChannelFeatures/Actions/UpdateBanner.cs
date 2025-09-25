@@ -5,10 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using SerpentineApi.DataAccess.Context.EntityExtensions;
 using SerpentineApi.Helpers;
-using SerpentineApi.Helpers;
-using SerpentineApi.Identity;
 using SerpentineApi.Services.CloudinaryStorage;
 
 namespace SerpentineApi.Features.ChannelFeatures.Actions;
@@ -124,7 +121,7 @@ internal class UpdateBannerEndpointHandler(
 
         if (request.BannerPictureFile is null)
         {
-            var deletionResult = await cloudinary.DeleteImageAsync(
+            var deletionResult = await cloudinary.DeleteFileAsync(
                 request.ChannelId.ToString(),
                 CloudinaryFolders.ChannelBanners.ToString()
             );
@@ -148,30 +145,19 @@ internal class UpdateBannerEndpointHandler(
         }
         else
         {
-            var deletionResult = await cloudinary.DeleteImageAsync(
-                request.ChannelId.ToString(),
-                CloudinaryFolders.ChannelBanners.ToString()
-            );
-
-            if (!deletionResult.TaskSucceded())
-            {
-                return new NotFoundApiResult(
-                    $"We had some errors deleting the banner: {deletionResult.Message}",
-                    deletionResult.Errors
-                );
-            }
+           
 
             var insertionResult = await cloudinary.UploadImage(
                 request.BannerPictureFile,
-                CloudinaryFolders.ChannelBanners.ToString(),
-                request.ChannelId.ToString()
+                request.ChannelId,
+                UploadType.ChannelBanner
             );
 
             if (!insertionResult.TaskSucceded())
             {
                 return new BadRequestApiResult(
-                    $"We had some errors adding the banner: {deletionResult.Message}",
-                    deletionResult.Errors
+                    $"We had some errors adding the banner: {insertionResult.Message}",
+                    insertionResult.Errors
                 );
             }
 

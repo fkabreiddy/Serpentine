@@ -9,6 +9,69 @@ public class CloudinaryService
 {
     private readonly CloudinarySettings _settings;
     private CloudinaryDotNet.Cloudinary _cloudinary;
+   
+    private ImageUploadParams BuildUploadUserProfilePictureParams(Stream stream, Ulid publicId)
+    {
+        var transformation = new Transformation()
+            .Width(150)
+            .Height(150)
+            .Gravity("face")
+            .Crop("thumb")
+            .Quality(100);
+
+        return new ImageUploadParams()
+        {
+            File = new FileDescription(publicId.ToString(), stream),
+            PublicId = publicId.ToString(),
+            Overwrite = true,
+            UseFilename = true,
+            UniqueFilename = true,
+            Folder = CloudinaryFolders.ProfilePictures,
+            Transformation = transformation,
+        };
+    }
+
+    private ImageUploadParams BuildUploadChannelCoverParams(Stream stream, Ulid publicId)
+    {
+        var transformation = new Transformation()
+            .Width(150)
+            .Height(150)
+            .Gravity(Gravity.Center)
+            .Crop("thumb")
+            .Quality(100);
+
+        return new ImageUploadParams()
+        {
+            File = new FileDescription(publicId.ToString(), stream),
+            PublicId = publicId.ToString(),
+            Overwrite = true,
+            UseFilename = true,
+            UniqueFilename = true,
+            Folder = CloudinaryFolders.ChannelCovers,
+            Transformation = transformation,
+        };
+    }
+
+ private ImageUploadParams BuildUploadChannelBannerParams(Stream stream, Ulid publicId)
+    {
+        var transformation = new Transformation()
+           
+            .Quality(100);
+
+        return new ImageUploadParams()
+        {
+            File = new FileDescription(publicId.ToString(), stream),
+            PublicId = publicId.ToString(),
+            Overwrite = true,
+            UseFilename = true,
+            UniqueFilename = true,
+            Folder = CloudinaryFolders.ChannelBanners,
+            Transformation = transformation,
+        };
+    }
+
+
+
 
     public CloudinaryService(IOptions<CloudinarySettings> cloudinarySettings)
     {
@@ -18,78 +81,34 @@ public class CloudinaryService
 
     private const long MaxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
 
-    public enum ImageVerificationResult
-    {
-        ImageSize,
-        ImageFormat,
-        Success,
-    }
 
-    private (string, ImageVerificationResult) VerifyImage(IFormFile image)
+
+    private InternalResult<string> VerifyImage(IFormFile image)
     {
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
         var extension = Path.GetExtension(image.FileName).ToLower();
 
         if (!allowedExtensions.Contains(extension))
-            return (
-                "the file format is not correct. Images only.",
-                ImageVerificationResult.ImageFormat
+            return new InternalResult<string>(
+                false,
+                "the file format is not correct. Images only."
+                
             );
 
         if (image.Length > MaxFileSizeInBytes)
-            return ("Image size is over 10mb.", ImageVerificationResult.ImageSize);
-
-        return ("Success", ImageVerificationResult.Success);
-    }
-
-    public async Task<InternalResult<string>> UploadImage(
-        IFormFile image,
-        string folderName,
-        string fileName,
-        bool isUnique = false,
-        int? width = null,
-        int? height = null
-    )
-    {
-        if (VerifyImage(image) is var reason && reason.Item2 != ImageVerificationResult.Success)
             return new InternalResult<string>(
                 false,
-                message: "Error with the image format or size",
-                errors: [reason.Item1]
+                "Image size is over 10mb."
             );
 
-        await using var stream = image.OpenReadStream();
+        return new InternalResult<string>(true, "Success");
+    }
 
-        var transformation = new Transformation();
 
-        transformation.Quality(100);
-        transformation.Gravity("auto");
-        transformation.Crop("fill");
-
-        if (width is not null)
-        {
-            transformation.Width(width);
-        }
-
-        if (height is not null)
-        {
-            transformation.Height(height);
-        }
-
-        var uploadParams = new ImageUploadParams()
-        {
-            File = new FileDescription(fileName, stream),
-            PublicId = $"{fileName}",
-            Overwrite = true,
-            UseFilename = true,
-            UniqueFilename = isUnique,
-            Folder = folderName,
-            Transformation = transformation,
-        };
-
-        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
+    private InternalResult<string> ProcessResult(
+        UploadResult uploadResult
+    ) {
         if (uploadResult.StatusCode == HttpStatusCode.OK)
         {
             if (
@@ -99,8 +118,8 @@ public class CloudinaryService
             {
                 return new(
                     false,
-                    message: "Error uploading the image",
-                    errors: ["Could not obtain the image url. Try again later."]
+                    message: "Error uploading the file",
+                    errors: ["Could not obtain the file url. Try again later."]
                 );
             }
 
@@ -109,12 +128,39 @@ public class CloudinaryService
 
         return new(
             false,
-            message: "Error uploading the image",
+            message: "Error uploading the file",
             errors: [uploadResult.Error?.Message ?? "Unknown error occurred."]
         );
     }
+   
 
-    public async Task<InternalResult<bool>> DeleteImageAsync(string fileName, string folderName)
+    public async Task<InternalResult<string>> UploadImage(
+        IFormFile image,
+        Ulid publicId,
+        UploadType type
+    )
+    {
+        if (VerifyImage(image) is var verification && !verification.IsSuccess)
+        {
+            return verification;
+        }
+
+        await using var stream = image.OpenReadStream();
+
+        var uploadParams = type switch
+        {
+            UploadType.UserProfilePicture => BuildUploadUserProfilePictureParams(stream, publicId),
+            UploadType.ChannelBanner => BuildUploadChannelBannerParams(stream, publicId),
+            UploadType.ChannelCover => BuildUploadChannelCoverParams(stream, publicId),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+
+        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+       return ProcessResult(uploadResult);
+    }
+
+    public async Task<InternalResult<bool>> DeleteFileAsync(string fileName, string folderName)
     {
         var deleteParams = new DeletionParams($"{folderName}/{fileName}")
         {
@@ -131,3 +177,9 @@ public class CloudinaryService
         return new InternalResult<bool>(false, false, result.Error.Message, [result.Error.Message]);
     }
 }
+
+ public enum UploadType {
+        ChannelCover,
+        ChannelBanner,
+        UserProfilePicture,
+    }
