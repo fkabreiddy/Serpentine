@@ -82,9 +82,7 @@ const AppBar: React.FC<ProfilePanelProps> = () => {
      
 
       <div className=" flex flex-col  items-center justify-end gap-4 ">
-        <IconButton tooltipText="Test" placement={"right"} onClick={() => tryTest()}>
-          <TestTubeIcon size={18}/>
-        </IconButton>
+       
         <HomeIcon/>
         <ExploreIcon />
         <ThemeSwitch />
