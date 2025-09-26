@@ -24,13 +24,13 @@ export default function DefaultLayout({
   const { setTheme } = useTheme("dark");
   const {getToken} = useJwtHelper();
   const {isAuthenticated, user} = useAuthStore();
-  const firstRender = useRef(false);
+  const firstRender = useRef(true);
   const navigate = useNavigate();
   const [loadLayout, setLoadLayout] = useState(false);
 
  useEffect(()=>{
     
-    if(!user && !isAuthenticated && firstRender.current)
+    if(!user && !isAuthenticated && !firstRender.current)
     {
 
       navigate("/");
@@ -44,7 +44,7 @@ export default function DefaultLayout({
 
     if(loadLayout)
     {
-      firstRender.current = true;
+      firstRender.current = false;
 
     }
 
@@ -52,7 +52,7 @@ export default function DefaultLayout({
   useEffect(() => {
 
 
-    if(!firstRender.current)
+    if(firstRender.current)
     {
       const token = getToken();
 

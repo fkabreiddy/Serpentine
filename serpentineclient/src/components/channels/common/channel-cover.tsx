@@ -15,17 +15,13 @@ import {
 } from "@heroui/react";
 import { Spinner } from "@heroui/spinner";
 import { UpdateChannelBannerRequest } from "@/models/requests/channels/update-banner-request";
-type FileType = File;
 
-const sizeMd =
-  "!size-[60px] min-w-[60px] min-h-[60px] max-w-[60px] max-h-[60px]";
-const sizeSm =
-  "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]";
+const size =
+  "!size-[40px] min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px]";
 
 export default function ChannelCover({
   pictureUrl,
   channelName,
-  isSmall = false,
   absolute = false,
   unreadMessages = 0,
   isEditable = false,
@@ -33,32 +29,27 @@ export default function ChannelCover({
 }: {
   pictureUrl: string | null;
   channelName: string | null;
-  isSmall: boolean;
   absolute: boolean;
   unreadMessages?: number;
   isEditable?: boolean;
   channel?: ChannelResponse | null;
 }) {
   return (
-    <Badge
-      shape={"circle"}
-      isInvisible={unreadMessages <= 0}
-      content={unreadMessages}
-      placement="bottom-right"
-      className={"bg-blue-600 text-white text-[10px]"}
-    >
+  
       <>
-        <div className={"group cursor-pointer"}>
+     
           {pictureUrl ? (
+            
+            
             <img
               src={pictureUrl}
               style={{ objectFit: "cover" }}
-              className={`shrink-0    ${absolute && "absolute  -bottom-[2px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${isSmall ? sizeSm : sizeMd}  rounded-full `}
+              className={`shrink-0 ${unreadMessages >= 1 && "ring-[3px] ring-blue-500"}  ${size}  rounded-full `}
             />
           ) : (
             <Avatar
-              size={!isSmall ? 50 : 28}
-              className={`shrink-0 rounded-full ${absolute && "absolute -bottom-[10px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${isSmall ? sizeSm : sizeMd}`}
+              size={60}
+              className={`shrink-0 rounded-full ${size} ${unreadMessages >= 1 && "ring-[3px] ring-blue-500"}`}
               variant="pixel"
               name={channelName ?? "serpentine"}
             />
@@ -71,14 +62,14 @@ export default function ChannelCover({
                 whileHover={{ opacity: 1 }}
                 animate={{ opacity: 0 }}
                 exit={{ opacity: 0 }}
-                className={`shrink-0 z-[32] invisible group-hover:visible flex items-center justify-center  backdrop-blur-md backdrop-opacity-90 ${absolute && "absolute -bottom-[2px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${!isSmall ? "!size-[60px] min-w-[60px] min-h-[60px] max-w-[60px] max-h-[60px]" : "!size-[28px] min-w-[28px] max-h-[28px] max-w-[28px] min-h-[28px]"}  rounded-full `}
+                className={`shrink-0 z-[32] invisible group-hover:visible flex items-center justify-center  backdrop-blur-md backdrop-opacity-90 ${absolute && "absolute -bottom-[2px] right-[20px] ring-[3px] dark:ring-black  ring-white"} ${size}  rounded-full `}
               >
                 <EditCoverDropdown channel={channel} />
               </motion.div>
             )}
-        </div>
+       
       </>
-    </Badge>
+ 
   );
 }
 

@@ -17,7 +17,7 @@ import {
 import CrosshatchPattern from "@/components/common/crosshatch-pattern";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "@/components/users/common/user-avatar";
-import { useActiveUser, useActiveUsersActions } from "@/client-hubs/active-user-hub";
+import { useActiveUser } from "@/client-hubs/active-user-hub";
 import { useTest } from "@/hooks/channel-member-hooks";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { useUiSound } from "@/helpers/sound-helper";
@@ -28,7 +28,7 @@ interface ProfilePanelProps {}
 const AppBar: React.FC<ProfilePanelProps> = () => {
 
   
-  const {} = useActiveUser();
+  useActiveUser();
   const navigate = useNavigate();
   const {layout, setLayout} = useLayoutStore();
   const isMobile = useIsMobile();

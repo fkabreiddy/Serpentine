@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useLayoutStore } from "@/contexts/layout-context";
 import ChannelsContainer from "@/components/channels/common/channels-container";
 import SearchBar from "@/components/search-channel-bar";
@@ -10,13 +9,10 @@ import { Spinner } from "@heroui/spinner";
 
 import StatusBar from "./status-bar";
 import GroupsContainer from "@/components/groups/common/groups-container";
-import emptyboxPlaceholder  from "../../../../public/images/placeholders/empty-box.png"
 
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
 import {BoxIcon} from "lucide-react";
 import { motion } from "motion/react";
-import { Skeleton } from "@heroui/react";
-import { useIsMobile } from "@/hooks/use-mobile";
 interface LeftSideBarProps {}
 
 const LeftSideBar: React.FC<LeftSideBarProps> = () => {
@@ -30,33 +26,24 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     setChannels,
     channels,
     loadingChannels,
-    isBusy,
     hasMore,
   } = useGetChannelsByUserId();
   const { user } = useAuthStore();
   const { layout, setLayout } = useLayoutStore();
   const {
     createdChannel,
-    setCreatedChannel,
     deletedChannelId,
     setDeletedChannelId,
     channelJoined,
     setChannelJoined,
-    setUpdatedChannel,
     updatedChannel,
     setNewUnreadMessage,
-    newUnreadMessage,
-    resetGroupUnreadMessages,
-    setResetGroupUnreadMessages
-  } = useGlobalDataStore();
-  const statusBarRef = React.useRef<HTMLDivElement | null>(null);
-  const [statusBarHeight, setStatusBarHeight] = useState<number>(0);
-  const alreadyMounted = useRef<boolean>(false);
-  const isMobile = useIsMobile();
+    newUnreadMessage  } = useGlobalDataStore();
+
 
    useEffect(()=>{
   
-    if(!newUnreadMessage) return;
+    if(!newUnreadMessage || (selectedChannel && selectedChannel.id === newUnreadMessage.channelId) ) return;
 
     setChannels(prev => 
     prev.map(channel =>
@@ -104,13 +91,6 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     }
   }, [deletedChannelId]);
 
-  useEffect(() => {
-    if (statusBarRef.current) {
-      setStatusBarHeight(statusBarRef.current.offsetHeight);
-    }
-
-    alreadyMounted.current = true;
-  }, [isMounted]);
 
   useEffect(() => {
     if (createdChannel) {
@@ -126,11 +106,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
     }
   }, [channels.length]);
 
-  const hasFetched = React.useRef(false);
 
   useEffect(() => {
-    if (user && !loadingChannels && !isBusy && !hasFetched.current) {
-      hasFetched.current = true;
+    if (user) {
       fetchChannels();
     }
   }, [user]);
@@ -221,7 +199,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
           )}
         </div>
         
-        <StatusBar isReady={(!hasMore && !loadingChannels && !isBusy)} channels={channels} /> 
+        <StatusBar isReady={(!hasMore && !loadingChannels)} channels={channels} /> 
             
         
       </div>

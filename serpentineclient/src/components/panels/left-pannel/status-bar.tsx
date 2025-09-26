@@ -75,7 +75,7 @@ export default function StatusBar({ channels, isReady = false }: StatusBarProps)
         <div
        
           
-          className="w-full backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-default-100 "
+          className="w-full backdrop-blur-xl px-2 py-3 justify-center  rounded-br-lg  items-center flex gap-3 border border-l-0 border-default-100 "
           
         >
           <div className="absolute w-full h-full backdrop-blur-2xl dark:bg-neutral-950/80   bg-neutral-100/80  z-[-1]" />

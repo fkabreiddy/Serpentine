@@ -17,6 +17,8 @@ import { FormView } from "@/models/utils";
 import IconButton from "@/components/common/icon-button";
 import { X } from "lucide-react";
 import CloseRightViewButton from "@/components/common/close-right-view-button";
+import ChannelCard from "../common/channel-card";
+import { ChannelResponse } from "@/models/responses/channel-response";
 
 
 export default function CreateChannelForm({onDone}:FormView){
@@ -179,6 +181,20 @@ function ChannelBannerAndCoverForm({onBannerChanged, onCoverChanged, channelName
   const bannerInput = useRef<HTMLInputElement>(null);
   const [bannerFile, setBannerFile] = useState<FileType | null>(null);
   const [coverFile, setCoverFile] = useState<FileType | null>(null);
+  const [channelPreview, setChannelPreview] = useState<ChannelResponse>(new ChannelResponse());
+
+  useEffect(()=>{
+
+    setChannelPreview((prev) => ({
+      ...prev,
+      bannerPicture: getChannelBanner(),
+      coverPicture: getChannelCover(),
+      name: channelName ?? "",
+      
+
+    }))
+  },[bannerFile, coverFile, channelName])
+
   const handleCoverInputClicked = () => {
     coverInput.current?.click();
   };
@@ -326,10 +342,7 @@ function ChannelBannerAndCoverForm({onBannerChanged, onCoverChanged, channelName
             className="hidden"
         />
 
-        <div className="flex flex-col w-full h-fit gap-2 relative mt-2 mb-2">
-          <ChannelBanner pictureUrl={getChannelBanner()}/>
-          <ChannelCover pictureUrl={getChannelCover()} channelName={channelName ?? ""} isSmall={false} absolute={true}/>
-        </div>
+        <ChannelCard showOptions={false} allowFecthActiveUsers={false} channel={channelPreview }/>
         <div className={"flex w-full items-center gap-3 mb-4"}>
           <Button onPress={() => onCoverPictureClicked()} color={coverFile ? "danger" : "default"}  size={"sm"} radius={"md"}>
             <p className={"text-xs"}>{coverFile ? "Remove" : "Upload"} cover</p>

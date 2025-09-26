@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFetch } from '../helpers/axios-helper';
  import ApiResult from "@/models/api-result";
 import { ChannelResponse } from "@/models/responses/channel-response";
@@ -218,10 +218,11 @@ export function useGetChannelsByUserId() {
 
     
     const [channels, setChannels] = useState<ChannelResponse[]>([]);
-    const [hasMore, setHasMore] = useState<boolean>(true);
     const [loadingChannels, setLoadingChannels] = useState<boolean>(false);
+    const firstRender = useRef(true);
+    const [hasMore, setHasMore] = useState(true);
     const [result, setResult] = useState<ApiResult<ChannelResponse[]> | null>(null);
-    const [isBusy, setIsBusy] = useState<boolean>(false);
+    
     const { get } = useFetch<ChannelResponse[]>();
 
    
@@ -230,7 +231,6 @@ export function useGetChannelsByUserId() {
 
         if(!result)
         {
-            setLoadingChannels(false);
             return;
         }
 
@@ -241,7 +241,6 @@ export function useGetChannelsByUserId() {
 
         } 
         else {
-            setHasMore(false);
             handleApiErrors(result);
         }
 
@@ -249,18 +248,24 @@ export function useGetChannelsByUserId() {
 
 
     }, [result]);
+
+    
+
+
+   
+  
     
     
 
    
     const getChannelsByUserId = async (data: GetChannelsByUserIdRequest) => {
+        if(!firstRender.current || !hasMore ) return;
+        firstRender.current = false;
         setResult(null);
         setLoadingChannels(true);
         let has = true;
         let channelCount = 0;
-        setIsBusy(true);
         setChannels([]);
-        setHasMore(true);
 
         do{
 
@@ -270,14 +275,19 @@ export function useGetChannelsByUserId() {
             has = (response.data !== null && response.data.length == 5);
             channelCount += response.data?.length || 0;
             setResult(response);
-        }while (has);
 
-        setIsBusy(false);
-        setHasMore(has);
+        }while(has);
+
+
+        setHasMore(false);
+        setLoadingChannels(false);
+
+        
+
        
     };
 
-    return { getChannelsByUserId, channels, loadingChannels, setChannels, result, hasMore, isBusy};
+    return { getChannelsByUserId, channels, loadingChannels, setChannels, hasMore,};
 }
 
 export function useGetManyChannelsByNameOrId() {

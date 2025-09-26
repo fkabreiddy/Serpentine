@@ -8,11 +8,11 @@ export const ChannelBanner: React.FC<{ pictureUrl: string | null }> = ({
   <>
     {pictureUrl ? (
       <img
-        className="rounded-sm w-full h-[100px]  object-cover  z-[0]"
+        className="rounded-md  aspect-video   object-cover  z-[0]"
         src={pictureUrl}
       />
     ) : (
-      <Skeleton isLoaded={false} className="h-[100px] w-full  rounded-sm" />
+      <div  className=" bg-neutral-300 dark:bg-neutral-950 !aspect-video   rounded-md" />
     )}
   </>
 );

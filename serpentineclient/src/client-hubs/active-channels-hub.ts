@@ -16,6 +16,7 @@ import { showMessageNotification } from "../helpers/sonner-helper";
 import { LucideToggleRight } from "lucide-react";
 import { user } from "@heroui/theme";
 import { channel } from "diagnostics_channel";
+import { useAuthStore } from "@/contexts/authentication-context";
 
 
 
@@ -24,6 +25,7 @@ export function useActiveChannelsHubConnection(){
   const {getToken} = useJwtHelper();
   const {activeChannelsHub, setConnection, setActiveChannelsHubConnectionState, clearChannels, quitConnection} = useActiveChannelsHubStore();
   const firstRender = useRef<boolean>(true);
+  const {setAuthenticationState} = useAuthStore();
   const {setDeletedChannelId, setNewUnreadMessage, setDeletedGroupId, currentGroupIdAtChatroomPage, setDeletedMessageId, setNewMessageRecievedOnCurrentGroup} = useGlobalDataStore()
   const [isMounted, setIsMounted]=useState<boolean>(false);
   const currentGroupIdRef = useRef(currentGroupIdAtChatroomPage);
@@ -42,7 +44,7 @@ export function useActiveChannelsHubConnection(){
       description: `You have been banned from a channel for ${ban.channelId}. Reason: ${ban.reason}`, 
       color: "danger"
     });
-  }, []); // Sin dependencias - solo usa setters y funciones
+  }, []); 
 
   const handleSendGroupDeleted = useCallback((result: HubResult<string | null>) => {
    
@@ -51,7 +53,7 @@ export function useActiveChannelsHubConnection(){
     if(!groupId) return;
     setDeletedGroupId(groupId);
    
-  }, []); // Sin dependencias - solo usa setters y funciones
+  }, []); 
 
 
   const handleSendChannelRemoved = useCallback((result: HubResult<string | null>) => {
@@ -64,7 +66,7 @@ export function useActiveChannelsHubConnection(){
       title: "Channel Deleted", 
       description: `One of the channels you belong has been deleted`
     });
-  }, []); // Sin dependencias
+  }, []); 
 
   const handleSendChannelMemberKickedOut = useCallback((result: HubResult<ChannelResponse | null>) => {
     const channel = result.data;
@@ -78,42 +80,42 @@ export function useActiveChannelsHubConnection(){
     });
   }, []); // Sin dependencias
 
-    const handleSendMessage = useCallback((result: HubResult<MessageResponse | null>)=>{
+  const handleSendMessage = useCallback((result: HubResult<MessageResponse | null>)=>{
 
 
-      const message = result.data;
+    const message = result.data;
 
-      if(!message) return;
-
-
-
+    if(!message) return;
 
 
 
-      if(currentGroupIdRef.current === message.groupId){
-        setNewMessageRecievedOnCurrentGroup(message);
-        return;
-      }
-
-      setNewUnreadMessage(message);
-      showMessageNotification({
-        title: `${message.channelName} > ${message.groupName}`, 
-        description: `@${message.senderUsername}: ${message.content.substring(0, 50)}`
-      });
-
-    },[]);
-
-    const handleSendMessageDeleted = useCallback((result: HubResult<string | null>)=>{
 
 
-      const messageId = result.data;
 
-      if(!messageId) return;
+    if(currentGroupIdRef.current === message.groupId){
+      setNewMessageRecievedOnCurrentGroup(message);
+      return;
+    }
 
-      setDeletedMessageId(messageId);
-    
+    setNewUnreadMessage(message);
+    showMessageNotification({
+      title: `${message.channelName} > ${message.groupName}`, 
+      description: `@${message.senderUsername}: ${message.content.substring(0, 50)}`
+    });
 
-    },[]);
+  },[]);
+
+  const handleSendMessageDeleted = useCallback((result: HubResult<string | null>)=>{
+
+
+    const messageId = result.data;
+
+    if(!messageId) return;
+
+    setDeletedMessageId(messageId);
+  
+
+  },[]);
 
   
   
@@ -183,7 +185,9 @@ export function useActiveChannelsHubConnection(){
       const newHub = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5000/hub/active-channels", {
           accessTokenFactory: () => token ?? "",
+
         })
+        .withStatefulReconnect()
         .withAutomaticReconnect()
         .build();
 
@@ -199,7 +203,11 @@ export function useActiveChannelsHubConnection(){
         handleReconnected(); 
       });
 
-    newHub.start().then(()=>{setConnection(newHub);})
+    newHub.start().then(()=>{setConnection(newHub);}).catch(err => {
+        if (err?.message?.includes("401") || err?.statusCode === 401) {
+          setAuthenticationState(null);
+        }
+    })
 
     
 

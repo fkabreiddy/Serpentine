@@ -4,9 +4,10 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { RightPanelView } from "@/models/right-panel-view";
 import ChannelSkeleton from "../skeletons/channel-skeleton";
-import ChannelCard from "./channel-card";
+import ChannelCardMini from "./channel-card-mini";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Tooltip } from "@heroui/react";
+import ChannelCardMiniSkeleton from "../skeletons/channel-card-mini-skeleton";
 
 export default function ChannelsContainer({
   filter = "",
@@ -35,7 +36,7 @@ export default function ChannelsContainer({
   return (
     <ScrollShadow
       orientation="horizontal"
-      className={` ${layout.sideBarExpanded ? "w-full flex-row items-start gap-7 " : "w-fit flex-col items-center gap-2"} flex   overflow-auto scrollbar-hide py-2 bg-white dark:bg-black `}
+      className={` ${layout.sideBarExpanded ? "w-full flex-row items-start gap-3 " : "w-fit flex-col items-center gap-2"} flex   overflow-auto scrollbar-hide py-2 bg-white dark:bg-black `}
     >
       <Tooltip
         content={"Create a channel"}
@@ -44,7 +45,7 @@ export default function ChannelsContainer({
         placement={"right"}
       >
         <button
-          className={` cursor-pointer shrink-0 ${layout.sideBarExpanded ? "size-[60px]" : "size-[28px]"} shrink-0 rounded-full bg-neutral-100 dark:bg-neutral-900 items-center justify-center flex hover:text-white hover:bg-blue-500 dark:hover:bg-blue-700 transition-all`}
+          className={` cursor-pointer shrink-0 ${layout.sideBarExpanded ? "size-[40px]" : "size-[28px]"} shrink-0 rounded-full bg-neutral-100 dark:bg-neutral-900 items-center justify-center flex hover:text-white hover:bg-blue-500 dark:hover:bg-blue-700 transition-all`}
           onClick={() =>
             setLayout({
               currentRightPanelView: RightPanelView.CreateChannelFormView,
@@ -59,7 +60,7 @@ export default function ChannelsContainer({
         channels
           .filter((ch) => ch.name.toLowerCase().includes(filter.toLowerCase()))
           .map((ch, i) => (
-            <ChannelCard
+            <ChannelCardMini
               index={i}
               onClick={() => onChannelSelected?.(ch)}
               key={ch.id}
@@ -70,7 +71,7 @@ export default function ChannelsContainer({
       {isLoading && (
         <>
           {Array.from({ length: 5 }).map((_, idx) => (
-            <ChannelSkeleton key={idx} />
+            <ChannelCardMiniSkeleton key={idx} />
           ))}
         </>
       )}

@@ -27,7 +27,6 @@ const createApiResult = <T>(
   isSuccess,
   statusCode,
   message,
-  resultTitle,
   errors,
   data,
 });

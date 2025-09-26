@@ -22,21 +22,8 @@ export default function CurrentGroupChatroomInfo({
   channelMembership: ChannelMemberResponse
 }) {
 
-  const {activeChannelsHub, activeChannelsHubsState, activeChannels} = useActiveChannelsHubStore();
   
-  const {activeUsersCount, getChannelActiveMembersCount} = useActiveChannelsHubActions();
 
-  async function fetchGetChannelActiveMembersCount(channelId: string)
-  {
-    await getChannelActiveMembersCount(channelId)
-
-  }
-  useEffect(()=>{
-    if(group && activeChannelsHub && activeChannelsHubsState === HubConnectionState.Connected)
-    {
-      fetchGetChannelActiveMembersCount(group.channelId);
-    }
-  }, [group, activeChannelsHub, activeChannelsHubsState, activeChannels])
   
   const navigate = useNavigate();
   return (
@@ -72,11 +59,6 @@ export default function CurrentGroupChatroomInfo({
           </div>
 
            <OptionsDropdown group={group} membership={channelMembership}/>
-        </div>
-        <div className="flex items-center gap-2  ml-[45px]">
-          <div className="size-2 rounded-full bg-green-600"/>
-         <p className="text-green-700 text-xs "> {activeUsersCount} Active members</p>
-
         </div>
       
       </motion.div>

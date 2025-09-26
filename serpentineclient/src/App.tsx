@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
 import IndexPage from "@/pages/index";
 import HomePage from "./pages/home";
@@ -9,8 +9,8 @@ import ChatroomPage from "./pages/chatroom-page";
 import ExplorePage from "./pages/explore-page";
 
 
-function App() {
 
+function App() {
 
 
 

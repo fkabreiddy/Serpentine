@@ -12,6 +12,8 @@ import { RightPanelView } from "@/models/right-panel-view.ts";
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
 import { includes } from "zod";
 import { Tooltip } from "@heroui/tooltip";
+import ChannelCard from "@/components/channels/common/channel-card";
+import GroupCardSkeleton from "../skeletons/group-card-skeleton";
 
 interface GroupsContainerProps {
   channel: ChannelResponse | null;
@@ -31,6 +33,7 @@ export default function GroupsContainer({
     setCreateGroupChannelData,
     
     createGroupChannelData: createChannelGroupData,
+    channelInfoId,
     setChannelInfoId,
     createdGroup,
     setCreatedGroup,
@@ -167,7 +170,7 @@ export default function GroupsContainer({
 
       callbackUnreadMessagesCount(counter);
     }
-  }, [groups.length]);
+  }, [groups]);
 
   useEffect(() => {
     if (channel === null) return;
@@ -179,24 +182,27 @@ export default function GroupsContainer({
     }
   }, [channel?.id]);
 
+  useEffect(()=>{
+
+    if(channelInfoId)
+    {
+      setLayout({
+        currentRightPanelView: RightPanelView.ChannelInfo,
+      });
+    }
+  },[channelInfoId])
+
   return (
     <>
       {channel && layout.sideBarExpanded && (
         <div
-          className={`flex flex-col  items-center   `}
+          className={`flex flex-col  relative  `}
         >
-          <div className="flex flex-col w-full gap-2 relative mt-2 mb-4">
-            <ChannelBanner pictureUrl={channel?.bannerPicture} />
-            <ChannelCover
-              absolute={true}
-              isSmall={false}
-              pictureUrl={channel.coverPicture}
-              channelName={channel.name}
-            />
-          </div>
 
-          <div className="flex items-center gap-3  w-full justify-between">
-            <div className="flex items-center gap-3">
+
+          <ChannelCard allowFecthActiveUsers={true} channel={channel}/>
+
+          <div className="flex items-center gap-3  w-full mt-3">
               {(channel.myMember?.isOwner || channel.myMember?.isAdmin) && (
                 <IconButton
                   onClick={() => setCreateGroupData(channel)}
@@ -210,41 +216,23 @@ export default function GroupsContainer({
                 placement="right"
                 onClick={() => {
                   setChannelInfoId(channel?.id);
-                  setLayout({
-                    currentRightPanelView: RightPanelView.ChannelInfo,
-                  });
+                  
                 }}
                 tooltipText="About"
               >
                 <Info className="size-[18px]" />
               </IconButton>
-            </div>
 
-            <div className="flex items-center gap-3">
-              {channel?.myMember?.isOwner &&
-                
-                  <Tooltip
-                    placement="bottom"
-                    showArrow={true}
-                    size="sm"
-                    content="Admin"
-                  >
-                    <KeyIcon className="size-[15px] opacity-80 cursor-pointer" />
-                  </Tooltip>
-                }
-              <h2 className="text-[13px] font-normal justify-self-end">
-                {channel ? `#${channel.name}` : "Channel"}
-              </h2>
-            </div>
+            
           </div>
 
           <div
             className="relative mb-[100px] w-full ml-[10px] pt-[25px]"
             style={{ width: `calc(100% - 18px)` }}
           >
-            {groups.filter((g) =>
+            {(groups.filter((g) =>
               g.name.toLowerCase().includes(filter.toLowerCase())
-            ).length >= 1 && (
+            ).length >= 1 || loadingGroups) && (
               <div
                 style={{ height: "calc(100% - 15px)" }}
                 className="absolute left-0 top-0 w-px border-l-2 dark:border-neutral-800 border-neutral-200 rounded-full"
@@ -262,15 +250,17 @@ export default function GroupsContainer({
                   key={idx.toString() + channel?.name}
                 />
               ))}
+
+              {loadingGroups && 
+                <>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <GroupCardSkeleton key={i} />
+                ))}
+                
+                </>
+              }
           </div>
-          {loadingGroups && (
-            <Spinner
-              size={"sm"}
-              color="default"
-              variant={"dots"}
-              className={" "}
-            />
-          )}
+          
           {!loadingGroups && groups.length <= 0 && (
             <span className={"text-xs opacity-50"}>
               No groups found on this channel (T_T)

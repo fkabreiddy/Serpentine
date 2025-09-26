@@ -52,7 +52,7 @@ public class CloudinaryService
         };
     }
 
- private ImageUploadParams BuildUploadChannelBannerParams(Stream stream, Ulid publicId)
+    private ImageUploadParams BuildUploadChannelBannerParams(Stream stream, Ulid publicId)
     {
         var transformation = new Transformation()
            
