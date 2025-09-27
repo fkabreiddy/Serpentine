@@ -2,6 +2,7 @@ import CloseRightViewButton from "@/components/common/close-right-view-button";
 import IconButton from "@/components/common/icon-button";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 import { showToast } from "@/helpers/sonner-helper";
 import {useDeleteChannel, useGetChannelById, useUpdateChannel} from "@/hooks/channel-hooks";
 import { UpdateChannelRequest, updateChannelSchema } from "@/models/requests/channels/update-channel-request";
@@ -20,7 +21,8 @@ import { useForm } from "react-hook-form";
 export default function EditChannelForm({onDone}:FormView){
 
 
-    const {updateChannelId, setUpdateChannelId, setUpdatedChannel: setUpdatedChannelOnStore} = useGlobalDataStore();
+    const { setUpdatedChannel: setUpdatedChannelOnStore} = useGlobalDataStore();
+    const {rightPanelData} = useRightPanelViewData();
     const {getChannelById, channel, loadingChannel} = useGetChannelById();
     const {setLayout} = useLayoutStore();
     const {updatedChannel, updateChannel, updatingChannel} = useUpdateChannel();
@@ -39,10 +41,10 @@ export default function EditChannelForm({onDone}:FormView){
     useEffect(()=>{
 
 
-        if(!updateChannelId) return;
-        fetchChannel(updateChannelId);
+        if(!rightPanelData.channelToUpdateId) return;
+        fetchChannel(rightPanelData.channelToUpdateId);
             
-    },[updateChannelId])
+    },[rightPanelData.channelToUpdateId])
 
 
     useEffect(()=>{
@@ -51,8 +53,7 @@ export default function EditChannelForm({onDone}:FormView){
         if(!channel.myMember || (channel.myMember && (!channel.myMember.isOwner || !channel.myMember.isAdmin))){
  
             showToast({ description: "You dont have permisson to do this action", color: "danger"})
-            setUpdateChannelId(null);
-            setLayout({currentRightPanelView: RightPanelView.DefaultView});
+            onDone();
             return;
         }
 

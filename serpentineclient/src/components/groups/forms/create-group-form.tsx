@@ -14,18 +14,23 @@ import { motion } from "motion/react";
 import { FormView } from "@/models/utils";
 import IconButton from "@/components/common/icon-button";
 import { X } from "lucide-react";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
+import RightViewHeader from "@/components/panels/right-panel/right-view-header";
 
 
 export default function CreateGroupForm({ onDone }: FormView) {
-  const { createGroupChannelData, setCreateGroupChannelData, setCreatedGroup } = useGlobalDataStore();
+  const {rightPanelData} = useRightPanelViewData(); 
+  const {setCreatedGroup} = useGlobalDataStore(); 
   const { creatingGroup, group, createGroup } = useCreateGroup();
   const [componentIsReady, setComponentIsReady] = useState(false);
 
 
 
   useEffect(() => {
+
+    if(!group) return;
     setCreatedGroup(group);
-    setCreateGroupChannelData(null);
+    
     if (group) {
       onDone();
     }
@@ -53,14 +58,13 @@ export default function CreateGroupForm({ onDone }: FormView) {
   };
 
   useEffect(() => {
-    if (createGroupChannelData?.channelId) {
-      setValue("channelId", createGroupChannelData.channelId);
-      setCreateGroupChannelData(createGroupChannelData);
+    if (rightPanelData.createGroupChannelData?.id) {
+      setValue("channelId", rightPanelData.createGroupChannelData?.id);
       setComponentIsReady(true);
     }
 
    
-  }, [createGroupChannelData]);
+  }, [rightPanelData.createGroupChannelData]);
   
   return (
     <>
@@ -73,27 +77,14 @@ export default function CreateGroupForm({ onDone }: FormView) {
 
         >
 
-           <div className="absolute top-2 right-2">
-              <IconButton tooltipText="Close" onClick={onDone}>
-                <X className="size-[18px]" />
-              </IconButton>
-            </div>
-           <div className="absolute top-2 right-2">
-              <IconButton tooltipText="Close" onClick={onDone}>
-                <X className="size-[18px]" />
-              </IconButton>
-            </div>
-          <div className="">
-            <h2 className="text-md font-semibold max-md:text-center">
-              Creating a Group
-            </h2>
-            <p className="text-xs opacity-45 max-md:text-center">
-              You are creating a group for channel :{" "}
-              <strong>#{createGroupChannelData?.channelName}</strong>. Be sure
+          <RightViewHeader 
+              title={"Creating a Group"} 
+              description={`You are creating a group for the channel: ${rightPanelData.createGroupChannelData?.name} Be sure
               that your group name is unique in your channel. You can change any
-              information previously
-            </p>
-          </div>
+              information previously`}
+              onClose={onDone}
+            />
+          
 
           <form
             onSubmit={handleSubmit((data) => submit(data))}

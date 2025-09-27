@@ -14,6 +14,7 @@ import { includes } from "zod";
 import { Tooltip } from "@heroui/tooltip";
 import ChannelCard from "@/components/channels/common/channel-card";
 import GroupCardSkeleton from "../skeletons/group-card-skeleton";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 
 interface GroupsContainerProps {
   channel: ChannelResponse | null;
@@ -28,13 +29,11 @@ export default function GroupsContainer({
 }: GroupsContainerProps) {
   const { getGroupsByChannelId, groups, setGroups, loadingGroups } =
     useGetGroupsByChannelId();
+    const {rightPanelData, setRightPanelViewData} = useRightPanelViewData();
   const prevChannelId = useRef("");
   const {
-    setCreateGroupChannelData,
     
-    createGroupChannelData: createChannelGroupData,
-    channelInfoId,
-    setChannelInfoId,
+   
     createdGroup,
     setCreatedGroup,
     newUnreadMessage,
@@ -142,16 +141,13 @@ export default function GroupsContainer({
   },[newUnreadMessage])
 
   useEffect(() => {
-    if (createChannelGroupData) {
+    if (rightPanelData.createGroupChannelData) {
       setLayout({ currentRightPanelView: RightPanelView.CreateGroupFormView });
     }
-  }, [createChannelGroupData]);
+  }, [rightPanelData.createGroupChannelData]);
 
   const setCreateGroupData = (channel: ChannelResponse) => {
-    setCreateGroupChannelData({
-      channelId: channel.id,
-      channelName: channel.name,
-    });
+    setRightPanelViewData({createGroupChannelData: channel});
   };
   useEffect(() => {
     if (createdGroup && createdGroup.channelId === channel?.id) {
@@ -184,13 +180,13 @@ export default function GroupsContainer({
 
   useEffect(()=>{
 
-    if(channelInfoId)
+    if(rightPanelData.channelInfoId)
     {
       setLayout({
         currentRightPanelView: RightPanelView.ChannelInfo,
       });
     }
-  },[channelInfoId])
+  },[rightPanelData.channelInfoId])
 
   return (
     <>
@@ -215,7 +211,7 @@ export default function GroupsContainer({
               <IconButton
                 placement="right"
                 onClick={() => {
-                  setChannelInfoId(channel?.id);
+                  setRightPanelViewData({channelInfoId: channel.id});
                   
                 }}
                 tooltipText="About"

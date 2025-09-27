@@ -4,12 +4,8 @@ import { GroupResponse } from "@/models/responses/group-response.ts";
 import { MessageResponse } from "@/models/responses/message-response";
 
 interface GlobalData {
-  createGroupChannelData: { channelId: string; channelName: string } | null;
-  setCreateGroupChannelData: (
-    data: { channelId: string; channelName: string } | null
-  ) => void;
-  channelInfoId: string | null;
-  setChannelInfoId: (id: string | null) => void;
+ 
+  
   createdChannel: ChannelResponse | null;
   setCreatedChannel: (channel: ChannelResponse | null) => void;
   createdGroup: GroupResponse | null;
@@ -18,8 +14,6 @@ interface GlobalData {
   setDeletedChannelId: (id: string | null) => void;
   channelJoined: ChannelResponse | null;
   setChannelJoined: (channel: ChannelResponse | null) => void;
-  updateChannelId: string | null;
-  setUpdateChannelId: (channelId : string | null) => void;
   updatedChannel: ChannelResponse | null;
   setUpdatedChannel: (channelId: ChannelResponse | null) => void;
   newUnreadMessage: MessageResponse | null;
@@ -44,11 +38,10 @@ interface GlobalData {
 }
 
 export const useGlobalDataStore = create<GlobalData>((set) => ({
-  createGroupChannelData: null,
+ 
   createdChannel: null,
   deletedChannelId: null,
   createdGroup: null,
-  channelInfoId: null,
   channelJoined: null,
   updateChannelId: null,
   updatedChannel: null, 
@@ -69,12 +62,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
       deletedChannelId: id,
     }));
   },
-  setChannelInfoId: (id: string | null) => {
-    set((state) => ({
-      ...state,
-      channelInfoId: id,
-    }));
-  },
+
   setCreatedGroup: (group: GroupResponse | null) => {
     set((state) => ({
       ...state,
@@ -82,14 +70,7 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }));
   },
 
-  setCreateGroupChannelData: (
-    data: { channelId: string; channelName: string } | null
-  ) => {
-    set((state) => ({
-      ...state,
-      createGroupChannelData: data,
-    }));
-  },
+  
   setCreatedChannel: (channel: ChannelResponse | null) => {
     set((state) => ({
       ...state,

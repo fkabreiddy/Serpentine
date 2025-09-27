@@ -15,6 +15,7 @@ import { ChannelMemberResponse } from "@/models/responses/channel-member-respons
 import IconButton from "@/components/common/icon-button";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { HubConnectionState } from "@microsoft/signalr";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 
 export default function ChannelCard({channel, allowFecthActiveUsers, showOptions = false}:{channel: ChannelResponse, allowFecthActiveUsers: boolean, showOptions?:boolean}){
 
@@ -29,22 +30,18 @@ export default function ChannelCard({channel, allowFecthActiveUsers, showOptions
         await getChannelActiveMembersCount(channelId);
     }
 
-    useEffect(()=>{
-
-      setIsMounted(true)
-
-    },[])
+    
 
 
     useEffect(()=>{
 
-      if(!isMounted || !allowFecthActiveUsers || !channel || !activeChannelsHub || activeChannelsHubsState !== HubConnectionState.Connected) return;
+      if( !allowFecthActiveUsers || !channel || !activeChannelsHub ) return;
 
       fetchGetActiveMembersCount(channel.id);
         
         
 
-    },[allowFecthActiveUsers, isMounted, channel, activeChannelsHubsState, activeChannelsHub])
+    },[allowFecthActiveUsers, channel, activeChannelsHub])
 
     return(
 
@@ -96,10 +93,9 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
 }) => {
   const { deletingChannel } = useDeleteChannel();
   const {
-    setChannelInfoId,
     setChannelJoined,
-    setUpdateChannelId: setUpdateChannelid,
   } = useGlobalDataStore();
+  const {rightPanelData, setRightPanelViewData, resetRightPanelViewData} = useRightPanelViewData();
 
   const { createChannelMember, joining, setChannelMember, channelMember } =
     useCreateChannelMember();
@@ -107,13 +103,29 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openLeaveChannelModal, setOpenLeaveChannelModal] = useState(false);
 
-  function showUpdateChannelForm() {
-    setUpdateChannelid(channel.id);
-    setLayout({ currentRightPanelView: RightPanelView.UpdateChannelFormView });
+  function showUpdateChannelForm(channelId: string) {
+    setRightPanelViewData({channelToUpdateId: channelId});
   }
   const join = async () => {
     await createChannelMember({ channelId: channel.id });
   };
+
+  function closeThis(){
+    resetRightPanelViewData();
+    setLayout({ currentRightPanelView: RightPanelView.UpdateChannelFormView });
+
+  }
+
+
+  useEffect(()=>{
+
+    if(rightPanelData.channelToUpdateId)
+    {
+      setLayout({ currentRightPanelView: RightPanelView.UpdateChannelFormView });
+
+    }
+
+  },[rightPanelData.channelToUpdateId])
 
   useEffect(() => {
     if (channelMember) {
@@ -124,8 +136,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
         description: `You've joined "${channel.name}'s" channel`,
       });
       setChannelMember(null);
-      setLayout({ currentRightPanelView: RightPanelView.DefaultView });
-      setChannelInfoId(null);
+     closeThis();
     }
   }, [channelMember]);
 
@@ -141,13 +152,13 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
         <LeaveChannelModal
           channelMember={channel.myMember}
           open={openLeaveChannelModal}
-          onOpenChanged={setOpenLeaveChannelModal}
+          onOpenChanged={(e)=> {setOpenLeaveChannelModal(e);  }}
         />
       )}
       <DeleteChannelModal
         channel={channel}
         open={openDeleteModal}
-        onOpenChanged={setOpenDeleteModal}
+        onOpenChanged={(e)=> {setOpenDeleteModal(e); }}
       />
       <Dropdown
         placement="bottom-end"
@@ -184,7 +195,7 @@ const OptionsDropdown: React.FC<{ channel: ChannelResponse }> = ({
                 <>
                   <DropdownItem
                     textValue="edit"
-                    onClick={showUpdateChannelForm}
+                    onClick={() => showUpdateChannelForm(channel.id)}
                     key="edit"
                     endContent={<Edit3Icon size={16} />}
                   >
@@ -285,7 +296,8 @@ open: boolean;
   channel: ChannelResponse;
 }) => {
   const { deleteChannel, channelDeleted, deletingChannel } = useDeleteChannel();
-  const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
+  const {resetRightPanelViewData} = useRightPanelViewData();
+  const { setDeletedChannelId } = useGlobalDataStore();
   const [channelNameConfirmation, setChannelNameConfirmation] =
     useState<string>("");
   const { setLayout } = useLayoutStore();
@@ -301,8 +313,8 @@ open: boolean;
 
   useEffect(() => {
     if (channelDeleted) {
-      setChannelInfoId(null);
       setDeletedChannelId(channel.id);
+      resetRightPanelViewData();
       setLayout({ currentRightPanelView: RightPanelView.DefaultView });
     }
   }, [channelDeleted]);
@@ -375,24 +387,20 @@ const LeaveChannelModal = ({
 }) => {
   const { deleteChannelMember, deletingChannelMember, channelMemberDeleted } =
     useDeleteChannelMember();
-  const { setChannelInfoId, setDeletedChannelId } = useGlobalDataStore();
-  const [channelNameConfirmation, setChannelNameConfirmation] =
-    useState<string>("");
+  const { setDeletedChannelId } = useGlobalDataStore();
+  const {resetRightPanelViewData} = useRightPanelViewData();
+
   const { setLayout } = useLayoutStore();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setChannelNameConfirmation(value);
-  };
-
+  
   const fetchLeaveChannel = async () => {
     await deleteChannelMember({ channelMemberId: channelMember.id });
   };
 
   useEffect(() => {
     if (channelMemberDeleted) {
-      setChannelInfoId(null);
       setDeletedChannelId(channelMember.channelId);
+      resetRightPanelViewData();
       setLayout({ currentRightPanelView: RightPanelView.DefaultView });
     }
   }, [channelMemberDeleted]);

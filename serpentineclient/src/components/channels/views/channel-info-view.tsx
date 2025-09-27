@@ -1,80 +1,45 @@
-import { useGlobalDataStore } from "@/contexts/global-data-context";
-import { useDeleteChannel, useGetChannelById } from "@/hooks/channel-hooks";
-import { useEffect, useState, useRef, useCallback, EventHandler } from "react";
+import { useGetChannelById } from "@/hooks/channel-hooks";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Spinner } from "@heroui/spinner";
-import { ChannelBanner } from "../common/channel-banner";
-import ChannelCover from "../common/channel-cover";
-import InfiniteScroll from "react-infinite-scroll-component";
 import {
   Activity,
-  ArrowLeft,
   CakeIcon,
-  CopyIcon,
-  Edit3Icon,
-  InfoIcon,
-  MessageCircleWarningIcon,
-  MoreVertical,
-  PlusCircle,
-  TrashIcon,
   UserIcon,
-  X,
 } from "lucide-react";
-import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
-import { HubResult } from "@/models/hub-result";
 
-import IconButton from "@/components/common/icon-button";
 import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  DropdownSection,
-} from "@heroui/react";
-import { ChannelResponse } from "@/models/responses/channel-response";
-import { useLayoutStore } from "@/contexts/layout-context";
-import { RightPanelView } from "@/models/right-panel-view";
-import { showToast } from "@/helpers/sonner-helper";
-import {
-  useCreateChannelMember,
-  useDeleteChannelMember,
   useGetChannelMembersByChannelId,
 } from "@/hooks/channel-member-hooks";
-import { useUiSound } from "@/helpers/sound-helper";
 import UserCard from "@/components/users/common/user-hor-card";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { useDateHelper } from "@/helpers/relative-date-helper";
 import { FormView } from "@/models/utils";
 import { useActiveChannelsHubActions } from "@/client-hubs/active-channels-hub";
 import ChannelCard from "../common/channel-card";
-import FormHeader from "@/components/panels/right-panel/right-view-header";
 import RightViewHeader from "@/components/panels/right-panel/right-view-header";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 
 export default function ChannelInfoView({onDone}:FormView) {
-  const { channelInfoId, setChannelInfoId } = useGlobalDataStore();
+  const { rightPanelData } = useRightPanelViewData();
   const { getChannelById, channel, loadingChannel } = useGetChannelById();
   const { getRelativeDate } = useDateHelper();
   const [showMoreDescription, setShowMoreDescription] = useState(false);
   const { activeUsersCount, getChannelActiveMembersCount } =
     useActiveChannelsHubActions();
 
-  const fetchChannel = async () => {
-    if (!channelInfoId) return;
-    await getChannelById({ channelId: channelInfoId });
-    await getChannelActiveMembersCount(channelInfoId);
+  const fetchChannel = async (channelId: string) => {
+    await getChannelById({ channelId: channelId });
+    await getChannelActiveMembersCount(channelId);
   };
 
   useEffect(() => {
-    fetchChannel();
+
+    if (!rightPanelData.channelInfoId) return;
+
+    fetchChannel(rightPanelData.channelInfoId);
 
     
-  }, [channelInfoId]);
+  }, [rightPanelData.channelInfoId]);
 
   if (loadingChannel)
     return (

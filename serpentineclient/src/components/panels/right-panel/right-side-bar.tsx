@@ -12,14 +12,15 @@ import { motion } from "framer-motion";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import EditChannelForm from "@/components/channels/forms/edit-channel-form";
 import UpdateGroupForm from "@/components/groups/forms/update-group-form";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 
 interface RightSideBarProps {}
 
 const RightSideBar: React.FC<RightSideBarProps> = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const { layout, setLayout } = useLayoutStore();
-  const {setChannelInfoId, setCreateGroupChannelData, setGroupToUpdateId, setUpdateChannelId} = useGlobalDataStore();
   const isMobile = useIsMobile();
+  const {setRightPanelViewData, resetRightPanelViewData, rightPanelData} = useRightPanelViewData();
 
   useEffect(() => {
     setIsMounted(true);
@@ -27,6 +28,8 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
 
   const close = () => {
     setLayout({ currentRightPanelView: RightPanelView.DefaultView });
+    resetRightPanelViewData();
+    
   };
 
   if (!isMounted) {
@@ -48,19 +51,19 @@ const RightSideBar: React.FC<RightSideBarProps> = () => {
         <CreateChannelForm onDone={() => {close();}} />
       )}
       {layout.currentRightPanelView === RightPanelView.CreateGroupFormView && (
-        <CreateGroupForm onDone={() => {close(); setCreateGroupChannelData(null)}} />
+        <CreateGroupForm onDone={() => {close();}} />
       )}
       {layout.currentRightPanelView === RightPanelView.ChannelInfo && (
-        <ChannelInfoView onDone={()=>{close(); setChannelInfoId(null);}} />
+        <ChannelInfoView onDone={()=>{close(); }} />
       )}
 
       {layout.currentRightPanelView === RightPanelView.UpdateChannelFormView && (
-        <EditChannelForm onDone={()=> {close(); setUpdateChannelId(null)}} />
+        <EditChannelForm onDone={()=> {close();}} />
       )}
 
       {layout.currentRightPanelView === RightPanelView.UpdateGroupFormView && (
 
-        <UpdateGroupForm onDone={()=>{close(); setGroupToUpdateId(null);}}/>
+        <UpdateGroupForm onDone={()=>{close(); }}/>
       )}
      
     </ScrollShadow>
