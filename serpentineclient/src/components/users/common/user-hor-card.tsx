@@ -2,30 +2,20 @@ import IconButton from "@/components/common/icon-button"
 import UserAvatar from "./user-avatar"
 import {
     ArrowDown,
-    ArrowLeft,
     ArrowUp,
     Ban,
-    CopyIcon,
-    Edit3Icon,
-    InfoIcon,
-    MessageCircleWarningIcon,
     MoreVertical,
-    PlusCircle,
-    TrashIcon,
     UserIcon,
     X
 } from "lucide-react"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown"
-import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Textarea } from "@heroui/react"
-import { channel } from "diagnostics_channel"
-import { join } from "path"
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Textarea } from "@heroui/react"
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response"
 import React, { useEffect, useState } from "react"
 import { useCreateBan } from "@/hooks/channel-ban-hooks"
 import { CreateChannelBanRequest, createChannelBanSchema } from "@/models/requests/channel-ban/create-channel-ban-request"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useAuthStore } from "@/contexts/authentication-context"
 import {useDeleteChannelMember, useUpdateChannelMember} from "@/hooks/channel-member-hooks.ts";
 import { useLayoutStore } from "@/contexts/layout-context"
 
@@ -46,7 +36,7 @@ const UserCard:React.FC<UserCardProps> = ({channelMember, onKickedOut, onUpdated
     return(
 
         <div className="w-full items-center flex  gap-3 ">
-            <UserAvatar src={channelMember?.userProfilePictureUrl ?? ""} userNameFallback={channelMember?.userUsername} size={30} />
+            <UserAvatar connectionColor={channelMember.isActive ? "ring-green-600": "ring-red-600"} src={channelMember?.userProfilePictureUrl ?? ""} userNameFallback={channelMember?.userUsername} size={30} />
             <div className="w-[90%]">
                 <p className="text-[13px] font-semibold">@{channelMember?.userUsername} {myChannelMember?.id === channelMember.id && <>(You)</>}</p>
                 <p className="text-xs font-normal opacity-60">{channelMember?.userName}{channelMember.isOwner && <> (Owner)</>}{!channelMember.isOwner && channelMember.isAdmin && <> (Admin)</>}</p>

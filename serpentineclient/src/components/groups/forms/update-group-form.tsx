@@ -2,25 +2,26 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Input, Textarea } from "@heroui/input";
+import { Input } from "@heroui/input";
 import { Checkbox } from "@heroui/checkbox";
 import { Button } from "@heroui/button";
 import { useGlobalDataStore } from "@/contexts/global-data-context.ts";
-import { useCreateGroup, useGetGroupById, useUpdateGroup } from "@/hooks/group-hooks.ts";
+import { useGetGroupById, useUpdateGroup } from "@/hooks/group-hooks.ts";
 import { motion } from "motion/react";
 import { UpdateGroupRequest, updateGroupSchema } from "@/models/requests/groups/update-group-request";
 import { useGetChannelMemberByUserAndChannelId } from "@/hooks/channel-member-hooks";
-import { useAuthStore } from "@/contexts/authentication-context";
 import { useLayoutStore } from "@/contexts/layout-context";
 import { RightPanelView } from "@/models/right-panel-view";
 import { Spinner } from "@heroui/react";
 import { FormView } from "@/models/utils";
-import IconButton from "@/components/common/icon-button";
-import { X } from "lucide-react";
+
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
+import RightViewHeader from "@/components/panels/right-panel/right-view-header";
 
 
 export default function UpdateGroupForm({ onDone }: FormView) {
-  const { groupToUpdateId, setUpdatedGroup: contextSetUpdatedGroup } =useGlobalDataStore();
+  const {rightPanelData} =  useRightPanelViewData(); 
+  const {setUpdatedGroup} = useGlobalDataStore();
   const {setLayout} = useLayoutStore();
   const { updateGroup, updatingGroup, updatedGroup } = useUpdateGroup();
   const {getChannelMemberByUserAndChannelId, channelMember} = useGetChannelMemberByUserAndChannelId();
@@ -47,11 +48,11 @@ export default function UpdateGroupForm({ onDone }: FormView) {
   //first we fetch the group
 
   useEffect(()=>{
-    if(groupToUpdateId)
+    if(rightPanelData.groupIdToUpdate)
     {
-      fetchGetGroupById({groupId: groupToUpdateId});
+      fetchGetGroupById({groupId: rightPanelData.groupIdToUpdate});
     }
-  },[groupToUpdateId])
+  },[rightPanelData.groupIdToUpdate])
 
   //then lets fetch the permission to see if the user is an admin or the owner of the channel
 
@@ -102,7 +103,7 @@ export default function UpdateGroupForm({ onDone }: FormView) {
   useEffect(()=>{
     if(updatedGroup)
     {
-      contextSetUpdatedGroup(updatedGroup);
+      setUpdatedGroup(updatedGroup);
       onDone();
     }
   },[updatedGroup])
@@ -141,23 +142,14 @@ export default function UpdateGroupForm({ onDone }: FormView) {
          className="flex flex-col gap-4 w-full max-sm:w-[80%] max-md:mt-8 max-md:pb-4"
 
         >
-            <div className="absolute top-2 right-2">
-                <IconButton tooltipText="Close" onClick={onDone}>
-                    <X className="size-[18px]" />
-                </IconButton>
-            </div>
-          <div className="">
-            <h2 className="text-md font-semibold max-md:text-center">
-              Updating a Group
-            </h2>
-            <p className="text-xs opacity-45 max-md:text-center">
-              You are updating the group:{" "}
-              <strong>{group?.name}</strong>. Be sure
+           
+          <RightViewHeader 
+              title={"Updating a group"} 
+              description={` You are updating the group: ${group?.name} Be sure
               that your group name is unique in your channel. You can change any
-              information previously
-            </p>
-          </div>
-
+              information previously`} 
+              onClose={onDone}
+            />
           <form
             onSubmit={handleSubmit((data) => submit(data))}
             className="w-full relative  flex flex-col gap-3 mt-4"

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using SerpentineApi.DataAccess.Cache;
 using SerpentineApi.Helpers;
 
 namespace SerpentineApi.Features.ChannelMemberFeatures.Queries;
@@ -88,7 +89,7 @@ internal class GetChannelMemberByChannelIdEndpoint : IEndpoint
     }
 }
 
-internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
+internal class GetByUserIdEndpointHandler(SerpentineDbContext context, ActiveUsersCache usersCache)
     : IEndpointHandler<
         GetChannelMembersByChannelIdRequest,
         OneOf<List<ChannelMemberResponse>, Failure>
@@ -99,7 +100,7 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
         CancellationToken cancellationToken = default
     )
     {
-        List<ChannelMember> channels = await context
+        List<ChannelMember> channelMembers = await context
             .ChannelMembers.AsNoTracking()
             .AsSplitQuery()
             .Where(ch => ch.ChannelId == request.ChannelId)
@@ -108,6 +109,13 @@ internal class GetByUserIdEndpointHandler(SerpentineDbContext context)
             .Take(request.Take)
             .ToListAsync(cancellationToken);
 
-        return channels.Select(ch => ch.ToResponse()).ToList();
+        var result = channelMembers.Select(ch => ch.ToResponse()).ToList();
+        
+        foreach (var channelMember in result)
+        {
+            channelMember.IsActive = usersCache.GetActivity(channelMember.UserId.ToString());
+        }
+
+        return result;
     }
 }

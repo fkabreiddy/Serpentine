@@ -13,6 +13,8 @@ export class ChannelMemberResponse extends BaseResponse {
   userUsername : string = "";
   userName : string = "";
   isAdmin: boolean = false;
+  isActive: boolean = false;
+
 
   constructor(init?: Partial<ChannelMemberResponse>) {
     super(init); 

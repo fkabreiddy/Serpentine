@@ -19,4 +19,6 @@ public class ChannelMemberResponse : BaseResponse
     public string UserUsername { get; set; } = "";
 
     public string UserName { get; set; } = "";
+
+    public bool IsActive { get; set; } = false;
 }

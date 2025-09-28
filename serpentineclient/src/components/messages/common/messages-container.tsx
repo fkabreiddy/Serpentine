@@ -47,7 +47,6 @@ export default function MessagesContainer({
   ); //leave this to a track the client state, the server state is in the lastAccess prop
 
 
-    const {unreadMessagesCount, getCountUnreadMessages, setUnreadMessagesCount} = useGetCountUnreadMessages();
   
   const { deletedMessageId, setDeletedMessageId } = useGlobalDataStore();
   const { user } = useAuthStore();
@@ -57,7 +56,6 @@ export default function MessagesContainer({
   const lastGroupIdRef = useRef<string>("");
   const lastReadMessageDateRef = useRef<string | null>(null);
   const {getDate} = useDateHelper();
-  const [fetchAfterPerformed, setFetchAfterPerformed] = useState(false);
   const creatingOrUpdatingAccess = useRef<boolean | null>(null);
   const observerRefTop = useRef<IntersectionObserver | null>(null);
   const observerRefBottom = useRef<IntersectionObserver | null>(null);
@@ -66,9 +64,6 @@ export default function MessagesContainer({
   const { playSubmit } = useUiSound();
 
 
-  async function fecthGetUnreadMessagesCount(groupId: string){
-      await getCountUnreadMessages({groupId: groupId});
-  }
 
   
   async function fetchCreateOrUpdateGroupAccess() {
@@ -126,7 +121,6 @@ export default function MessagesContainer({
       skip: messages?.length,
     });
 
-    setFetchAfterPerformed(true);
    
   };
 
@@ -183,14 +177,7 @@ export default function MessagesContainer({
     }
   },[groupId]);
 
-  useEffect(()=>{
-
-    if(fetchAfterPerformed && !hasMoreAfter && lastReadMessageDate === messages[0]?.createdAt){
-
-      setUnreadMessagesCount(0);
-    }
-
-  },[fetchAfterPerformed, hasMoreAfter, lastReadMessageDate])
+  
 
   useEffect(()=>{
 
@@ -244,11 +231,7 @@ export default function MessagesContainer({
 
     };
 
-
-    
-
     firstFetch();
-    fecthGetUnreadMessagesCount(groupId);
   }, [isMounted]);
 
   //other effects
@@ -301,7 +284,6 @@ export default function MessagesContainer({
         className=" flex flex-col-reverse h-fit w-[90%] pb-[40px]    "
         
       > 
-        {unreadMessagesCount > 0 && <UnreadMessagesCountBanner date={lastAccess?.lastReadMessageDate ?? new Date().toString()} count={unreadMessagesCount} />}
         {messages.map((message, idx) => {
 
           
@@ -430,13 +412,3 @@ const UnreadMessagesDivider = ({date}:{date: string}) => {
     </div>
   );};
 
-
-const UnreadMessagesCountBanner = ({count, date}: {count: number, date: string})=>{
-
-  return(
-
-    <div className="absolute px-3 py-2 flex items-center justify-between  w-full bg-pink-500/50 backdrop-blur-md z-[30] left-[0] text-white h-fit top-[76px]">
-      <p className="text-xs">You have {count} unread messages </p>
-    </div>
-  )
-}

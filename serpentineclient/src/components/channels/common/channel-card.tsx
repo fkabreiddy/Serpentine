@@ -19,11 +19,9 @@ import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 
 export default function ChannelCard({channel, allowFecthActiveUsers, showOptions = false}:{channel: ChannelResponse, allowFecthActiveUsers: boolean, showOptions?:boolean}){
 
-    const [isMounted, setIsMounted] = useState(false);
-    const firstRender = useRef(true);
     const { activeUsersCount, getChannelActiveMembersCount } =
         useActiveChannelsHubActions();
-        const {activeChannelsHubsState, activeChannelsHub} = useActiveChannelsHubStore();
+        const {activeChannelsHub, activeChannels} = useActiveChannelsHubStore();
 
 
     async function fetchGetActiveMembersCount(channelId: string){
@@ -35,13 +33,14 @@ export default function ChannelCard({channel, allowFecthActiveUsers, showOptions
 
     useEffect(()=>{
 
-      if( !allowFecthActiveUsers || !channel || !activeChannelsHub ) return;
-
+      if( !allowFecthActiveUsers || !channel || !activeChannelsHub  ) return;
+      if(!activeChannels.includes(channel.id)) return;
+      
       fetchGetActiveMembersCount(channel.id);
         
         
 
-    },[allowFecthActiveUsers, channel, activeChannelsHub])
+    },[allowFecthActiveUsers, channel, activeChannelsHub, activeChannels])
 
     return(
 

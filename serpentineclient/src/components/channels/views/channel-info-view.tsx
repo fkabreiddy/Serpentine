@@ -149,7 +149,7 @@ const UsersContainer: React.FC<UserContainerProps> = ({
 
   function handleOnUserKickedOut(channelMemberId: string) {
     setChannelMembers((prev) =>
-      channelMembers.filter((cm) => cm.id !== channelMemberId)
+      prev.filter((cm) => cm.id !== channelMemberId)
     );
   }
   const observeLastElement = useCallback(
@@ -199,6 +199,7 @@ const UsersContainer: React.FC<UserContainerProps> = ({
               onKickedOut={handleOnUserKickedOut}
               onUpdated={handleUserUpdated}
               myChannelMember={myMember}
+              
               channelMember={cm}
             />
 

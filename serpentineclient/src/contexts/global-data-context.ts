@@ -28,8 +28,6 @@ interface GlobalData {
   setNewMessageRecievedOnCurrentGroup: (message: MessageResponse | null) => void;
   messageToReplyTo: MessageResponse | null;
   setMessageToReplyTo: (message: MessageResponse | null)=>void
-  groupToUpdateId: string | null;
-  setGroupToUpdateId: (id: string | null)=>void;
   updatedGroup: GroupResponse | null;
   setUpdatedGroup: (group: GroupResponse | null) => void;
   deletedGroupId: string | null;
@@ -53,7 +51,6 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
   messageToReplyTo: null,
   updatedGroup: null,
   deletedGroupId: null,
-  groupToUpdateId: null,
 
 
   setDeletedChannelId: (id: string | null) => {
@@ -92,14 +89,14 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     }));
   },
 
-   setUpdatedChannel: (channel: ChannelResponse | null) => {
+  setUpdatedChannel: (channel: ChannelResponse | null) => {
     set((state) => ({
       ...state,
       updatedChannel: channel,
     }));
   },
 
-     setNewUnreadMessage: (message: MessageResponse | null) => {
+  setNewUnreadMessage: (message: MessageResponse | null) => {
     set((state) => ({
       ...state,
       newUnreadMessage: message,
@@ -140,15 +137,6 @@ export const useGlobalDataStore = create<GlobalData>((set) => ({
     set((state)=>({
         ...state,
         messageToReplyTo: message
-
-    }))
-  },
-
-  setGroupToUpdateId: (id: string | null) => {
-
-    set((state)=>({
-        ...state,
-        groupToUpdateId: id
 
     }))
   },

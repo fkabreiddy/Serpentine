@@ -2,6 +2,7 @@ import { ChannelResponse } from "@/models/responses/channel-response";
 import { ChannelBanner } from "./channel-banner";
 import ChannelCover from "./channel-cover";
 import {
+  Button,
   Chip,
   Popover,
   PopoverContent,
@@ -14,6 +15,7 @@ import IconButton from "@/components/common/icon-button";
 import { useCreateChannelMember } from "@/hooks/channel-member-hooks";
 import { useCallback, useEffect } from "react";
 import { showToast } from "@/helpers/sonner-helper";
+import ChannelCard from "./channel-card";
 
 export default function SearchChannelCard({
   channel,
@@ -56,17 +58,7 @@ export default function SearchChannelCard({
       key={channel.id}
       className="flex relative  px-2 rounded-lg   flex-col gap-2 w-full max-w-full "
     >
-      <div className="flex flex-col w-full gap-2 relative  mb-2">
-        <ChannelBanner
-          pictureUrl={channel?.bannerPicture ?? ""}
-        />
-        <ChannelCover
-          absolute={true}
-          isSmall={false}
-          pictureUrl={channel?.coverPicture ?? ""}
-          channelName={channel?.name ?? ""}
-        />
-      </div>
+      <ChannelCard channel={channel} allowFecthActiveUsers={false}  />
       <div className="flex items-center gap-3 w-full  justify-between">
         <div className="flex items-center gap-3">
           <IconButton
@@ -89,29 +81,29 @@ export default function SearchChannelCard({
                 <UserLock size={18} />
               </Tooltip>
             ) : (
-              <IconButton onClick={() => join()} tooltipText="Join">
+              <Button onPress={() => join()} className="bg-blue-600 text-white" disabled={joining} size="sm" radius="lg" >
                 {joining ? (
                   <Spinner size="sm" variant="spinner" />
                 ) : (
-                  <UserPlus2 size={18} />
+                  <p>Join</p>
                 )}
-              </IconButton>
+              </Button>
             )
           ) : (
-            <Tooltip
+            <Chip
               size="sm"
-              placement="bottom"
-              showArrow={true}
-              content="You've joined this channel"
+              variant="flat"
+              className="cursor-pointer"
+              color="success"
             >
-              <UserCheck2 size={18} />
-            </Tooltip>
+              <p className="text-xs ">
+                Joined
+              </p>
+            </Chip>
           )}
         </div>
 
-        <p className="text-[13px] font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
-          #{channel.name}
-        </p>
+       
       </div>
       <p className="text-xs my-3 opacity-70 line-clamp-3">
         <strong>Description: </strong>

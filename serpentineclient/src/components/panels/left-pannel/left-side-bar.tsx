@@ -155,7 +155,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = () => {
 
           {layout.sideBarExpanded && (
             <SearchBar
-            searchButton={true}
+            searchButton={false}
               placeholder={"Search on your things..."}
               width="100%"
               onSearch={setFilter}

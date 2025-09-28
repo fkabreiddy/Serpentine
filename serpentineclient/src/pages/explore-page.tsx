@@ -5,6 +5,7 @@ import WarmBeigeBg from "@/components/common/warm-beige-bg";
 import { useAuthStore } from "@/contexts/authentication-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 import { useGetManyChannelsByNameOrId } from "@/hooks/channel-hooks";
 import { ChannelResponse } from "@/models/responses/channel-response";
 import { RightPanelView } from "@/models/right-panel-view";
@@ -95,9 +96,10 @@ interface ChannelsResultsProps {
 }
 const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
 
+  const {rightPanelData, setRightPanelViewData} = useRightPanelViewData();
   const {setChannelJoined} = useGlobalDataStore();
 
-  const {setChannelInfoId} = useGlobalDataStore();
+
   const { setLayout } = useLayoutStore();
   const {user} = useAuthStore();
 
@@ -121,9 +123,18 @@ const ChannelsResults = ({ filter = "" }: ChannelsResultsProps) => {
     
     function handleOnInfoClicked(channelId:string){
 
-        setChannelInfoId(channelId);
-        setLayout({currentRightPanelView: RightPanelView.ChannelInfo});
+        setRightPanelViewData({channelInfoId: channelId});
     }
+
+
+    useEffect(()=>{
+
+      if(rightPanelData.channelInfoId)
+      {
+        setLayout({currentRightPanelView: RightPanelView.ChannelInfo});
+
+      }
+    },[rightPanelData.channelInfoId])
 
 if(loadingChannels) return <div className="flex   w-full justify-center"> <Spinner size="sm" variant="spinner"/></div>;
   return (

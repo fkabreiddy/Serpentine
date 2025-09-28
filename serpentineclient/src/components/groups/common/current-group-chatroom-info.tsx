@@ -3,6 +3,7 @@ import IconButton from "@/components/common/icon-button";
 import { useActiveChannelsHubStore } from "@/contexts/active-channels-hub-context";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
 import { useLayoutStore } from "@/contexts/layout-context";
+import { useRightPanelViewData } from "@/contexts/right-panel-view-data";
 import { useDeleteGroup } from "@/hooks/group-hooks";
 import { ChannelMemberResponse } from "@/models/responses/channel-member-response";
 import { GroupResponse } from "@/models/responses/group-response";
@@ -73,19 +74,19 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
 }) => {
 
   const {layout, setLayout} = useLayoutStore();
-  const {groupToUpdateId, setGroupToUpdateId} = useGlobalDataStore();
+  const {setRightPanelViewData, rightPanelData} = useRightPanelViewData();
   const [deleteGroupModalOpen, setDeleteGroupModalOpen] = useState<boolean>(false);
 
  
 
   useEffect(()=>{
 
-    if(groupToUpdateId)
+    if(rightPanelData.groupIdToUpdate)
     {
       setLayout({currentRightPanelView: RightPanelView.UpdateGroupFormView})
     }
 
-  },[groupToUpdateId])
+  },[rightPanelData.groupIdToUpdate])
 
 
   
@@ -125,7 +126,7 @@ const OptionsDropdown: React.FC<{ group: GroupResponse, membership: ChannelMembe
            {(membership.isAdmin ||
                membership.isOwner) && (
                <DropdownSection showDivider={true} title={"Actions"}>
-                 <DropdownItem textValue="edit" onClick={()=>{setGroupToUpdateId(group.id);}} key="edit" endContent={<Edit3Icon size={16} />}>
+                 <DropdownItem textValue="edit" onClick={()=>{setRightPanelViewData({groupIdToUpdate: group.id});}} key="edit" endContent={<Edit3Icon size={16} />}>
                    <p className="font-normal text-[13px]">Edit this Group</p>
                  </DropdownItem>
                </DropdownSection>
