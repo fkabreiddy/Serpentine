@@ -13,7 +13,7 @@ import { MessageCircle } from "lucide-react";
 import { GroupAccessResponse } from "@/models/responses/group-access-response";
 import { useCreateOrUpdateGroupAccess } from "@/hooks/group-access-hooks";
 import { useGlobalDataStore } from "@/contexts/global-data-context";
-import { useDateHelper } from "@/helpers/relative-date-helper";
+import { useDateHelper, useLocalDateHelper } from "@/helpers/relative-date-helper";
 
 
 
@@ -55,6 +55,7 @@ export default function MessagesContainer({
   const firstRender = useRef(true);
   const lastGroupIdRef = useRef<string>("");
   const lastReadMessageDateRef = useRef<string | null>(null);
+  const {utcToLocal} = useLocalDateHelper();
   const {getDate} = useDateHelper();
   const creatingOrUpdatingAccess = useRef<boolean | null>(null);
   const observerRefTop = useRef<IntersectionObserver | null>(null);
@@ -354,30 +355,16 @@ export default function MessagesContainer({
 
 
 function MessageDateDivider({ date }: {date: string}) {
-  const { getDate } = useDateHelper();
+  const {humanizedDate} = useLocalDateHelper();
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  
   return (
     <div className="flex gap-3 w-full items-center opacity-60">
        <div className="flex  w-full items-center justify-end ">
           <hr className="w-[30px] border-2 border-neutral-300 rounded-l-full dark:border-neutral-800" />
           <p className="text-[13px] whitespace-nowrap bg-neutral-300 dark:bg-neutral-800  px-2 rounded-md">
             {" "}
-            {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
-            {getDate(date).year}
+            {humanizedDate(date)}
           </p>
       </div>
     </div>
@@ -385,29 +372,15 @@ function MessageDateDivider({ date }: {date: string}) {
 }
 
 const UnreadMessagesDivider = ({date}:{date: string}) => {
-  const { getDate } = useDateHelper();
+  const { humanizedDate } = useLocalDateHelper();
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  
   return (
     <div className="flex  w-full items-center justify-end">
       <hr className="w-[30px] border-2 border-blue-600 rounded-l-full " />
       <p className="text-[13px] whitespace-nowrap bg-blue-600 text-white px-2 rounded-md"> New since
-        {" "}
-        {monthNames[getDate(date).month - 1]} {getDate(date).day},{" "}
-        {getDate(date).year}  at {getDate(date).hour}:{getDate(date).minute}
+        {" "}{humanizedDate(date)}
+      
       </p>
     </div>
   );};

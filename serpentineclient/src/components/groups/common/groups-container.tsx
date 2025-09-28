@@ -258,7 +258,7 @@ export default function GroupsContainer({
           </div>
           
           {!loadingGroups && groups.length <= 0 && (
-            <span className={"text-xs opacity-50"}>
+            <span className={"text-xs text-center opacity-50"}>
               No groups found on this channel (T_T)
             </span>
           )}

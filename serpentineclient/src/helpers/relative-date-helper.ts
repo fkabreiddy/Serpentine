@@ -1,5 +1,12 @@
 import { CalendarDate } from "@heroui/react";
 import { CalendarDateTime, parseDateTime, parseZonedDateTime, ZonedDateTime } from "@internationalized/date";
+import dayjs, { Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+// habilitamos plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const useDateHelper = () =>{
 
@@ -17,26 +24,63 @@ export const useDateHelper = () =>{
     return "just now";
   }
 
-  const getDate = (iso:string) : CalendarDateTime | ZonedDateTime=>{
+  const getDate = (iso: string) : Dayjs => {
 
-    try{
-
-      if(iso.endsWith("Z"))
-      {
-        iso = iso.replace("Z", "");
-      }
-      return parseDateTime(iso);
-    }catch{
-      return  parseZonedDateTime(iso);
-    }
+    return dayjs(iso);
   }
 
   
 
   return{
-
-    getRelativeDate,
     getDate,
+    getRelativeDate,
   }
 }
 
+export const useLocalDateHelper = () =>{
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const utcToLocal = (
+    date: string | Date | dayjs.Dayjs,
+    
+  ): Dayjs => {
+    return dayjs.utc(date).local()
+  }
+
+  const humanizedDate = (date: string) : string =>{
+    return `${monthNames[utcToLocal(date).month() - 1]} ${utcToLocal(date).date()},
+            ${utcToLocal(date).year()}`;
+  }
+
+  const humanizedDateTime = (date: string) : string =>{
+    return `${monthNames[utcToLocal(date).month() - 1]} ${utcToLocal(date).date()},
+            ${utcToLocal(date).year()} at ${utcToLocal(date).hour()}:${utcToLocal(date).hour()}`;
+  }
+
+   const humanizedTime = (date: string) : string =>{
+    return `${utcToLocal(date).hour()}:${utcToLocal(date).hour()}`;
+  }
+
+
+  return {
+
+    utcToLocal,
+    humanizedDate,
+    humanizedDateTime,
+    humanizedTime
+  }
+}

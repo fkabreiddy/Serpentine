@@ -1,5 +1,5 @@
 import UserAvatar from "@/components/users/common/user-avatar";
-import { useDateHelper } from "@/helpers/relative-date-helper";
+import { useDateHelper, useLocalDateHelper } from "@/helpers/relative-date-helper";
 import { MessageResponse } from "@/models/responses/message-response";
 import { motion } from "framer-motion";
 import {
@@ -91,7 +91,7 @@ const MessageBubbleCard = ({
   lastReadMessageDate: string;
   onUpdateLastSeenMessageDate: (date: string) => void;
 }) => {
-  const { getDate } = useDateHelper();
+  const { humanizedDateTime, humanizedTime} = useLocalDateHelper();
 
   const [clicked, setClicked] = useState(false);
   const isMobile = useIsMobile()
@@ -139,7 +139,7 @@ useEffect(() => {
       {isTheSameSender ? 
             <>
               <div className="absolute top-1/2 -translate-y-1/2  dark:bg-neutral-950 bg-neutral-300  group-hover:flex hidden rounded-full px-2  items-center justify-center transition-all">
-                <label className="text-[10]">{getDate(message.createdAt).hour}:{getDate(message.createdAt).minute}</label>
+                <label className="text-[10]">{humanizedTime(message.createdAt)}</label>
 
               </div>
              <div className="dark:border-neutral-950 border-neutral-300  border-2 h-full  "/> 
@@ -147,7 +147,7 @@ useEffect(() => {
             </>
             :
               <>
-            
+                
                 {message.isNotification ? (
                   <div className="size-[28px] shrink-0 bg-yellow-500 text-white rounded-full flex justify-center items-center">
                     <MessageCircleIcon className="size-[16px] fill-white" />
@@ -165,7 +165,7 @@ useEffect(() => {
       
       <div  className={`w-full  flex flex-col items-start gap-1 ${isTheSameSender && ""}`}>
         <div className={"w-full   flex gap-3 items-start opacity-50   "}>
-          
+         
           {isTheSameSender || <>
           
             {!message.isNotification ? (
@@ -179,8 +179,7 @@ useEffect(() => {
               )}
 
                <label className={`text-[13px] font-normal ${isTheSameSender && "hidden group-hover:block"}`}>
-                {getDate(message.createdAt).hour}:
-                {getDate(message.createdAt).minute}
+                {humanizedDateTime(message.createdAt)}
               </label>
           </>}
         
@@ -262,6 +261,7 @@ const MessageDropdown = ({
   const { deleteMessage, deletingMessage } = useDeleteMessage();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const { setMessageToReplyTo } = useGlobalDataStore();
+  const { humanizedDateTime} = useLocalDateHelper();
 
   async function fetchDelete() {
     await deleteMessage({ messageId: message.id });
@@ -315,9 +315,7 @@ const MessageDropdown = ({
               </p>
               <p className="font-normal text-xs opacity-60">
                 {" "}
-                on {getDate(message.createdAt).month}/
-                {getDate(message.createdAt).day}/
-                {getDate(message.createdAt).year}
+                on {humanizedDateTime(message.createdAt)}
               </p>
             </DropdownItem>
           </DropdownSection>
